@@ -9,8 +9,31 @@ public struct Exercise: Decodable, Equatable, Sendable {
     public let equipment: [String]
     public let repRange: [Int]
     public let incrementKg: Double
+    public let incrementLb: Double
     public let sets: Int
     public let detectable: Bool
+
+    /// Smallest weight jump for this exercise in the given unit.
+    public func increment(in unit: WeightUnit) -> Double {
+        unit == .kg ? incrementKg : incrementLb
+    }
+}
+
+/// The unit the user lifts in. History is always stored in kg; plans come out in this unit.
+public enum WeightUnit: String, Codable, Sendable {
+    case kg, lb
+
+    static let kgPerLb = 0.45359237
+
+    /// kg -> this unit, to 2 decimals so a set logged as 135 lb comes back as exactly 135.
+    public func fromKg(_ kg: Double) -> Double {
+        self == .kg ? kg : (kg / Self.kgPerLb * 100).rounded(.toNearestOrEven) / 100
+    }
+
+    /// This unit -> kg, for saving to history.
+    public func toKg(_ weight: Double) -> Double {
+        self == .kg ? weight : weight * Self.kgPerLb
+    }
 }
 
 /// A kind of gym equipment the user can say their gym has.
@@ -82,12 +105,12 @@ public struct PlannedExercise: Equatable, Sendable {
     public let name: String
     public let detectable: Bool
     public internal(set) var sets: Int
-    /// nil means first time: the user picks a starting weight.
-    public let weightKg: Double?
+    /// In the workout's unit. nil means first time: the user picks a starting weight.
+    public let weight: Double?
     public let targetReps: Int
     public let reason: String
-    /// Weight step for this exercise (e.g. 2.5 kg for a barbell), used by the weight picker.
-    public let incrementKg: Double
+    /// Weight step for this exercise in the workout's unit (e.g. 2.5 kg or 5 lb for a barbell).
+    public let increment: Double
     let kind: String
 }
 
@@ -98,6 +121,7 @@ public struct SkippedItem: Equatable, Sendable {
 
 public struct Workout: Equatable, Sendable {
     public let sessionType: String
+    public let unit: WeightUnit
     public let estimatedMinutes: Int
     public let exercises: [PlannedExercise]
     public let skipped: [SkippedItem]

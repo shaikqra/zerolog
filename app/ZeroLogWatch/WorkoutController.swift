@@ -22,7 +22,7 @@ final class WorkoutController {
     }
 
     func confirm(weightKg: Double, reps: Int) {
-        active?.confirmSet(weightKg: weightKg, reps: reps)
+        active?.confirmSet(weight: weightKg, reps: reps)
     }
 
     func skipExercise() {

@@ -7,8 +7,10 @@ struct WorkoutView: View {
     @State private var weight = 20.0
     @State private var reps = 8
 
-    /// Starting weight when there's no history: an empty barbell.
-    private let defaultWeightKg = 20.0
+    /// Starting weight when there's no history: an empty barbell (20 kg or 45 lb).
+    private func startingWeight(_ unit: WeightUnit) -> Double {
+        unit == .lb ? 45 : 20
+    }
 
     var body: some View {
         NavigationStack {
@@ -37,8 +39,8 @@ struct WorkoutView: View {
                 Stepper(value: $reps, in: 1...50) {
                     LabeledContent("Reps", value: "\(reps)")
                 }
-                Stepper(value: $weight, in: 0...400, step: item.incrementKg) {
-                    LabeledContent("Weight", value: "\(weight.formatted()) kg")
+                Stepper(value: $weight, in: 0...1000, step: item.increment) {
+                    LabeledContent("Weight", value: "\(weight.formatted()) \(active.plan.unit.rawValue)")
                 }
             }
         }
@@ -54,7 +56,7 @@ struct WorkoutView: View {
         }
         .safeAreaInset(edge: .bottom) {
             Button {
-                model.confirm(weightKg: weight, reps: reps)
+                model.confirm(weight: weight, reps: reps)
             } label: {
                 Label("Confirm set", systemImage: "checkmark")
                     .frame(maxWidth: .infinity)
@@ -65,7 +67,7 @@ struct WorkoutView: View {
         }
         // Refill reps and weight whenever a new set starts.
         .task(id: "\(active.exerciseIndex)-\(active.setNumber)") {
-            weight = active.suggestedWeightKg ?? defaultWeightKg
+            weight = active.suggestedWeight ?? startingWeight(active.plan.unit)
             reps = active.suggestedReps
         }
     }

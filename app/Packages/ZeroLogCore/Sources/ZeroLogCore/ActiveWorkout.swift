@@ -24,19 +24,23 @@ public struct ActiveWorkout: Equatable, Sendable {
         setNumber == 1 ? [] : logged.last?.sets ?? []
     }
 
-    /// Pre-filled weight for the next set: what you just lifted, else the plan. nil = first time, user picks.
-    public var suggestedWeightKg: Double? { setsDoneForCurrent.last?.weightKg ?? current?.weightKg }
+    /// Pre-filled weight for the next set, in the plan's unit: what you just lifted, else the plan.
+    /// nil = first time, user picks.
+    public var suggestedWeight: Double? {
+        setsDoneForCurrent.last.map { plan.unit.fromKg($0.weightKg) } ?? current?.weight
+    }
 
     /// Pre-filled reps for the next set: what you just did, else the target.
     public var suggestedReps: Int { setsDoneForCurrent.last?.reps ?? current?.targetReps ?? 0 }
 
     public var totalSetsLogged: Int { logged.reduce(0) { $0 + $1.sets.count } }
 
-    /// Records one set and moves on. Returns false and changes nothing for impossible values.
+    /// Records one set (weight in the plan's unit; history keeps kg) and moves on.
+    /// Returns false and changes nothing for impossible values.
     @discardableResult
-    public mutating func confirmSet(weightKg: Double, reps: Int) -> Bool {
-        guard let current, reps > 0, weightKg >= 0 else { return false }
-        let set = LoggedSet(weightKg: weightKg, reps: reps)
+    public mutating func confirmSet(weight: Double, reps: Int) -> Bool {
+        guard let current, reps > 0, weight >= 0 else { return false }
+        let set = LoggedSet(weightKg: plan.unit.toKg(weight), reps: reps)
         if setNumber == 1 {
             logged.append(LoggedExercise(exerciseId: current.exerciseId, sets: [set]))
         } else {

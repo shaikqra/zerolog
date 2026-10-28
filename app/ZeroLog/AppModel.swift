@@ -6,8 +6,11 @@ import ZeroLogCore
 struct UserSettings: Codable, Equatable {
     var equipment: Set<String>
     var minutes: Int
+    var unit: WeightUnit
 
-    static let fallback = UserSettings(equipment: [], minutes: 45)
+    /// Pounds on US phones, kilograms everywhere else (UK gyms use kg).
+    static let fallback = UserSettings(equipment: [], minutes: 45,
+                                       unit: Locale.current.measurementSystem == .us ? .lb : .kg)
 }
 
 /// The phone app's state: settings, saved history, today's plan and the workout in progress.
@@ -56,8 +59,8 @@ final class AppModel {
         active = ActiveWorkout(plan: plan, date: Today.dateString())
     }
 
-    func confirm(weightKg: Double, reps: Int) {
-        active?.confirmSet(weightKg: weightKg, reps: reps)
+    func confirm(weight: Double, reps: Int) {
+        active?.confirmSet(weight: weight, reps: reps)
     }
 
     func skipExercise() {
@@ -102,6 +105,6 @@ final class AppModel {
         }
         let current = settings ?? .fallback
         plan = Engine.generateWorkout(catalog: catalog, gymEquipment: current.equipment,
-                                      minutes: current.minutes, history: history)
+                                      minutes: current.minutes, history: history, unit: current.unit)
     }
 }

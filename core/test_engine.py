@@ -3,7 +3,7 @@
 import json
 import unittest
 
-from engine import generate_workout, load_catalog, next_session_type
+from engine import KG_PER_LB, generate_workout, load_catalog, next_session_type
 
 CATALOG = load_catalog()
 FULL_GYM = {"barbell", "bench", "rack", "dumbbells", "cable", "lat_pulldown", "leg_press"}
@@ -66,31 +66,31 @@ class Progression(unittest.TestCase):
     def test_first_time_has_no_weight_and_explains_why(self):
         w = generate_workout(CATALOG, FULL_GYM, 60, [], session_type="push")
         bench = find(w, "bench_press")
-        self.assertIsNone(bench["weight_kg"])
+        self.assertIsNone(bench["weight"])
         self.assertIn("First time", bench["reason"])
 
     def test_top_of_range_on_every_set_adds_weight(self):
         history = [session("2026-10-21", "push", "bench_press", 60, [10, 10, 10])]
         bench = find(generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push"), "bench_press")
-        self.assertEqual(bench["weight_kg"], 62.5)
+        self.assertEqual(bench["weight"], 62.5)
         self.assertEqual(bench["target_reps"], 6)
 
     def test_otherwise_holds_weight_and_aims_one_rep_higher(self):
         history = [session("2026-10-21", "push", "bench_press", 60, [9, 8, 7])]
         bench = find(generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push"), "bench_press")
-        self.assertEqual(bench["weight_kg"], 60)
+        self.assertEqual(bench["weight"], 60)
         self.assertEqual(bench["target_reps"], 8)
 
     def test_two_misses_in_a_row_drops_about_ten_percent(self):
         history = [session("2026-10-17", "push", "bench_press", 60, [6, 5, 4]),
                    session("2026-10-21", "push", "bench_press", 60, [6, 5, 5])]
         bench = find(generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push"), "bench_press")
-        self.assertEqual(bench["weight_kg"], 52.5)  # 54 kg rounded down to the 2.5 kg step
+        self.assertEqual(bench["weight"], 52.5)  # 54 kg rounded down to the 2.5 kg step
 
     def test_one_miss_alone_does_not_deload(self):
         history = [session("2026-10-21", "push", "bench_press", 60, [6, 5, 5])]
         bench = find(generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push"), "bench_press")
-        self.assertEqual(bench["weight_kg"], 60)
+        self.assertEqual(bench["weight"], 60)
 
 
 class Recovery(unittest.TestCase):
@@ -98,13 +98,40 @@ class Recovery(unittest.TestCase):
         history = [session("2026-10-21", "push", "bench_press", 60, [10, 10, 10])]
         bench = find(generate_workout(CATALOG, FULL_GYM, 60, history, recovery="low", session_type="push"),
                      "bench_press")
-        self.assertEqual(bench["weight_kg"], 60)
+        self.assertEqual(bench["weight"], 60)
         self.assertEqual(bench["sets"], 2)
         self.assertIn("recovery is low", bench["reason"])
 
     def test_unknown_recovery_value_is_rejected(self):
         with self.assertRaises(ValueError):
             generate_workout(CATALOG, FULL_GYM, 60, [], recovery="tired")
+
+
+class Units(unittest.TestCase):
+    def test_pounds_progress_in_pound_steps(self):
+        history = [session("2026-10-21", "push", "bench_press", 135 * KG_PER_LB, [10, 10, 10])]
+        w = generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push", unit="lb")
+        bench = find(w, "bench_press")
+        self.assertEqual(w["unit"], "lb")
+        self.assertEqual(bench["weight"], 140)
+        self.assertEqual(bench["reason"], "You hit 10 reps on every set last time: +5 lb.")
+
+    def test_switching_units_snaps_to_a_loadable_weight(self):
+        history = [session("2026-10-21", "push", "bench_press", 60, [9, 8, 7])]  # 60 kg = 132.28 lb
+        bench = find(generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push", unit="lb"),
+                     "bench_press")
+        self.assertEqual(bench["weight"], 130)
+
+    def test_deload_in_pounds_rounds_down_to_a_pound_step(self):
+        history = [session("2026-10-17", "push", "bench_press", 135 * KG_PER_LB, [6, 5, 4]),
+                   session("2026-10-21", "push", "bench_press", 135 * KG_PER_LB, [6, 5, 5])]
+        bench = find(generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push", unit="lb"),
+                     "bench_press")
+        self.assertEqual(bench["weight"], 120)  # 121.5 lb rounded down to the 5 lb step
+
+    def test_unknown_unit_is_rejected(self):
+        with self.assertRaises(ValueError):
+            generate_workout(CATALOG, FULL_GYM, 60, [], unit="stone")
 
 
 class Time(unittest.TestCase):

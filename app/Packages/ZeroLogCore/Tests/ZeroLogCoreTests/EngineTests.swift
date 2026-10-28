@@ -18,9 +18,9 @@ final class EngineTests: XCTestCase {
     }
 
     private func workout(minutes: Int = 60, history: [Session] = [], recovery: Recovery = .normal,
-                         type: String? = "push", gym: Set<String>? = nil) -> Workout {
+                         type: String? = "push", gym: Set<String>? = nil, unit: WeightUnit = .kg) -> Workout {
         Engine.generateWorkout(catalog: catalog, gymEquipment: gym ?? fullGym, minutes: minutes,
-                               history: history, recovery: recovery, sessionType: type)
+                               history: history, recovery: recovery, sessionType: type, unit: unit)
     }
 
     private func find(_ workout: Workout, _ id: String) throws -> PlannedExercise {
@@ -86,14 +86,14 @@ final class EngineTests: XCTestCase {
 
     func testFirstTimeHasNoWeightAndExplainsWhy() throws {
         let bench = try find(workout(), "bench_press")
-        XCTAssertNil(bench.weightKg)
+        XCTAssertNil(bench.weight)
         XCTAssertTrue(bench.reason.contains("First time"))
     }
 
     func testTopOfRangeOnEverySetAddsWeight() throws {
         let bench = try find(workout(history: [session("2026-10-21", "push", "bench_press", 60, [10, 10, 10])]),
                              "bench_press")
-        XCTAssertEqual(bench.weightKg, 62.5)
+        XCTAssertEqual(bench.weight, 62.5)
         XCTAssertEqual(bench.targetReps, 6)
         XCTAssertEqual(bench.reason, "You hit 10 reps on every set last time: +2.5 kg.")
     }
@@ -101,20 +101,20 @@ final class EngineTests: XCTestCase {
     func testOtherwiseHoldsWeightAndAimsOneRepHigher() throws {
         let bench = try find(workout(history: [session("2026-10-21", "push", "bench_press", 60, [9, 8, 7])]),
                              "bench_press")
-        XCTAssertEqual(bench.weightKg, 60)
+        XCTAssertEqual(bench.weight, 60)
         XCTAssertEqual(bench.targetReps, 8)
     }
 
     func testTwoMissesInARowDropsAboutTenPercent() throws {
         let history = [session("2026-10-17", "push", "bench_press", 60, [6, 5, 4]),
                        session("2026-10-21", "push", "bench_press", 60, [6, 5, 5])]
-        XCTAssertEqual(try find(workout(history: history), "bench_press").weightKg, 52.5)
+        XCTAssertEqual(try find(workout(history: history), "bench_press").weight, 52.5)
     }
 
     func testOneMissAloneDoesNotDeload() throws {
         let bench = try find(workout(history: [session("2026-10-21", "push", "bench_press", 60, [6, 5, 5])]),
                              "bench_press")
-        XCTAssertEqual(bench.weightKg, 60)
+        XCTAssertEqual(bench.weight, 60)
     }
 
     // MARK: Recovery
@@ -122,9 +122,33 @@ final class EngineTests: XCTestCase {
     func testLowRecoveryHoldsWeightAndCutsASet() throws {
         let history = [session("2026-10-21", "push", "bench_press", 60, [10, 10, 10])]
         let bench = try find(workout(history: history, recovery: .low), "bench_press")
-        XCTAssertEqual(bench.weightKg, 60)
+        XCTAssertEqual(bench.weight, 60)
         XCTAssertEqual(bench.sets, 2)
         XCTAssertTrue(bench.reason.contains("recovery is low"))
+    }
+
+    // MARK: Units
+
+    func testPoundsProgressInPoundSteps() throws {
+        let w = workout(history: [session("2026-10-21", "push", "bench_press", 135 * 0.45359237, [10, 10, 10])],
+                        unit: .lb)
+        let bench = try find(w, "bench_press")
+        XCTAssertEqual(w.unit, .lb)
+        XCTAssertEqual(bench.weight, 140)
+        XCTAssertEqual(bench.increment, 5)
+        XCTAssertEqual(bench.reason, "You hit 10 reps on every set last time: +5 lb.")
+    }
+
+    func testSwitchingUnitsSnapsToALoadableWeight() throws {
+        // 60 kg = 132.28 lb
+        let w = workout(history: [session("2026-10-21", "push", "bench_press", 60, [9, 8, 7])], unit: .lb)
+        XCTAssertEqual(try find(w, "bench_press").weight, 130)
+    }
+
+    func testDeloadInPoundsRoundsDownToAPoundStep() throws {
+        let history = [session("2026-10-17", "push", "bench_press", 135 * 0.45359237, [6, 5, 4]),
+                       session("2026-10-21", "push", "bench_press", 135 * 0.45359237, [6, 5, 5])]
+        XCTAssertEqual(try find(workout(history: history, unit: .lb), "bench_press").weight, 120)
     }
 
     // MARK: Time

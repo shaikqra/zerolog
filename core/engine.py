@@ -8,6 +8,8 @@ History format (oldest session first):
     [{"date": "2026-10-20", "session_type": "push",
       "exercises": [{"exercise_id": "bench_press",
                      "sets": [{"weight_kg": 60, "reps": 8}, ...]}]}]
+
+History is always stored in kg. Plans come out in the user's unit ("kg" or "lb").
 """
 
 import json
@@ -21,6 +23,7 @@ WORK_SECONDS_PER_SET = 45
 REST_SECONDS = {"compound": 150, "isolation": 90}
 MIN_SETS = 2
 DELOAD_FACTOR = 0.9
+KG_PER_LB = 0.45359237
 
 
 def load_catalog(path=DATA_FILE):
@@ -38,9 +41,11 @@ def next_session_type(catalog, history):
     return order[(order.index(last) + 1) % len(order)]
 
 
-def generate_workout(catalog, gym_equipment, minutes, history, recovery="normal", session_type=None):
+def generate_workout(catalog, gym_equipment, minutes, history, recovery="normal", session_type=None, unit="kg"):
     if recovery not in ("normal", "low"):
         raise ValueError("recovery must be 'normal' or 'low'")
+    if unit not in ("kg", "lb"):
+        raise ValueError("unit must be 'kg' or 'lb'")
     session_type = session_type or next_session_type(catalog, history)
 
     # 1. Pick one exercise per movement slot, using only this gym's equipment.
@@ -53,13 +58,14 @@ def generate_workout(catalog, gym_equipment, minutes, history, recovery="normal"
             skipped.append({"name": pattern, "reason": "No equipment for this movement at this gym"})
 
     # 2. Decide weight, reps and sets for each one from past sessions.
-    plan = [_prescribe(ex, history, recovery) for ex in chosen]
+    plan = [_prescribe(ex, history, recovery, unit) for ex in chosen]
 
     # 3. Shrink the workout until it fits the time available.
     _fit_to_time(plan, minutes, skipped)
 
     return {
         "session_type": session_type,
+        "unit": unit,
         "estimated_minutes": round(_estimate_seconds(plan) / 60),
         "exercises": [{k: v for k, v in item.items() if k != "kind"} for item in plan],
         "skipped": skipped,
@@ -94,24 +100,35 @@ def _sessions_with(history, exercise_id):
     return found
 
 
+def to_unit(kg, unit):
+    """kg -> the user's unit, to 2 decimals so a set logged as 135 lb comes back as exactly 135."""
+    return kg if unit == "kg" else round(kg / KG_PER_LB, 2)
+
+
+def _in_unit(sets, unit, inc):
+    """Past sets in the user's unit, snapped to the nearest weight they can load.
+    This is what makes switching between kg and lb give sensible plates."""
+    return [{"weight": _round(to_unit(s["weight_kg"], unit), inc), "reps": s["reps"]} for s in sets]
+
+
 def _working_weight(sets):
-    return max(s["weight_kg"] for s in sets)
+    return max(s["weight"] for s in sets)
 
 
 def _reps_at(sets, weight):
-    return [s["reps"] for s in sets if s["weight_kg"] == weight]
+    return [s["reps"] for s in sets if s["weight"] == weight]
 
 
-def _prescribe(ex, history, recovery):
+def _prescribe(ex, history, recovery, unit):
     low, high = ex["rep_range"]
-    inc = ex["increment_kg"]
+    inc = ex["increment_kg"] if unit == "kg" else ex["increment_lb"]
     sets = ex["sets"] if recovery == "normal" else max(MIN_SETS, ex["sets"] - 1)
     item = {"exercise_id": ex["id"], "name": ex["name"], "kind": ex["kind"],
             "detectable": ex["detectable"], "sets": sets}
 
-    past = _sessions_with(history, ex["id"])
+    past = [_in_unit(sets, unit, inc) for sets in _sessions_with(history, ex["id"])]
     if not past:
-        item.update(weight_kg=None, target_reps=low,
+        item.update(weight=None, target_reps=low,
                     reason=f"First time: pick a weight you can lift for {low}-{high} reps with 2 to spare.")
         return item
 
@@ -120,11 +137,11 @@ def _prescribe(ex, history, recovery):
 
     if min(reps) >= high:
         if recovery == "low":
-            item.update(weight_kg=weight, target_reps=high,
-                        reason=f"You earned an increase, but recovery is low today: holding at {weight:g} kg.")
+            item.update(weight=weight, target_reps=high,
+                        reason=f"You earned an increase, but recovery is low today: holding at {weight:g} {unit}.")
         else:
-            item.update(weight_kg=_round(weight + inc, inc), target_reps=low,
-                        reason=f"You hit {high} reps on every set last time: +{inc:g} kg.")
+            item.update(weight=_round(weight + inc, inc), target_reps=low,
+                        reason=f"You hit {high} reps on every set last time: +{inc:g} {unit}.")
         return item
 
     missed_last = min(reps) < low
@@ -135,12 +152,12 @@ def _prescribe(ex, history, recovery):
     )
     if missed_last and missed_before:
         new_weight = math.floor(weight * DELOAD_FACTOR / inc) * inc
-        item.update(weight_kg=_round(new_weight, inc), target_reps=low,
+        item.update(weight=_round(new_weight, inc), target_reps=low,
                     reason=f"Missed {low} reps two sessions running: dropping about 10% to rebuild.")
         return item
 
     target = min(high, min(reps) + 1)
-    item.update(weight_kg=weight, target_reps=target,
+    item.update(weight=weight, target_reps=target,
                 reason=f"Same weight as last time; aim for {target} reps per set.")
     return item
 

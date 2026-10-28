@@ -46,12 +46,15 @@ struct SessionDetailView: View {
     @Environment(AppModel.self) private var model
     let session: Session
 
+    /// History is stored in kg; show it in the unit the user picked.
+    private var unit: WeightUnit { model.settings?.unit ?? .kg }
+
     var body: some View {
         List {
             ForEach(session.exercises, id: \.exerciseId) { logged in
                 Section(model.exerciseName(logged.exerciseId)) {
                     ForEach(Array(logged.sets.enumerated()), id: \.offset) { index, set in
-                        LabeledContent("Set \(index + 1)", value: "\(set.reps) × \(set.weightKg.formatted()) kg")
+                        LabeledContent("Set \(index + 1)", value: "\(set.reps) × \(unit.fromKg(set.weightKg).formatted()) \(unit.rawValue)")
                     }
                 }
             }

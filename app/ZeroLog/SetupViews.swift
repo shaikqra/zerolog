@@ -6,6 +6,7 @@ struct OnboardingView: View {
     @Environment(AppModel.self) private var model
     @State private var equipment: Set<String> = []
     @State private var minutes = 45
+    @State private var unit = UserSettings.fallback.unit
 
     var body: some View {
         NavigationStack {
@@ -17,9 +18,12 @@ struct OnboardingView: View {
                 Section("How long do you usually train?") {
                     MinutesPicker(minutes: $minutes)
                 }
+                Section("Weights in") {
+                    UnitPicker(unit: $unit)
+                }
                 Section {
                     Button("Plan my first workout") {
-                        model.updateSettings(UserSettings(equipment: equipment, minutes: minutes))
+                        model.updateSettings(UserSettings(equipment: equipment, minutes: minutes, unit: unit))
                     }
                     .disabled(equipment.isEmpty)
                 } footer: {
@@ -48,6 +52,13 @@ struct SettingsView: View {
                 EquipmentSection(types: model.catalog?.equipmentTypes ?? [], selected: setting(\.equipment))
                 Section("Session length") {
                     MinutesPicker(minutes: setting(\.minutes))
+                }
+                Section {
+                    UnitPicker(unit: setting(\.unit))
+                } header: {
+                    Text("Weights in")
+                } footer: {
+                    Text("Past workouts convert automatically.")
                 }
             }
             .navigationTitle("Settings")
@@ -82,6 +93,18 @@ struct EquipmentSection: View {
                 ))
             }
         }
+    }
+}
+
+struct UnitPicker: View {
+    @Binding var unit: WeightUnit
+
+    var body: some View {
+        Picker("Weights in", selection: $unit) {
+            Text("kg").tag(WeightUnit.kg)
+            Text("lb").tag(WeightUnit.lb)
+        }
+        .pickerStyle(.segmented)
     }
 }
 

@@ -45,7 +45,7 @@ struct SetView: View {
                         .font(.headline)
                         .monospacedDigit()
                         .focusable()
-                        .digitalCrownRotation($weight, from: 0, through: 400, by: item.incrementKg,
+                        .digitalCrownRotation($weight, from: 0, through: 400, by: item.increment,
                                               sensitivity: .low)
                         .accessibilityLabel("Weight \(weight.formatted()) kilograms. Turn the crown to change.")
                     Spacer()
@@ -71,7 +71,7 @@ struct SetView: View {
             }
             // Refill the pickers whenever a new set starts.
             .task(id: "\(workout.exerciseIndex)-\(workout.setNumber)") {
-                weight = workout.suggestedWeightKg ?? defaultWeightKg
+                weight = workout.suggestedWeight ?? defaultWeightKg
                 reps = workout.suggestedReps
             }
         }

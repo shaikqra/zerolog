@@ -25,7 +25,8 @@ public enum Engine {
         minutes: Int,
         history: [Session],
         recovery: Recovery = .normal,
-        sessionType: String? = nil
+        sessionType: String? = nil,
+        unit: WeightUnit = .kg
     ) -> Workout {
         let type = sessionType ?? nextSessionType(catalog: catalog, history: history)
 
@@ -42,13 +43,13 @@ public enum Engine {
         }
 
         // 2. Decide weight, reps and sets for each one from past sessions.
-        var plan = chosen.map { prescribe($0, history: history, recovery: recovery) }
+        var plan = chosen.map { prescribe($0, history: history, recovery: recovery, unit: unit) }
 
         // 3. Shrink the workout until it fits the time available.
         fitToTime(&plan, minutes: minutes, skipped: &skipped)
 
         let minutesEstimate = (Double(estimateSeconds(plan)) / 60).rounded(.toNearestOrEven)
-        return Workout(sessionType: type, estimatedMinutes: Int(minutesEstimate),
+        return Workout(sessionType: type, unit: unit, estimatedMinutes: Int(minutesEstimate),
                        exercises: plan, skipped: skipped)
     }
 
@@ -80,26 +81,35 @@ public enum Engine {
         return found
     }
 
-    static func workingWeight(_ sets: [LoggedSet]) -> Double {
-        sets.map(\.weightKg).max() ?? 0
+    /// A past set in the user's unit.
+    typealias PastSet = (weight: Double, reps: Int)
+
+    /// Past sets in the user's unit, snapped to the nearest weight they can load.
+    /// This is what makes switching between kg and lb give sensible plates.
+    static func inUnit(_ sets: [LoggedSet], unit: WeightUnit, step: Double) -> [PastSet] {
+        sets.map { (weight: roundTo(unit.fromKg($0.weightKg), step: step), reps: $0.reps) }
     }
 
-    static func reps(_ sets: [LoggedSet], at weight: Double) -> [Int] {
-        sets.filter { $0.weightKg == weight }.map(\.reps)
+    static func workingWeight(_ sets: [PastSet]) -> Double {
+        sets.map { $0.weight }.max() ?? 0
     }
 
-    static func prescribe(_ ex: Exercise, history: [Session], recovery: Recovery) -> PlannedExercise {
+    static func reps(_ sets: [PastSet], at weight: Double) -> [Int] {
+        sets.filter { $0.weight == weight }.map { $0.reps }
+    }
+
+    static func prescribe(_ ex: Exercise, history: [Session], recovery: Recovery, unit: WeightUnit) -> PlannedExercise {
         let low = ex.repRange[0], high = ex.repRange[1]
-        let inc = ex.incrementKg
+        let inc = ex.increment(in: unit)
         let sets = recovery == .normal ? ex.sets : max(minSets, ex.sets - 1)
 
         func make(_ weight: Double?, _ target: Int, _ reason: String) -> PlannedExercise {
             PlannedExercise(exerciseId: ex.id, name: ex.name, detectable: ex.detectable, sets: sets,
-                            weightKg: weight, targetReps: target, reason: reason,
-                            incrementKg: ex.incrementKg, kind: ex.kind)
+                            weight: weight, targetReps: target, reason: reason,
+                            increment: inc, kind: ex.kind)
         }
 
-        let past = sessionsWith(history, exerciseId: ex.id)
+        let past = sessionsWith(history, exerciseId: ex.id).map { inUnit($0, unit: unit, step: inc) }
         guard let last = past.first else {
             return make(nil, low, "First time: pick a weight you can lift for \(low)-\(high) reps with 2 to spare.")
         }
@@ -110,10 +120,10 @@ public enum Engine {
         if fewest >= high {
             if recovery == .low {
                 return make(weight, high,
-                            "You earned an increase, but recovery is low today: holding at \(format(weight)) kg.")
+                            "You earned an increase, but recovery is low today: holding at \(format(weight)) \(unit.rawValue).")
             }
             return make(roundTo(weight + inc, step: inc), low,
-                        "You hit \(high) reps on every set last time: +\(format(inc)) kg.")
+                        "You hit \(high) reps on every set last time: +\(format(inc)) \(unit.rawValue).")
         }
 
         let missedLast = fewest < low

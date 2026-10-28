@@ -18,7 +18,7 @@ struct TodayView: View {
                         }
                         Section {
                             ForEach(plan.exercises, id: \.exerciseId) { item in
-                                ExerciseRow(item: item)
+                                ExerciseRow(item: item, unit: plan.unit)
                             }
                         } footer: {
                             Text("About \(plan.estimatedMinutes) minutes")
@@ -65,6 +65,7 @@ struct TodayView: View {
 
 struct ExerciseRow: View {
     let item: PlannedExercise
+    let unit: WeightUnit
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -82,7 +83,7 @@ struct ExerciseRow: View {
 
     /// "3 × 6 · 62.5 kg", or "3 × 6 · choose weight" the first time.
     private var prescription: String {
-        let weight = item.weightKg.map { "\($0.formatted()) kg" } ?? "choose weight"
+        let weight = item.weight.map { "\($0.formatted()) \(unit.rawValue)" } ?? "choose weight"
         return "\(item.sets) × \(item.targetReps) · \(weight)"
     }
 }
