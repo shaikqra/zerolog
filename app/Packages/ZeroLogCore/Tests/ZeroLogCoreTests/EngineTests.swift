@@ -158,6 +158,39 @@ final class EngineTests: XCTestCase {
         XCTAssertEqual(try find(workout(history: history, unit: .lb), "bench_press").weight, 120)
     }
 
+    // MARK: Changes and Undo
+
+    func testIncreaseIsMarkedAndCanBeUndone() throws {
+        let w = workout(history: [session("2026-10-21", "push", "bench_press", 60, [10, 10, 10])])
+        let bench = try find(w, "bench_press")
+        XCTAssertEqual(bench.change, .increased)
+        XCTAssertEqual(bench.previousWeight, 60)
+        let kept = try find(Engine.undoChange(w, exerciseId: "bench_press"), "bench_press")
+        XCTAssertEqual(kept.weight, 60)
+        XCTAssertEqual(kept.targetReps, 10)
+        XCTAssertNil(kept.change)
+        XCTAssertEqual(kept.reason, "Kept at 60 kg, as you asked. Aim for 10 reps.")
+    }
+
+    func testDeloadIsMarkedAndUndoAimsForTheBottomOfTheRange() throws {
+        let history = [session("2026-10-17", "push", "bench_press", 60, [6, 5, 4]),
+                       session("2026-10-21", "push", "bench_press", 60, [6, 5, 5])]
+        let w = workout(history: history)
+        XCTAssertEqual(try find(w, "bench_press").change, .deloaded)
+        let kept = try find(Engine.undoChange(w, exerciseId: "bench_press"), "bench_press")
+        XCTAssertEqual(kept.weight, 60)
+        XCTAssertEqual(kept.targetReps, 6)
+    }
+
+    func testHoldingWeightIsNotAChange() throws {
+        let held = [session("2026-10-21", "push", "bench_press", 60, [9, 8, 7])]
+        let earned = [session("2026-10-21", "push", "bench_press", 60, [10, 10, 10])]
+        for w in [workout(history: held), workout(history: earned, recovery: .low), workout()] {
+            XCTAssertNil(try find(w, "bench_press").change)
+            XCTAssertEqual(Engine.undoChange(w, exerciseId: "bench_press"), w)
+        }
+    }
+
     // MARK: Time
 
     func testFitsInsideTheTimeAvailable() {

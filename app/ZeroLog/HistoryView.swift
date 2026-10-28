@@ -24,7 +24,7 @@ struct HistoryView: View {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("\(session.sessionType.capitalized) day")
                                         .font(.headline)
-                                    Text("\(Today.display(session.date)), \(setCount(session)) sets")
+                                    Text("\(Today.display(session.date)), \(setsText(setCount(session)))")
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
@@ -59,6 +59,12 @@ struct SessionDetailView: View {
                 }
             }
         }
+        .textCase(nil)
         .navigationTitle(Today.display(session.date))
     }
+}
+
+/// "1 set", "3 sets".
+func setsText(_ count: Int) -> String {
+    count == 1 ? "1 set" : "\(count) sets"
 }

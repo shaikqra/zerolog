@@ -102,11 +102,12 @@ public enum Engine {
         let low = ex.repRange[0], high = ex.repRange[1]
         let inc = ex.increment(in: unit)
         let sets = recovery == .normal ? ex.sets : max(minSets, ex.sets - 1)
+        var previous: Double?
 
-        func make(_ weight: Double?, _ target: Int, _ reason: String) -> PlannedExercise {
+        func make(_ weight: Double?, _ target: Int, _ reason: String, change: WeightChange? = nil) -> PlannedExercise {
             PlannedExercise(exerciseId: ex.id, name: ex.name, detectable: ex.detectable, sets: sets,
-                            weight: weight, targetReps: target, reason: reason,
-                            increment: inc, kind: ex.kind)
+                            weight: weight, targetReps: target, reason: reason, increment: inc,
+                            previousWeight: previous, change: change, kind: ex.kind, repRange: ex.repRange)
         }
 
         let past = sessionsWith(history, exerciseId: ex.id).map { inUnit($0, unit: unit, step: inc) }
@@ -115,6 +116,7 @@ public enum Engine {
         }
 
         let weight = workingWeight(last)
+        previous = weight
         let fewest = reps(last, at: weight).min() ?? 0
 
         if fewest >= high {
@@ -123,7 +125,8 @@ public enum Engine {
                             "You earned an increase, but recovery is low today: holding at \(format(weight)) \(unit.rawValue).")
             }
             return make(roundTo(weight + inc, step: inc), low,
-                        "You hit \(high) reps on every set last time: +\(format(inc)) \(unit.rawValue).")
+                        "You hit \(high) reps on every set last time: +\(format(inc)) \(unit.rawValue).",
+                        change: .increased)
         }
 
         let missedLast = fewest < low
@@ -133,11 +136,29 @@ public enum Engine {
         if missedLast && missedBefore {
             let lighter = (weight * deloadFactor / inc).rounded(.down) * inc
             return make(roundTo(lighter, step: inc), low,
-                        "Missed \(low) reps two sessions running: dropping about 10% to rebuild.")
+                        "Missed \(low) reps two sessions running: dropping about 10% to rebuild.",
+                        change: .deloaded)
         }
 
         let target = min(high, fewest + 1)
         return make(weight, target, "Same weight as last time; aim for \(target) reps per set.")
+    }
+
+    /// The user's Undo on a "What I changed" card: put one exercise back to last time's weight.
+    /// Undoing an increase aims for the top of the rep range again; undoing a deload aims for the bottom.
+    public static func undoChange(_ workout: Workout, exerciseId: String) -> Workout {
+        guard let index = workout.exercises.firstIndex(where: { $0.exerciseId == exerciseId }) else { return workout }
+        let item = workout.exercises[index]
+        guard let change = item.change, let previous = item.previousWeight else { return workout }
+        let target = change == .increased ? item.repRange[1] : item.repRange[0]
+        var exercises = workout.exercises
+        exercises[index] = PlannedExercise(
+            exerciseId: item.exerciseId, name: item.name, detectable: item.detectable, sets: item.sets,
+            weight: previous, targetReps: target,
+            reason: "Kept at \(format(previous)) \(workout.unit.rawValue), as you asked. Aim for \(target) reps.",
+            increment: item.increment, previousWeight: previous, change: nil, kind: item.kind, repRange: item.repRange)
+        return Workout(sessionType: workout.sessionType, unit: workout.unit, estimatedMinutes: workout.estimatedMinutes,
+                       exercises: exercises, skipped: workout.skipped)
     }
 
     static func roundTo(_ weight: Double, step: Double) -> Double {

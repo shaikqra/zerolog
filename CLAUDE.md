@@ -38,6 +38,9 @@ Food photo logging alone is a commodity. **Automatic lift detection + the full z
 ## Design rules (non-negotiable)
 - **AI never free-writes workouts.** It selects from a structured exercise database and applies explicit progression rules.
 - **Calories/macros always shown as ranges with confidence.**
+- **Code does the numbers; AI only chooses and words things.** Every weight, rep count or calorie the user sees comes from code, never from a model.
+- **Every automatic change shows its reason and can be undone** ("What I changed" on Today: weight up or down now; more kinds later).
+- **No template look in the app:** sentence case (no ALL-CAPS labels), no "·" between facts ("3 × 6 at 135 lb"), no "→" in buttons, no emoji, no gradient or glass decoration.
 - **Responsible design:** no shaming, no streak-guilt or obsessive tracking mechanics, no medical claims.
 - **Health data is sensitive.** Flag for a lawyer (don't give legal advice): UK GDPR special-category data; US state consumer-health-data laws (e.g. Washington My Health My Data Act).
 

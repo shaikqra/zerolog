@@ -40,8 +40,14 @@ final class ScreenshotTests: XCTestCase {
         snap("04b How to do it, mid-set")
         doneButton.tap()
         XCTAssertTrue(confirmButton.waitForExistence(timeout: 10))
+
+        // Hit the top of the rep range (6 -> 10) on all 3 sets, so the next push day adds weight.
+        let addRep = app.steppers.firstMatch.buttons["Increment"]
+        for _ in 1...4 { addRep.tap() }
         confirmButton.tap()
         snap("05 Workout, second set")
+        confirmButton.tap()
+        confirmButton.tap()
 
         // 4. End early and save.
         app.buttons["End"].tap()
@@ -54,9 +60,19 @@ final class ScreenshotTests: XCTestCase {
         XCTAssertTrue(startButton.waitForExistence(timeout: 10))
         snap("07 Today, next workout")
 
+        // Pull and legs days, one set each, so push day comes round again.
+        logOneSetAndSave()
+        logOneSetAndSave()
+        let undoButton = app.buttons["Undo"]
+        XCTAssertTrue(undoButton.waitForExistence(timeout: 10))
+        snap("07b What I changed")
+        undoButton.tap()
+        sleep(1)
+        snap("07c After Undo")
+
         // 6. History and one past workout.
         app.tabBars.buttons["History"].tap()
-        let pastWorkout = app.staticTexts["Push day"]
+        let pastWorkout = app.collectionViews.staticTexts["Push day"].firstMatch
         XCTAssertTrue(pastWorkout.waitForExistence(timeout: 10))
         snap("08 History")
         pastWorkout.tap()
@@ -67,6 +83,19 @@ final class ScreenshotTests: XCTestCase {
         app.tabBars.buttons["Settings"].tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 10))
         snap("10 Settings")
+    }
+
+    /// Logs one set of whatever comes first and saves it, to move the rotation on.
+    private func logOneSetAndSave() {
+        app.buttons["Start workout"].tap()
+        let confirm = app.buttons["Confirm set"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 10))
+        confirm.tap()
+        app.buttons["End"].tap()
+        let save = app.buttons["Save workout"]
+        XCTAssertTrue(save.waitForExistence(timeout: 10))
+        save.tap()
+        XCTAssertTrue(app.buttons["Start workout"].waitForExistence(timeout: 10))
     }
 
     private func scrollUntilVisible(_ element: XCUIElement) {

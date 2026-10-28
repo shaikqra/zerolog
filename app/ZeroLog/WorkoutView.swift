@@ -50,6 +50,7 @@ struct WorkoutView: View {
                 }
             }
         }
+        .textCase(nil)
         .navigationTitle("\(active.plan.sessionType.capitalized) day")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -98,7 +99,7 @@ struct WorkoutView: View {
             Text(anythingLogged ? "Workout done" : "Nothing logged")
                 .font(.title2.bold())
             if anythingLogged {
-                Text("\(active.totalSetsLogged) sets logged. Your next plan builds on them.")
+                Text("\(setsText(active.totalSetsLogged)) logged. Your next plan builds on \(active.totalSetsLogged == 1 ? "it" : "them").")
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }

@@ -102,6 +102,11 @@ public struct Session: Codable, Equatable, Sendable {
 
 // MARK: - Output (today's workout)
 
+/// A weight change the engine made from last time. The app shows it with its reason and an Undo.
+public enum WeightChange: String, Sendable {
+    case increased, deloaded
+}
+
 public struct PlannedExercise: Equatable, Sendable {
     public let exerciseId: String
     public let name: String
@@ -113,7 +118,12 @@ public struct PlannedExercise: Equatable, Sendable {
     public let reason: String
     /// Weight step for this exercise in the workout's unit (e.g. 2.5 kg or 5 lb for a barbell).
     public let increment: Double
+    /// Working weight last time, in the workout's unit. nil the first time.
+    public let previousWeight: Double?
+    /// Set when the engine changed the weight from last time. nil when it held or it's the first time.
+    public let change: WeightChange?
     let kind: String
+    let repRange: [Int]
 }
 
 public struct SkippedItem: Equatable, Sendable {

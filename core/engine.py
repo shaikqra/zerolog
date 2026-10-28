@@ -124,7 +124,7 @@ def _prescribe(ex, history, recovery, unit):
     inc = ex["increment_kg"] if unit == "kg" else ex["increment_lb"]
     sets = ex["sets"] if recovery == "normal" else max(MIN_SETS, ex["sets"] - 1)
     item = {"exercise_id": ex["id"], "name": ex["name"], "kind": ex["kind"],
-            "detectable": ex["detectable"], "sets": sets}
+            "detectable": ex["detectable"], "sets": sets, "previous_weight": None, "change": None}
 
     past = [_in_unit(sets, unit, inc) for sets in _sessions_with(history, ex["id"])]
     if not past:
@@ -134,13 +134,14 @@ def _prescribe(ex, history, recovery, unit):
 
     weight = _working_weight(past[0])
     reps = _reps_at(past[0], weight)
+    item["previous_weight"] = weight
 
     if min(reps) >= high:
         if recovery == "low":
             item.update(weight=weight, target_reps=high,
                         reason=f"You earned an increase, but recovery is low today: holding at {weight:g} {unit}.")
         else:
-            item.update(weight=_round(weight + inc, inc), target_reps=low,
+            item.update(weight=_round(weight + inc, inc), target_reps=low, change="increased",
                         reason=f"You hit {high} reps on every set last time: +{inc:g} {unit}.")
         return item
 
@@ -152,7 +153,7 @@ def _prescribe(ex, history, recovery, unit):
     )
     if missed_last and missed_before:
         new_weight = math.floor(weight * DELOAD_FACTOR / inc) * inc
-        item.update(weight=_round(new_weight, inc), target_reps=low,
+        item.update(weight=_round(new_weight, inc), target_reps=low, change="deloaded",
                     reason=f"Missed {low} reps two sessions running: dropping about 10% to rebuild.")
         return item
 
@@ -160,6 +161,20 @@ def _prescribe(ex, history, recovery, unit):
     item.update(weight=weight, target_reps=target,
                 reason=f"Same weight as last time; aim for {target} reps per set.")
     return item
+
+
+def undo_change(catalog, workout, exercise_id):
+    """The user's Undo on a "What I changed" card: put one exercise back to last time's weight.
+    Undoing an increase aims for the top of the rep range again; undoing a deload aims for the bottom."""
+    item = next((e for e in workout["exercises"] if e["exercise_id"] == exercise_id), None)
+    if item is None or item["change"] is None:
+        return workout
+    low, high = next(ex["rep_range"] for ex in catalog["exercises"] if ex["id"] == exercise_id)
+    target = high if item["change"] == "increased" else low
+    weight = item["previous_weight"]
+    kept = dict(item, weight=weight, target_reps=target, change=None,
+                reason=f"Kept at {weight:g} {workout['unit']}, as you asked. Aim for {target} reps.")
+    return dict(workout, exercises=[kept if e is item else e for e in workout["exercises"]])
 
 
 def _round(weight, inc):

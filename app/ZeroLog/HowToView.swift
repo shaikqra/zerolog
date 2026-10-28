@@ -25,6 +25,7 @@ struct HowToView: View {
                 }
             }
         }
+        .textCase(nil)
         .navigationTitle(exercise?.name ?? "How to do it")
         .navigationBarTitleDisplayMode(.inline)
     }

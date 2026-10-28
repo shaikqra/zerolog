@@ -28,6 +28,9 @@ final class AppModel {
     /// A plain-language problem to show the user, if any.
     private(set) var problem: String?
 
+    /// Exercises whose automatic weight change the user undid. Cleared once a workout is saved.
+    private var undone: Set<String> = []
+
     private let store: HistoryStore?
     private let settingsKey = "settings"
 
@@ -50,6 +53,12 @@ final class AppModel {
 
     func exercise(_ id: String) -> Exercise? {
         catalog?.exercises.first { $0.id == id }
+    }
+
+    /// Undo on a "What I changed" card: today's plan goes back to last time's weight for this exercise.
+    func undoChange(_ exerciseId: String) {
+        undone.insert(exerciseId)
+        refresh()
     }
 
     func exerciseName(_ id: String) -> String {
@@ -83,6 +92,7 @@ final class AppModel {
             do {
                 guard let store else { throw CocoaError(.fileWriteUnknown) }
                 try store.append(finished.session)
+                undone = []
             } catch {
                 saveProblem = "This workout couldn't be saved, so your next plan won't include it."
             }
@@ -108,7 +118,11 @@ final class AppModel {
             problem = "Your workout history couldn't be read, so today's plan starts fresh."
         }
         let current = settings ?? .fallback
-        plan = Engine.generateWorkout(catalog: catalog, gymEquipment: current.equipment,
-                                      minutes: current.minutes, history: history, unit: current.unit)
+        var next = Engine.generateWorkout(catalog: catalog, gymEquipment: current.equipment,
+                                          minutes: current.minutes, history: history, unit: current.unit)
+        for exerciseId in undone {
+            next = Engine.undoChange(next, exerciseId: exerciseId)
+        }
+        plan = next
     }
 }

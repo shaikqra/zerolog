@@ -16,6 +16,14 @@ struct TodayView: View {
                                     .foregroundStyle(.orange)
                             }
                         }
+                        let changes = plan.exercises.filter { $0.change != nil }
+                        if !changes.isEmpty {
+                            Section("What I changed") {
+                                ForEach(changes, id: \.exerciseId) { item in
+                                    ChangeRow(item: item, unit: plan.unit) { model.undoChange(item.exerciseId) }
+                                }
+                            }
+                        }
                         Section {
                             ForEach(plan.exercises, id: \.exerciseId) { item in
                                 NavigationLink {
@@ -35,6 +43,7 @@ struct TodayView: View {
                             }
                         }
                     }
+                    .textCase(nil)
                     .navigationTitle("\(plan.sessionType.capitalized) day")
                     .safeAreaInset(edge: .bottom) {
                         Button {
@@ -85,9 +94,43 @@ struct ExerciseRow: View {
         .padding(.vertical, 4)
     }
 
-    /// "3 × 6 · 62.5 kg", or "3 × 6 · choose weight" the first time.
+    /// "3 × 6 at 62.5 kg", or "3 × 6, choose a weight" the first time.
     private var prescription: String {
-        let weight = item.weight.map { "\($0.formatted()) \(unit.rawValue)" } ?? "choose weight"
-        return "\(item.sets) × \(item.targetReps) · \(weight)"
+        let sets = "\(item.sets) × \(item.targetReps)"
+        guard let weight = item.weight else { return "\(sets), choose a weight" }
+        return "\(sets) at \(weight.formatted()) \(unit.rawValue)"
+    }
+}
+
+/// One weight change the engine made, why, and an Undo.
+struct ChangeRow: View {
+    let item: PlannedExercise
+    let unit: WeightUnit
+    let undo: () -> Void
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                Text(item.reason)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Undo", action: undo)
+                .buttonStyle(.borderless)
+        }
+        .padding(.vertical, 4)
+    }
+
+    /// "Added 5 lb to Barbell bench press" or "Lightened Barbell bench press to 120 lb".
+    private var title: String {
+        guard let weight = item.weight, let previous = item.previousWeight else { return item.name }
+        switch item.change {
+        case .increased: return "Added \((weight - previous).formatted()) \(unit.rawValue) to \(item.name)"
+        case .deloaded: return "Lightened \(item.name) to \(weight.formatted()) \(unit.rawValue)"
+        case nil: return item.name
+        }
     }
 }

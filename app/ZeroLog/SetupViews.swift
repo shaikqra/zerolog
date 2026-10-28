@@ -32,6 +32,7 @@ struct OnboardingView: View {
                     }
                 }
             }
+            .textCase(nil)
             .navigationTitle("Your gym")
             .onAppear {
                 // Start with everything ticked; most gyms have it all.
@@ -61,6 +62,7 @@ struct SettingsView: View {
                     Text("Past workouts convert automatically.")
                 }
             }
+            .textCase(nil)
             .navigationTitle("Settings")
         }
     }

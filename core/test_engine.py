@@ -3,7 +3,7 @@
 import json
 import unittest
 
-from engine import KG_PER_LB, generate_workout, load_catalog, next_session_type
+from engine import KG_PER_LB, generate_workout, load_catalog, next_session_type, undo_change
 
 CATALOG = load_catalog()
 FULL_GYM = {"barbell", "bench", "rack", "dumbbells", "cable", "lat_pulldown", "leg_press"}
@@ -137,6 +137,34 @@ class Units(unittest.TestCase):
     def test_unknown_unit_is_rejected(self):
         with self.assertRaises(ValueError):
             generate_workout(CATALOG, FULL_GYM, 60, [], unit="stone")
+
+
+class Changes(unittest.TestCase):
+    def test_increase_is_marked_and_can_be_undone(self):
+        history = [session("2026-10-21", "push", "bench_press", 60, [10, 10, 10])]
+        w = generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push")
+        bench = find(w, "bench_press")
+        self.assertEqual((bench["change"], bench["previous_weight"]), ("increased", 60))
+        kept = find(undo_change(CATALOG, w, "bench_press"), "bench_press")
+        self.assertEqual((kept["weight"], kept["target_reps"], kept["change"]), (60, 10, None))
+        self.assertEqual(kept["reason"], "Kept at 60 kg, as you asked. Aim for 10 reps.")
+
+    def test_deload_is_marked_and_undo_aims_for_the_bottom_of_the_range(self):
+        history = [session("2026-10-17", "push", "bench_press", 60, [6, 5, 4]),
+                   session("2026-10-21", "push", "bench_press", 60, [6, 5, 5])]
+        w = generate_workout(CATALOG, FULL_GYM, 60, history, session_type="push")
+        self.assertEqual(find(w, "bench_press")["change"], "deloaded")
+        kept = find(undo_change(CATALOG, w, "bench_press"), "bench_press")
+        self.assertEqual((kept["weight"], kept["target_reps"]), (60, 6))
+
+    def test_holding_weight_is_not_a_change(self):
+        held = [session("2026-10-21", "push", "bench_press", 60, [9, 8, 7])]
+        earned = [session("2026-10-21", "push", "bench_press", 60, [10, 10, 10])]
+        for w in (generate_workout(CATALOG, FULL_GYM, 60, held, session_type="push"),
+                  generate_workout(CATALOG, FULL_GYM, 60, earned, recovery="low", session_type="push"),
+                  generate_workout(CATALOG, FULL_GYM, 60, [], session_type="push")):
+            self.assertIsNone(find(w, "bench_press")["change"])
+            self.assertEqual(undo_change(CATALOG, w, "bench_press"), w)
 
 
 class Time(unittest.TestCase):

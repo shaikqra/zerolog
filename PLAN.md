@@ -121,6 +121,20 @@ Food-photo logging is a commodity, as you said yourself. Shipping it first would
 
 **Explicitly out of v1:** Android, social features, streaks/badges (responsible-design rule), barcode scanning, wearables other than Apple Watch, web app.
 
+**Ideas taken from reviewing FitG (a similar app, 2026-10-29).** Ideas only, rebuilt in our own words and code. None of its files, data or text are used.
+- **Now (built):** "What I changed" cards on Today. Each automatic weight change shows its reason and an Undo. Also no-template copy rules (see CLAUDE.md).
+- **v1.1 food, parked:**
+  - Protein target around 1.6 g per kg of body weight. Research suggests muscle gain levels off near there. ⚠ verify the source before using it in the app.
+  - A planned meal the user doesn't tap still counts as eaten for that day's maths. The app asks once, gently, and never nags.
+  - Logging a meal means confirming the planned one with one tap, and only correcting it when it was different.
+- **v1.2 coach, parked:**
+  - A hard cap on notifications per day, e.g. 4. Every notification has a button that does something.
+  - The coach speaks in the first person through its changes, with no mascot.
+- **Not taken:**
+  - FitG's Indian home-food focus: ZeroLog is US/UK.
+  - Its visual identity: it's FitG's brand.
+  - Its missed-workout reshuffle: ZeroLog has no fixed calendar, so the rotation simply continues from the last session.
+
 ---
 
 ## 3. Architecture and tech stack
