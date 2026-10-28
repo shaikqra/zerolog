@@ -1,0 +1,446 @@
+/* ZeroLog landing page styles.
+   Colours: chalk background, graphite text, one accent (competition-plate blue). */
+
+:root {
+  --chalk: #f1f2ee;
+  --graphite: #1c1e22;
+  --steel: #5d626b;
+  --rule: #d6d8d1;
+  --plate: #2347c5;
+  --plate-ink: #ffffff;
+  --watch-body: #1c1e22;
+  --watch-screen: #000000;
+
+  --display: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  --text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --chalk: #16181b;
+    --graphite: #ecede9;
+    --steel: #a2a7ae;
+    --rule: #2c2f34;
+    --plate: #6f8cff;
+    --plate-ink: #0d1022;
+    --watch-body: #2c2f34;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--chalk);
+  color: var(--graphite);
+  font: 400 1.0625rem/1.55 var(--text);
+}
+
+a { color: inherit; text-underline-offset: 0.2em; }
+
+:focus-visible {
+  outline: 3px solid var(--plate);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---------- Header ---------- */
+
+.site-header { padding: 1.25rem 0; }
+
+.logo {
+  font: 700 1.25rem/1 var(--display);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+  padding: 2.5rem 0 4.5rem;
+}
+
+@media (min-width: 52rem) {
+  .hero { grid-template-columns: 1.25fr 1fr; padding: 4rem 0 6rem; }
+}
+
+h1 {
+  margin: 0 0 2rem;
+  font: 700 clamp(3.25rem, 10vw, 6.75rem)/0.92 var(--display);
+  letter-spacing: -0.045em;
+}
+
+.lede {
+  max-width: 32rem;
+  margin: 0 0 2rem;
+  font-size: 1.25rem;
+  line-height: 1.45;
+}
+
+.fine {
+  max-width: 30rem;
+  margin: 0.875rem 0 0;
+  color: var(--steel);
+  font-size: 0.9375rem;
+}
+
+/* ---------- Waitlist form ---------- */
+
+.waitlist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 30rem;
+}
+
+.waitlist label {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.waitlist input {
+  flex: 1 1 14rem;
+  min-height: 3.25rem;
+  padding: 0 1rem;
+  border: 2px solid var(--graphite);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.waitlist input::placeholder { color: var(--steel); }
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--plate);
+  color: var(--plate-ink);
+  font: 600 1.0625rem/1 var(--text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button:hover { filter: brightness(1.08); }
+
+/* ---------- Watch (the one animated moment) ---------- */
+
+.watch-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.watch {
+  position: relative;
+  width: min(17rem, 72vw);
+  aspect-ratio: 41 / 49;
+  padding: 0.9rem;
+  border-radius: 28%;
+  background: var(--watch-body);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.06);
+}
+
+/* Digital crown */
+.watch::after {
+  content: "";
+  position: absolute;
+  right: -0.55rem;
+  top: 24%;
+  width: 0.6rem;
+  height: 16%;
+  border-radius: 0.3rem;
+  background: var(--watch-body);
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.1rem 1.2rem;
+  border-radius: 24%;
+  background: var(--watch-screen);
+  color: #ffffff;
+  font-family: var(--display);
+}
+
+.w-ex {
+  margin: 0;
+  color: #9aa6ff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.w-set {
+  margin: 0.1rem 0 0;
+  color: #8a8f98;
+  font-size: 0.8125rem;
+}
+
+.w-reps {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: auto 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.w-count {
+  font-size: 4.25rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.w-unit { color: #8a8f98; font-size: 1rem; }
+
+.w-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+}
+
+.w-weight { margin: 0; font-size: 1.125rem; font-weight: 600; }
+
+.w-tap {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 2px solid #6f8cff;
+  border-radius: 50%;
+  color: #6f8cff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  transition: background-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+
+.watch.done .w-tap {
+  background: #6f8cff;
+  color: #000000;
+  transform: scale(1.08);
+}
+
+.w-logged { display: none; }
+.watch.done .w-logged { display: inline; }
+.watch.done .w-ask { display: none; }
+
+.watch-caption {
+  margin: 0;
+  color: var(--steel);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding: 4.5rem 0;
+  border-top: 1px solid var(--rule);
+}
+
+h2 {
+  max-width: 36rem;
+  margin: 0 0 1rem;
+  font: 700 clamp(1.875rem, 4.5vw, 2.75rem)/1.05 var(--display);
+  letter-spacing: -0.03em;
+}
+
+.section p { max-width: 36rem; }
+
+/* Concept video: vertical, same format as the short-form posts */
+.video-frame {
+  display: grid;
+  place-items: center;
+  width: min(20rem, 100%);
+  aspect-ratio: 9 / 16;
+  margin-top: 2rem;
+  border: 2px dashed var(--rule);
+  border-radius: 1.5rem;
+  color: var(--steel);
+}
+
+.video-frame video {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+/* How it works: a real sequence, so it is numbered */
+.steps {
+  display: grid;
+  gap: 2.5rem;
+  margin: 2.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+@media (min-width: 46rem) {
+  .steps { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+}
+
+.steps li { counter-increment: step; }
+
+.steps li::before {
+  content: counter(step);
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--plate);
+  font: 700 3rem/1 var(--display);
+}
+
+.steps h3 {
+  margin: 0 0 0.5rem;
+  font: 700 1.375rem/1.2 var(--display);
+}
+
+.steps p { margin: 0; color: var(--steel); }
+
+/* Food: the calorie range, drawn as a range */
+.split {
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+@media (min-width: 52rem) {
+  .split { grid-template-columns: 1fr 1fr; }
+}
+
+.range { max-width: 26rem; }
+
+.range-figure {
+  margin: 0 0 1rem;
+  font: 700 clamp(2.5rem, 7vw, 3.75rem)/1 var(--display);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.range-figure span { color: var(--steel); font-size: 0.45em; letter-spacing: 0; }
+
+.range-track {
+  position: relative;
+  height: 0.75rem;
+  border-radius: 999px;
+  background: var(--rule);
+}
+
+.range-band {
+  position: absolute;
+  left: 36%;
+  width: 24%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--plate);
+}
+
+.range-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  color: var(--steel);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.range-note { margin: 0.75rem 0 0; color: var(--steel); font-size: 0.9375rem; }
+
+/* Why: one big statement */
+.statement {
+  max-width: 44rem;
+  margin: 0 0 1.25rem;
+  font: 600 clamp(1.625rem, 4vw, 2.5rem)/1.2 var(--display);
+  letter-spacing: -0.02em;
+}
+
+/* FAQ */
+.faq { max-width: 44rem; margin-top: 2rem; }
+
+.faq details { border-bottom: 1px solid var(--rule); }
+
+.faq summary {
+  padding: 1.1rem 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.faq details p { margin: 0 0 1.25rem; color: var(--steel); }
+
+/* Closing call to action */
+.closing { text-align: left; }
+.closing .waitlist { margin-top: 1.75rem; }
+
+/* Footer */
+.site-footer {
+  padding: 2rem 0 3rem;
+  border-top: 1px solid var(--rule);
+  color: var(--steel);
+  font-size: 0.875rem;
+}
+
+.site-footer nav { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+
+/* Thank-you + privacy pages */
+/* Only top/bottom padding here, so the side gutter from .wrap survives */
+.narrow { max-width: 42.5rem; padding-top: 3rem; padding-bottom: 5rem; }
+
+.narrow h1 { font-size: clamp(2.5rem, 8vw, 4rem); }
+
+.offer {
+  margin-top: 3rem;
+  padding: clamp(1.25rem, 5vw, 2rem);
+  border: 2px solid var(--graphite);
+  border-radius: 1.5rem;
+}
+
+.offer h2 { margin-bottom: 0.5rem; }
+
+.price {
+  margin: 0 0 1.25rem;
+  font: 700 2.5rem/1 var(--display);
+  letter-spacing: -0.03em;
+}
+
+.price span { display: block; margin-top: 0.5rem; color: var(--steel); font: 400 1rem/1.4 var(--text); letter-spacing: 0; }
+
+.offer ul { margin: 0 0 1.75rem; padding-left: 1.2rem; }
+.offer li { margin-bottom: 0.4rem; }
+
+.prose h2 { font-size: 1.5rem; margin-top: 2.5rem; }
+.prose p, .prose li { color: var(--graphite); }
+
+.draft-banner {
+  padding: 0.75rem 1rem;
+  border: 2px dashed var(--plate);
+  border-radius: 0.75rem;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

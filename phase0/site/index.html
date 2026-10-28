@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZeroLog: you lift, it logs</title>
+  <meta name="description" content="An iPhone + Apple Watch app built to spot your lifts, count your reps and plan your next session. Join the waitlist.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%232347c5%22/%3E%3Cpath d=%22M9 16.5l4.5 4.5L23 11.5%22 stroke=%22white%22 stroke-width=%223.5%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="logo" href="/">ZeroLog</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div>
+        <h1>You lift.<br>It logs.</h1>
+        <p class="lede">ZeroLog is an iPhone + Apple Watch app built to spot your lifts, count your reps and plan your next session. The only thing you tap is ✓.</p>
+
+        <form class="waitlist" data-waitlist>
+          <label for="email-top">Email address</label>
+          <input id="email-top" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          <button class="button" type="submit">Join the waitlist</button>
+        </form>
+        <p class="fine">Needs an Apple Watch. Launching in the US and UK first. ZeroLog is still being built, so everything you see here is a concept.</p>
+      </div>
+
+      <div class="watch-stage">
+        <!-- Starts in its finished state so it still makes sense without JavaScript. -->
+        <div class="watch done" aria-hidden="true">
+          <div class="screen">
+            <p class="w-ex">Bench press</p>
+            <p class="w-set">Set 3 of 4</p>
+            <p class="w-reps"><span class="w-count" id="rep-count">8</span><span class="w-unit">reps</span></p>
+            <div class="w-confirm">
+              <p class="w-weight"><span class="w-ask">80 kg?</span><span class="w-logged">Logged</span></p>
+              <span class="w-tap">✓</span>
+            </div>
+          </div>
+        </div>
+        <p class="watch-caption">Concept: the watch counts, you confirm.</p>
+      </div>
+    </section>
+
+    <!-- Concept video (add the file before launch, see README.md) -->
+    <section class="section" aria-labelledby="demo-title">
+      <h2 id="demo-title">See the idea in 30 seconds</h2>
+      <div class="video-frame">
+        <p>Concept demo video goes here.</p>
+      </div>
+      <p class="fine">Concept demo. ZeroLog is being built now.</p>
+    </section>
+
+    <!-- How it works -->
+    <section class="section" aria-labelledby="how-title">
+      <h2 id="how-title">Three steps, and only one of them is yours</h2>
+      <ol class="steps">
+        <li>
+          <h3>Walk in</h3>
+          <p>ZeroLog notices you've arrived at your gym and has today's workout ready. It's built from your history, your recovery and the equipment your gym actually has.</p>
+        </li>
+        <li>
+          <h3>Lift</h3>
+          <p>Your Apple Watch spots the exercise and counts the reps.</p>
+        </li>
+        <li>
+          <h3>Tap ✓</h3>
+          <p>Confirm the weight. That's the logging done.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Food -->
+    <section class="section" aria-labelledby="food-title">
+      <div class="split">
+        <div>
+          <h2 id="food-title">Food, without the fake precision</h2>
+          <p>Snap a photo and get an honest range, not a made-up exact number. Eat the same thing twice and ZeroLog remembers it, so next time it's one tap.</p>
+        </div>
+        <div class="range" role="img" aria-label="Example estimate: 520 to 640 kilocalories, medium confidence">
+          <p class="range-figure">520–640 <span>kcal</span></p>
+          <div class="range-track"><div class="range-band"></div></div>
+          <div class="range-scale"><span>200</span><span>1,100</span></div>
+          <p class="range-note">Chicken rice bowl, medium confidence</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why (also carries the coach) -->
+    <section class="section" aria-labelledby="why-title">
+      <h2 id="why-title" class="statement">Hevy for lifting. MyFitnessPal for food. Another app for sleep. You type into all of them.</h2>
+      <p>We think tracking should be the app's job, not yours. ZeroLog keeps training, food and recovery in one place, with a coach that sees the whole week, so its advice fits how you actually slept, ate and lifted.</p>
+    </section>
+
+    <!-- Data -->
+    <section class="section" aria-labelledby="data-title">
+      <h2 id="data-title">Your data stays yours</h2>
+      <p>Your health data stays on your phone by default. We'll never sell it or use it for ads.</p>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" aria-labelledby="faq-title">
+      <h2 id="faq-title">Questions</h2>
+      <div class="faq">
+        <details>
+          <summary>Do I need an Apple Watch?</summary>
+          <p>Yes. Automatic rep counting needs the watch on your wrist.</p>
+        </details>
+        <details>
+          <summary>Which exercises will it detect?</summary>
+          <p>We're starting with the most common lifts, like bench press, overhead press, rows, curls and pulldowns, and adding more as accuracy improves. You can always confirm or fix a set with one tap.</p>
+        </details>
+        <details>
+          <summary>When can I use it?</summary>
+          <p>Founding members get the beta first, planned for summer 2027.</p>
+        </details>
+        <details>
+          <summary>What will it cost?</summary>
+          <p>The planned launch price is $59.99 a year, with a monthly option. Founding members pay $49.99 for their first year.</p>
+        </details>
+        <details>
+          <summary>Can I get a refund?</summary>
+          <p>Yes. Full refund any time before launch. One email, no questions.</p>
+        </details>
+        <details>
+          <summary>Is it on Android?</summary>
+          <p>Not yet. iPhone and Apple Watch come first.</p>
+        </details>
+        <details>
+          <summary>Does it replace Hevy and MyFitnessPal?</summary>
+          <p>That's the goal.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- Closing call to action -->
+    <section class="section closing" aria-labelledby="closing-title">
+      <h2 id="closing-title">Stop typing. Start lifting.</h2>
+      <form class="waitlist" data-waitlist>
+        <label for="email-bottom">Email address</label>
+        <input id="email-bottom" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+        <button class="button" type="submit">Join the waitlist</button>
+      </form>
+    </section>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <nav>
+      <span>© 2026 ZeroLog</span>
+      <a href="privacy.html">Privacy</a>
+      <a href="mailto:hello@getzerolog.com">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // Waitlist form: LOCAL PREVIEW ONLY. It does not save emails anywhere.
+  // On launch day this is replaced with the Kit form (see README.md).
+  document.querySelectorAll("form[data-waitlist]").forEach(function (form) {
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      window.location.href = "thanks.html";
+    });
+  });
+
+  // Watch animation: counts 1 to 8 reps once, then shows the tick.
+  // Skipped for people who have reduced motion turned on.
+  (function () {
+    var watch = document.querySelector(".watch");
+    var count = document.getElementById("rep-count");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    watch.classList.remove("done");
+    count.textContent = "0";
+    var reps = 0;
+    function nextRep() {
+      reps += 1;
+      count.textContent = String(reps);
+      if (reps < 8) setTimeout(nextRep, 600);
+      else setTimeout(function () { watch.classList.add("done"); }, 700);
+    }
+    setTimeout(nextRep, 900);
+  })();
+</script>
+
+</body>
+</html>
