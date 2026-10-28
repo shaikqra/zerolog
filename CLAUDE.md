@@ -6,6 +6,12 @@ Read this first every session. Plan lives in `PLAN.md`.
 **Build-first (decided 2026-10-28).** Shaik chose to build the core app now and market later. The waitlist page (already built, `phase0/site/`) still goes live Nov 10 with no video, to collect signups while building. Concierge test, video and creator outreach are parked.
 **No Mac.** Build order: Mac-free core first (rep-detection prototype in Python on Sensor Logger data; workout engine in `core/`, a Python reference implementation to port to Swift later). Mac (buy or rent) only when the core works and app screens are next. Do not create accounts, add API keys, install paid services or spend money without Shaik's explicit OK. Dad (Ali) approves all billing.
 
+## Repo layout
+- `core/` Python reference engine + tests (runs on Windows: `python -m unittest -v`)
+- `app/` iPhone + Watch app (Swift/SwiftUI). No local Mac: GitHub Actions (`.github/workflows/app.yml`, macOS runner) runs Swift tests and builds both apps on every push touching `app/` or `core/data/`. ~200 free Mac-minutes/month, so batch changes, don't push tiny fixes one by one.
+- `phase0/` landing page + copy
+- Engine rules and the exercise JSON exist in both Python and Swift; CI fails if the JSON copies differ. Change both.
+
 ## Product in one line
 iPhone + Apple Watch app that removes manual fitness tracking: "Hevy + MyFitnessPal + a coach, and you never type a thing."
 
