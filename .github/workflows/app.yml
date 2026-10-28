@@ -1,0 +1,46 @@
+# Builds and tests the iPhone + Watch app on GitHub's Mac servers.
+# Only runs when app code or the exercise database changes, to save free Mac minutes.
+name: App build
+
+on:
+  push:
+    branches: [main]
+    paths: ["app/**", "core/data/**", ".github/workflows/app.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Exercise database matches the Python copy
+        run: cmp core/data/exercises.json app/Packages/ZeroLogCore/Sources/ZeroLogCore/Resources/exercises.json
+
+      - name: Engine tests
+        run: swift test --package-path app/Packages/ZeroLogCore
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: app
+        run: xcodegen generate
+
+      - name: Build iPhone app
+        working-directory: app
+        run: >
+          xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLog
+          -destination 'generic/platform=iOS Simulator'
+          CODE_SIGNING_ALLOWED=NO -quiet build
+
+      - name: Build Watch app
+        working-directory: app
+        run: >
+          xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLogWatch
+          -destination 'generic/platform=watchOS Simulator'
+          CODE_SIGNING_ALLOWED=NO -quiet build
