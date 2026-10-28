@@ -95,7 +95,8 @@ public enum Engine {
 
         func make(_ weight: Double?, _ target: Int, _ reason: String) -> PlannedExercise {
             PlannedExercise(exerciseId: ex.id, name: ex.name, detectable: ex.detectable, sets: sets,
-                            weightKg: weight, targetReps: target, reason: reason, kind: ex.kind)
+                            weightKg: weight, targetReps: target, reason: reason,
+                            incrementKg: ex.incrementKg, kind: ex.kind)
         }
 
         let past = sessionsWith(history, exerciseId: ex.id)

@@ -78,6 +78,8 @@ public struct PlannedExercise: Equatable, Sendable {
     public let weightKg: Double?
     public let targetReps: Int
     public let reason: String
+    /// Weight step for this exercise (e.g. 2.5 kg for a barbell), used by the weight picker.
+    public let incrementKg: Double
     let kind: String
 }
 
