@@ -27,6 +27,11 @@ class Database(unittest.TestCase):
         for ex in CATALOG["exercises"]:
             self.assertLessEqual(set(ex["equipment"]), known, ex["id"])
 
+    def test_every_exercise_has_three_or_four_form_cues(self):
+        for ex in CATALOG["exercises"]:
+            self.assertIn(len(ex["cues"]), (3, 4), ex["id"])
+            self.assertTrue(all(cue.strip() for cue in ex["cues"]), ex["id"])
+
 
 class Selection(unittest.TestCase):
     def test_only_uses_equipment_the_gym_has(self):

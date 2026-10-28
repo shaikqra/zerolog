@@ -48,8 +48,12 @@ final class AppModel {
         refresh()
     }
 
+    func exercise(_ id: String) -> Exercise? {
+        catalog?.exercises.first { $0.id == id }
+    }
+
     func exerciseName(_ id: String) -> String {
-        catalog?.exercises.first { $0.id == id }?.name ?? id
+        exercise(id)?.name ?? id
     }
 
     // MARK: Workout in progress

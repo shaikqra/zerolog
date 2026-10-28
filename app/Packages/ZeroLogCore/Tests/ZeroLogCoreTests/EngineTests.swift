@@ -42,6 +42,13 @@ final class EngineTests: XCTestCase {
         }
     }
 
+    func testEveryExerciseHasThreeOrFourFormCues() {
+        for exercise in catalog.exercises {
+            XCTAssertTrue((3...4).contains(exercise.cues.count), exercise.id)
+            XCTAssertFalse(exercise.cues.contains { $0.trimmingCharacters(in: .whitespaces).isEmpty }, exercise.id)
+        }
+    }
+
     // MARK: Selection
 
     func testOnlyUsesEquipmentTheGymHas() {

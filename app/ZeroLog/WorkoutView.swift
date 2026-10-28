@@ -6,6 +6,7 @@ struct WorkoutView: View {
     @Environment(AppModel.self) private var model
     @State private var weight = 20.0
     @State private var reps = 8
+    @State private var showingHowTo = false
 
     /// Starting weight when there's no history: an empty barbell (20 kg or 45 lb).
     private func startingWeight(_ unit: WeightUnit) -> Double {
@@ -34,6 +35,11 @@ struct WorkoutView: View {
                 Text(item.reason)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
+                Button {
+                    showingHowTo = true
+                } label: {
+                    Label("How to do it", systemImage: "play.rectangle")
+                }
             }
             Section("This set") {
                 Stepper(value: $reps, in: 1...50) {
@@ -64,6 +70,17 @@ struct WorkoutView: View {
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .padding()
+        }
+        // A sheet, not a push: pushing would re-run the refill below and undo the user's changes.
+        .sheet(isPresented: $showingHowTo) {
+            NavigationStack {
+                HowToView(exerciseId: item.exerciseId)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { showingHowTo = false }
+                        }
+                    }
+            }
         }
         // Refill reps and weight whenever a new set starts.
         .task(id: "\(active.exerciseIndex)-\(active.setNumber)") {

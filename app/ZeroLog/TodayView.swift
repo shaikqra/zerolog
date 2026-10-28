@@ -18,7 +18,11 @@ struct TodayView: View {
                         }
                         Section {
                             ForEach(plan.exercises, id: \.exerciseId) { item in
-                                ExerciseRow(item: item, unit: plan.unit)
+                                NavigationLink {
+                                    HowToView(exerciseId: item.exerciseId)
+                                } label: {
+                                    ExerciseRow(item: item, unit: plan.unit)
+                                }
                             }
                         } footer: {
                             Text("About \(plan.estimatedMinutes) minutes")

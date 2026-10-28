@@ -12,6 +12,8 @@ public struct Exercise: Decodable, Equatable, Sendable {
     public let incrementLb: Double
     public let sets: Int
     public let detectable: Bool
+    /// Short form tips shown on the "How to do it" screen.
+    public let cues: [String]
 
     /// Smallest weight jump for this exercise in the given unit.
     public func increment(in unit: WeightUnit) -> Double {

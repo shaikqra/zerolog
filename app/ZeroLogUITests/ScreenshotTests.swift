@@ -13,19 +13,33 @@ final class ScreenshotTests: XCTestCase {
         snap("01 Setup")
         let planButton = app.buttons["Plan my first workout"]
         scrollUntilVisible(planButton)
-        snap("02 Setup, bottom")
         planButton.tap()
 
         // 2. Today's plan.
         let startButton = app.buttons["Start workout"]
         XCTAssertTrue(startButton.waitForExistence(timeout: 10))
-        snap("03 Today")
+        snap("02 Today")
+
+        // How to do an exercise, opened from the plan.
+        app.staticTexts["Barbell bench press"].tap()
+        XCTAssertTrue(app.navigationBars["Barbell bench press"].waitForExistence(timeout: 10))
+        snap("03 How to do it")
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(startButton.waitForExistence(timeout: 10))
         startButton.tap()
 
         // 3. Logging: first set, then the second set pre-filled from the first.
         let confirmButton = app.buttons["Confirm set"]
         XCTAssertTrue(confirmButton.waitForExistence(timeout: 10))
         snap("04 Workout, first set")
+
+        // How to do it, opened mid-set.
+        app.buttons["How to do it"].tap()
+        let doneButton = app.buttons["Done"]
+        XCTAssertTrue(doneButton.waitForExistence(timeout: 10))
+        snap("04b How to do it, mid-set")
+        doneButton.tap()
+        XCTAssertTrue(confirmButton.waitForExistence(timeout: 10))
         confirmButton.tap()
         snap("05 Workout, second set")
 
