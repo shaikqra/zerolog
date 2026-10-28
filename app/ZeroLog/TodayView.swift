@@ -1,40 +1,65 @@
 import SwiftUI
 import ZeroLogCore
 
-/// Today's workout, straight from the engine.
+/// Today's workout, straight from the engine, with a button to start it.
 struct TodayView: View {
-    private let workout = SampleData.todaysWorkout()
+    @Environment(AppModel.self) private var model
 
     var body: some View {
         NavigationStack {
-            if let workout {
-                List {
-                    Section {
-                        ForEach(workout.exercises, id: \.exerciseId) { item in
-                            ExerciseRow(item: item)
+            Group {
+                if let plan = model.plan {
+                    List {
+                        if let problem = model.problem {
+                            Section {
+                                Label(problem, systemImage: "exclamationmark.triangle")
+                                    .foregroundStyle(.orange)
+                            }
                         }
-                    } footer: {
-                        Text("About \(workout.estimatedMinutes) minutes")
-                    }
-
-                    if !workout.skipped.isEmpty {
-                        Section("Left out today") {
-                            ForEach(workout.skipped, id: \.name) { item in
-                                Text("\(item.name): \(item.reason)")
+                        Section {
+                            ForEach(plan.exercises, id: \.exerciseId) { item in
+                                ExerciseRow(item: item)
+                            }
+                        } footer: {
+                            Text("About \(plan.estimatedMinutes) minutes")
+                        }
+                        if !plan.skipped.isEmpty {
+                            Section("Left out today") {
+                                ForEach(plan.skipped, id: \.name) { item in
+                                    Text("\(item.name): \(item.reason)")
+                                }
                             }
                         }
                     }
+                    .navigationTitle("\(plan.sessionType.capitalized) day")
+                    .safeAreaInset(edge: .bottom) {
+                        Button {
+                            model.start()
+                        } label: {
+                            Text("Start workout")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .padding()
+                        .disabled(plan.exercises.isEmpty)
+                    }
+                } else {
+                    ContentUnavailableView(
+                        "Today's workout isn't ready",
+                        systemImage: "exclamationmark.triangle",
+                        description: Text(model.problem ?? "Reinstall ZeroLog to fix it.")
+                    )
                 }
-                .navigationTitle("\(workout.sessionType.capitalized) day")
-            } else {
-                ContentUnavailableView(
-                    "Today's workout didn't load",
-                    systemImage: "exclamationmark.triangle",
-                    description: Text("The exercise list is missing. Reinstall ZeroLog to fix it.")
-                )
+            }
+            .fullScreenCover(isPresented: workoutIsOpen) {
+                WorkoutView()
             }
         }
-        .tint(.plate)
+    }
+
+    private var workoutIsOpen: Binding<Bool> {
+        Binding(get: { model.active != nil }, set: { _ in })
     }
 }
 
@@ -60,8 +85,4 @@ struct ExerciseRow: View {
         let weight = item.weightKg.map { "\($0.formatted()) kg" } ?? "choose weight"
         return "\(item.sets) × \(item.targetReps) · \(weight)"
     }
-}
-
-#Preview {
-    TodayView()
 }

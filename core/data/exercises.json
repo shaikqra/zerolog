@@ -1,5 +1,14 @@
 {
   "_note": "The exercise database. Order matters: within a movement pattern, earlier exercises are preferred when a gym has the equipment for several. 'detectable' = we expect the watch to recognise it from wrist motion (to be proven with real data).",
+  "equipment_types": [
+    {"id": "barbell",      "name": "Barbell"},
+    {"id": "rack",         "name": "Squat rack"},
+    {"id": "bench",        "name": "Flat bench"},
+    {"id": "dumbbells",    "name": "Dumbbells"},
+    {"id": "cable",        "name": "Cable machine"},
+    {"id": "lat_pulldown", "name": "Lat pulldown machine"},
+    {"id": "leg_press",    "name": "Leg press machine"}
+  ],
   "exercises": [
     {"id": "bench_press",           "name": "Barbell bench press",       "pattern": "horizontal_push",    "kind": "compound",  "equipment": ["barbell", "bench", "rack"], "rep_range": [6, 10],  "increment_kg": 2.5, "sets": 3, "detectable": true},
     {"id": "db_bench_press",        "name": "Dumbbell bench press",      "pattern": "horizontal_push",    "kind": "compound",  "equipment": ["dumbbells", "bench"],       "rep_range": [8, 12],  "increment_kg": 2.0, "sets": 3, "detectable": true},

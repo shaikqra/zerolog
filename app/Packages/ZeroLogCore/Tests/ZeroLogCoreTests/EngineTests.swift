@@ -34,6 +34,14 @@ final class EngineTests: XCTestCase {
         XCTAssertEqual(catalog.sessions["order"], ["push", "pull", "legs"])
     }
 
+    func testEveryExerciseUsesKnownEquipment() {
+        let known = Set(catalog.equipmentTypes.map(\.id))
+        XCTAssertTrue(known.contains("lat_pulldown"))  // ids keep their underscores
+        for exercise in catalog.exercises {
+            XCTAssertTrue(Set(exercise.equipment).isSubset(of: known), exercise.id)
+        }
+    }
+
     // MARK: Selection
 
     func testOnlyUsesEquipmentTheGymHas() {

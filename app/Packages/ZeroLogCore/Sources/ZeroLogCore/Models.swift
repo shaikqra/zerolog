@@ -13,8 +13,16 @@ public struct Exercise: Decodable, Equatable, Sendable {
     public let detectable: Bool
 }
 
+/// A kind of gym equipment the user can say their gym has.
+public struct EquipmentType: Decodable, Equatable, Sendable {
+    public let id: String
+    public let name: String
+}
+
 /// The exercise database plus the push/pull/legs session layouts.
 public struct Catalog: Decodable, Sendable {
+    /// In display order. Kept as a list (not a dictionary) because snake_case key conversion would rename ids.
+    public let equipmentTypes: [EquipmentType]
     public let exercises: [Exercise]
     public let sessions: [String: [String]]
 

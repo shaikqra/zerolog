@@ -1,5 +1,6 @@
 """Tests for the workout engine. Run from this folder with:  python -m unittest -v"""
 
+import json
 import unittest
 
 from engine import generate_workout, load_catalog, next_session_type
@@ -17,6 +18,14 @@ def session(date, session_type, exercise_id, weight, reps_per_set):
 
 def find(workout, exercise_id):
     return next(e for e in workout["exercises"] if e["exercise_id"] == exercise_id)
+
+
+class Database(unittest.TestCase):
+    def test_every_exercise_uses_known_equipment(self):
+        with open("data/exercises.json", encoding="utf-8") as f:
+            known = {e["id"] for e in json.load(f)["equipment_types"]}
+        for ex in CATALOG["exercises"]:
+            self.assertLessEqual(set(ex["equipment"]), known, ex["id"])
 
 
 class Selection(unittest.TestCase):
