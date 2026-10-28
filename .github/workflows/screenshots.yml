@@ -1,0 +1,42 @@
+# Runs the phone app on an iPhone simulator, taps through it and saves a photo of each screen.
+# Manual only (Actions tab -> Screenshots -> Run workflow), to save free Mac minutes.
+name: Screenshots
+
+on:
+  workflow_dispatch:
+
+jobs:
+  screenshots:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: app
+        run: xcodegen generate
+
+      - name: Available iPhone simulators
+        run: xcrun simctl list devices available | grep -i iphone | head -20
+
+      - name: Tap through the app
+        working-directory: app
+        run: >
+          xcodebuild test -project ZeroLog.xcodeproj -scheme ZeroLog
+          -destination 'platform=iOS Simulator,name=iPhone 16'
+          -resultBundlePath ../screens.xcresult
+          CODE_SIGNING_ALLOWED=NO -quiet
+
+      - name: Pull the photos out
+        if: always()
+        run: xcrun xcresulttool export attachments --path screens.xcresult --output-path screenshots
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots
+          retention-days: 7

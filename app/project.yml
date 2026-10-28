@@ -32,7 +32,19 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: ZeroLog
         INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
         TARGETED_DEVICE_FAMILY: "1"
-    scheme: {}
+    scheme:
+      testTargets: [ZeroLogUITests]
+
+  # Taps through the phone app and takes screenshots (see .github/workflows/screenshots.yml).
+  ZeroLogUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [ZeroLogUITests]
+    dependencies:
+      - target: ZeroLog
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.getzerolog.app.uitests
 
   ZeroLogWatch:
     type: application
