@@ -1,0 +1,45 @@
+# Engine tests on a LINUX runner.
+#
+# Why: GitHub bills macOS minutes at 10x, so the 2,000 free minutes on a private
+# repo are really only ~200 Mac-minutes a month. Linux bills at 1x. The whole
+# ZeroLogCore package is Foundation-only, so these 36 Swift tests do not need a
+# Mac at all -- verified running them on Linux x86_64 in 0.124 seconds.
+#
+# Everything that can run here must run here. The macOS workflow is now only
+# for things that genuinely require Xcode: generating the project and building
+# the iPhone and Watch apps.
+name: Core tests
+
+on:
+  push:
+    paths:
+      - "app/Packages/**"
+      - "core/**"
+      - ".github/workflows/core-tests.yml"
+  pull_request:
+    paths:
+      - "app/Packages/**"
+      - "core/**"
+  workflow_dispatch:
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    container: swift:6.2          # official Swift image; no third-party action
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      # The container runs as root, which makes git distrust the checkout dir.
+      - name: Trust the workspace
+        run: git config --global --add safe.directory '*'
+
+      - name: Exercise database matches the Python copy
+        run: cmp core/data/exercises.json app/Packages/ZeroLogCore/Sources/ZeroLogCore/Resources/exercises.json
+
+      - name: Swift engine tests
+        run: swift test --package-path app/Packages/ZeroLogCore
+
+      - name: Python reference engine tests
+        working-directory: core
+        run: python3 -m unittest -v

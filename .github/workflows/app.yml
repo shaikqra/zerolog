@@ -1,12 +1,26 @@
-# Builds and tests the iPhone + Watch app on GitHub's Mac servers.
-# Only runs when app code or the exercise database changes, to save free Mac minutes.
+# Builds the iPhone + Watch app on GitHub's Mac servers.
+#
+# macOS minutes bill at 10x, so this workflow does ONLY what needs Xcode.
+# The exercise-database check and the 36 engine tests moved to core-tests.yml
+# on a Linux runner (1x billing) -- the core package is Foundation-only and
+# needs no Mac.
+#
+# `!app/Packages/**` is the important bit: editing the engine no longer starts
+# a Mac build, because Linux already compiled and tested it.
 name: App build
 
 on:
   push:
     branches: [main]
-    paths: ["app/**", "core/data/**", ".github/workflows/app.yml"]
+    paths:
+      - "app/**"
+      - "!app/Packages/**"
+      - ".github/workflows/app.yml"
   workflow_dispatch:
+
+concurrency:                      # never pay for a superseded commit
+  group: app-build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -17,12 +31,6 @@ jobs:
 
       - name: Show Xcode version
         run: xcodebuild -version
-
-      - name: Exercise database matches the Python copy
-        run: cmp core/data/exercises.json app/Packages/ZeroLogCore/Sources/ZeroLogCore/Resources/exercises.json
-
-      - name: Engine tests
-        run: swift test --package-path app/Packages/ZeroLogCore
 
       - name: Install XcodeGen
         run: brew install xcodegen
