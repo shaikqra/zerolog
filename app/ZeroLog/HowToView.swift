@@ -10,22 +10,26 @@ struct HowToView: View {
     var body: some View {
         let exercise = model.exercise(exerciseId)
         List {
+            AnimationPlaceholder()
+                .listRowInsets(EdgeInsets())
+                .listRowBackground(Color.clear)
             Section {
-                AnimationPlaceholder()
-                    .listRowInsets(EdgeInsets())
-            }
-            Section("How to do it") {
                 ForEach(Array((exercise?.cues ?? []).enumerated()), id: \.offset) { index, cue in
-                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    HStack(alignment: .firstTextBaseline, spacing: 14) {
                         Text("\(index + 1)")
-                            .font(.body.bold().monospacedDigit())
-                            .foregroundStyle(Color.plate)
+                            .font(.score(26, relativeTo: .title2))
+                            .foregroundStyle(Color.load)
                         Text(cue)
+                            .font(.ui(17))
+                            .foregroundStyle(Color.textPrimary)
                     }
                 }
+            } header: {
+                SectionTitle("How to do it")
             }
+            .listRowBackground(Color.surface)
         }
-        .textCase(nil)
+        .darkList()
         .navigationTitle(exercise?.name ?? "How to do it")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -37,13 +41,13 @@ private struct AnimationPlaceholder: View {
         VStack(spacing: 12) {
             Image(systemName: "figure.strengthtraining.traditional")
                 .font(.system(size: 64))
-                .foregroundStyle(Color.plate)
+                .foregroundStyle(Color.textTertiary)
             Text("Animation coming soon")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.ui(15))
+                .foregroundStyle(Color.textSecondary)
         }
         .frame(maxWidth: .infinity)
         .frame(height: 240)
-        .background(Color.plate.opacity(0.08))
+        .background(Color.surface, in: RoundedRectangle(cornerRadius: 22))
     }
 }

@@ -4,11 +4,16 @@ import SwiftUI
 struct ZeroLogApp: App {
     @State private var model = AppModel()
 
+    init() {
+        Style.apply()
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environment(model)
-                .tint(.plate)
+                .tint(Color.textPrimary)
+                .preferredColorScheme(.dark)
         }
     }
 }

@@ -11,29 +11,34 @@ struct OnboardingView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section {
-                    Text("Tell ZeroLog what your gym has. It only plans exercises you can actually do there.")
-                }
+                Text("Tell ZeroLog what your gym has. It only plans exercises you can actually do there.")
+                    .font(.ui(17))
+                    .foregroundStyle(Color.textSecondary)
+                    .listRowBackground(Color.clear)
                 EquipmentSection(types: model.catalog?.equipmentTypes ?? [], selected: $equipment)
-                Section("How long do you usually train?") {
-                    MinutesPicker(minutes: $minutes)
-                }
-                Section("Weights in") {
-                    UnitPicker(unit: $unit)
-                }
                 Section {
-                    Button("Plan my first workout") {
-                        model.updateSettings(UserSettings(equipment: equipment, minutes: minutes, unit: unit))
-                    }
-                    .disabled(equipment.isEmpty)
-                } footer: {
-                    if equipment.isEmpty {
-                        Text("Pick at least one piece of equipment.")
-                    }
+                    MinutesPicker(minutes: $minutes)
+                } header: {
+                    SectionTitle("How long do you usually train?")
                 }
+                .listRowBackground(Color.surface)
+                Section {
+                    UnitPicker(unit: $unit)
+                } header: {
+                    SectionTitle("Weights in")
+                }
+                .listRowBackground(Color.surface)
             }
-            .textCase(nil)
+            .darkList()
             .navigationTitle("Your gym")
+            .safeAreaInset(edge: .bottom) {
+                Button("Plan my first workout") {
+                    model.updateSettings(UserSettings(equipment: equipment, minutes: minutes, unit: unit))
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                .padding(20)
+                .disabled(equipment.isEmpty)
+            }
             .onAppear {
                 // Start with everything ticked; most gyms have it all.
                 if equipment.isEmpty {
@@ -51,18 +56,24 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 EquipmentSection(types: model.catalog?.equipmentTypes ?? [], selected: setting(\.equipment))
-                Section("Session length") {
+                Section {
                     MinutesPicker(minutes: setting(\.minutes))
+                } header: {
+                    SectionTitle("Session length")
                 }
+                .listRowBackground(Color.surface)
                 Section {
                     UnitPicker(unit: setting(\.unit))
                 } header: {
-                    Text("Weights in")
+                    SectionTitle("Weights in")
                 } footer: {
                     Text("Past workouts convert automatically.")
+                        .font(.ui(14))
+                        .foregroundStyle(Color.textTertiary)
                 }
+                .listRowBackground(Color.surface)
             }
-            .textCase(nil)
+            .darkList()
             .navigationTitle("Settings")
         }
     }
@@ -85,7 +96,7 @@ struct EquipmentSection: View {
     @Binding var selected: Set<String>
 
     var body: some View {
-        Section("Equipment") {
+        Section {
             ForEach(types, id: \.id) { type in
                 Toggle(type.name, isOn: Binding(
                     get: { selected.contains(type.id) },
@@ -93,8 +104,19 @@ struct EquipmentSection: View {
                         if isOn { selected.insert(type.id) } else { selected.remove(type.id) }
                     }
                 ))
+                .font(.ui(17))
+                .tint(Color.done)
+            }
+        } header: {
+            SectionTitle("Equipment")
+        } footer: {
+            if selected.isEmpty {
+                Text("Pick at least one piece of equipment.")
+                    .font(.ui(14))
+                    .foregroundStyle(Color.textTertiary)
             }
         }
+        .listRowBackground(Color.surface)
     }
 }
 
@@ -119,5 +141,6 @@ struct MinutesPicker: View {
                 Text("\(option) min").tag(option)
             }
         }
+        .font(.ui(17))
     }
 }

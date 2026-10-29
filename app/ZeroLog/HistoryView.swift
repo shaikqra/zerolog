@@ -21,16 +21,20 @@ struct HistoryView: View {
                             NavigationLink {
                                 SessionDetailView(session: session)
                             } label: {
-                                VStack(alignment: .leading, spacing: 2) {
+                                VStack(alignment: .leading, spacing: 4) {
                                     Text("\(session.sessionType.capitalized) day")
-                                        .font(.headline)
+                                        .font(.ui(18, bold: true))
+                                        .foregroundStyle(Color.textPrimary)
                                     Text("\(Today.display(session.date)), \(setsText(setCount(session)))")
-                                        .font(.subheadline)
-                                        .foregroundStyle(.secondary)
+                                        .font(.ui(15))
+                                        .foregroundStyle(Color.textSecondary)
                                 }
+                                .padding(.vertical, 4)
                             }
                         }
+                        .listRowBackground(Color.surface)
                     }
+                    .darkList()
                 }
             }
             .navigationTitle("History")
@@ -52,14 +56,25 @@ struct SessionDetailView: View {
     var body: some View {
         List {
             ForEach(session.exercises, id: \.exerciseId) { logged in
-                Section(model.exerciseName(logged.exerciseId)) {
+                Section {
                     ForEach(Array(logged.sets.enumerated()), id: \.offset) { index, set in
-                        LabeledContent("Set \(index + 1)", value: "\(set.reps) × \(unit.fromKg(set.weightKg).formatted()) \(unit.rawValue)")
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("Set \(index + 1)")
+                                .font(.ui(17))
+                                .foregroundStyle(Color.textSecondary)
+                            Spacer()
+                            Text("\(set.reps) × \(unit.fromKg(set.weightKg).formatted()) \(unit.rawValue)")
+                                .font(.score(26, relativeTo: .title2))
+                                .foregroundStyle(Color.textPrimary)
+                        }
                     }
+                } header: {
+                    SectionTitle(model.exerciseName(logged.exerciseId))
                 }
+                .listRowBackground(Color.surface)
             }
         }
-        .textCase(nil)
+        .darkList()
         .navigationTitle(Today.display(session.date))
     }
 }

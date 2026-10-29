@@ -10,19 +10,28 @@ struct TodayView: View {
             Group {
                 if let plan = model.plan {
                     List {
+                        Text(summary(plan))
+                            .font(.ui(17))
+                            .foregroundStyle(Color.textSecondary)
+                            .listRowBackground(Color.clear)
                         if let problem = model.problem {
                             Section {
                                 Label(problem, systemImage: "exclamationmark.triangle")
-                                    .foregroundStyle(.orange)
+                                    .font(.ui(16))
+                                    .foregroundStyle(Color.textPrimary)
                             }
+                            .listRowBackground(Color.surface)
                         }
                         let changes = plan.exercises.filter { $0.change != nil }
                         if !changes.isEmpty {
-                            Section("What I changed") {
+                            Section {
                                 ForEach(changes, id: \.exerciseId) { item in
                                     ChangeRow(item: item, unit: plan.unit) { model.undoChange(item.exerciseId) }
                                 }
+                            } header: {
+                                SectionTitle("What I changed")
                             }
+                            .listRowBackground(Color.surface)
                         }
                         Section {
                             ForEach(plan.exercises, id: \.exerciseId) { item in
@@ -32,30 +41,30 @@ struct TodayView: View {
                                     ExerciseRow(item: item, unit: plan.unit)
                                 }
                             }
-                        } footer: {
-                            Text("About \(plan.estimatedMinutes) minutes")
+                        } header: {
+                            SectionTitle("Today's plan")
                         }
+                        .listRowBackground(Color.surface)
                         if !plan.skipped.isEmpty {
-                            Section("Left out today") {
+                            Section {
                                 ForEach(plan.skipped, id: \.name) { item in
                                     Text("\(item.name): \(item.reason)")
+                                        .font(.ui(15))
+                                        .foregroundStyle(Color.textSecondary)
                                 }
+                            } header: {
+                                SectionTitle("Left out today")
                             }
+                            .listRowBackground(Color.surface)
                         }
                     }
-                    .textCase(nil)
+                    .darkList()
                     .navigationTitle("\(plan.sessionType.capitalized) day")
                     .safeAreaInset(edge: .bottom) {
-                        Button {
-                            model.start()
-                        } label: {
-                            Text("Start workout")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
-                        .padding()
-                        .disabled(plan.exercises.isEmpty)
+                        Button("Start workout", action: model.start)
+                            .buttonStyle(PrimaryButtonStyle())
+                            .padding(20)
+                            .disabled(plan.exercises.isEmpty)
                     }
                 } else {
                     ContentUnavailableView(
@@ -74,6 +83,12 @@ struct TodayView: View {
     private var workoutIsOpen: Binding<Bool> {
         Binding(get: { model.active != nil }, set: { _ in })
     }
+
+    /// "4 moves, about 38 minutes."
+    private func summary(_ plan: Workout) -> String {
+        let moves = plan.exercises.count == 1 ? "1 move" : "\(plan.exercises.count) moves"
+        return "\(moves), about \(plan.estimatedMinutes) minutes."
+    }
 }
 
 struct ExerciseRow: View {
@@ -81,17 +96,18 @@ struct ExerciseRow: View {
     let unit: WeightUnit
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             Text(item.name)
-                .font(.headline)
+                .font(.ui(18, bold: true))
+                .foregroundStyle(Color.textPrimary)
             Text(prescription)
-                .font(.subheadline.monospacedDigit())
-                .foregroundStyle(Color.plate)
+                .font(.score(28, relativeTo: .title2))
+                .foregroundStyle(Color.load)
             Text(item.reason)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .font(.ui(15))
+                .foregroundStyle(Color.textSecondary)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 6)
     }
 
     /// "3 × 6 at 62.5 kg", or "3 × 6, choose a weight" the first time.
@@ -109,19 +125,17 @@ struct ChangeRow: View {
     let undo: () -> Void
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.headline)
-                Text(item.reason)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.ui(17, bold: true))
+                .foregroundStyle(Color.textPrimary)
+            Text(item.reason)
+                .font(.ui(15))
+                .foregroundStyle(Color.textSecondary)
             Button("Undo", action: undo)
-                .buttonStyle(.borderless)
+                .buttonStyle(OutlineButtonStyle())
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 6)
     }
 
     /// "Added 5 lb to Barbell bench press" or "Lightened Barbell bench press to 120 lb".

@@ -42,7 +42,7 @@ final class ScreenshotTests: XCTestCase {
         XCTAssertTrue(confirmButton.waitForExistence(timeout: 10))
 
         // Hit the top of the rep range (6 -> 10) on all 3 sets, so the next push day adds weight.
-        let addRep = app.steppers.firstMatch.buttons["Increment"]
+        let addRep = app.buttons["Add rep"]
         for _ in 1...4 { addRep.tap() }
         confirmButton.tap()
         snap("05 Workout, second set")
