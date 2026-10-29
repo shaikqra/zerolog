@@ -1,6 +1,6 @@
 import Foundation
 
-/// ZeroLog workout engine: Swift port of core/engine.py.
+/// ZeroLog workout engine. Single source of truth for every number the user sees.
 /// Builds today's workout only from the exercise database, past sessions and fixed rules.
 /// Nothing is free-written, and the same inputs always give the same workout.
 public enum Engine {

@@ -1,7 +1,7 @@
 import XCTest
 @testable import ZeroLogCore
 
-/// Same rules as core/test_engine.py. If a rule changes, change it in both places.
+/// The progression rules. These tests are the specification -- change them first.
 final class EngineTests: XCTestCase {
     private var catalog: Catalog!
     private let fullGym: Set<String> = ["barbell", "bench", "rack", "dumbbells", "cable", "lat_pulldown", "leg_press"]
