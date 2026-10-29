@@ -1,32 +1,24 @@
 /* ZeroLog landing page styles.
-   Colours: chalk background, graphite text, one accent (competition-plate blue). */
+   Same look as the app: true black, white text and buttons, data colours from competition
+   weight plates (red = workouts, blue = food), Big Shoulders Display for big type and numbers,
+   Atkinson Hyperlegible for everything else. */
 
 :root {
-  --chalk: #f1f2ee;
-  --graphite: #1c1e22;
-  --steel: #5d626b;
-  --rule: #d6d8d1;
-  --plate: #2347c5;
-  --plate-ink: #ffffff;
-  --watch-body: #1c1e22;
+  --chalk: #000000;      /* page */
+  --surface: #111214;    /* panels */
+  --graphite: #f3f3f0;   /* text, primary buttons */
+  --steel: #a9aaa5;      /* supporting text */
+  --rule: #2b2c30;       /* hairlines, empty tracks */
+  --plate: #ff5b4f;      /* red plate: workouts */
+  --food: #4e8eff;       /* blue plate: food */
+  --done: #3fd68a;       /* green plate: done */
+  --watch-body: #1b1c1f;
   --watch-screen: #000000;
 
-  --display: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
-  --text: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --text: "Atkinson Hyperlegible", system-ui, sans-serif;
 
-  color-scheme: light dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --chalk: #16181b;
-    --graphite: #ecede9;
-    --steel: #a2a7ae;
-    --rule: #2c2f34;
-    --plate: #6f8cff;
-    --plate-ink: #0d1022;
-    --watch-body: #2c2f34;
-  }
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -43,7 +35,7 @@ body {
 a { color: inherit; text-underline-offset: 0.2em; }
 
 :focus-visible {
-  outline: 3px solid var(--plate);
+  outline: 3px solid var(--graphite);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -61,7 +53,7 @@ a { color: inherit; text-underline-offset: 0.2em; }
 
 .logo {
   font: 700 1.25rem/1 var(--display);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   text-decoration: none;
 }
 
@@ -80,7 +72,7 @@ a { color: inherit; text-underline-offset: 0.2em; }
 
 h1 {
   margin: 0 0 2rem;
-  font: 700 clamp(3.25rem, 10vw, 6.75rem)/0.92 var(--display);
+  font: 800 clamp(3.25rem, 10vw, 6.75rem)/0.92 var(--display);
   letter-spacing: -0.045em;
 }
 
@@ -119,7 +111,7 @@ h1 {
   min-height: 3.25rem;
   padding: 0 1rem;
   border: 2px solid var(--graphite);
-  border-radius: 999px;
+  border-radius: 14px;
   background: transparent;
   color: inherit;
   font: inherit;
@@ -134,10 +126,10 @@ h1 {
   min-height: 3.25rem;
   padding: 0 1.5rem;
   border: 0;
-  border-radius: 999px;
-  background: var(--plate);
-  color: var(--plate-ink);
-  font: 600 1.0625rem/1 var(--text);
+  border-radius: 14px;
+  background: var(--graphite);
+  color: var(--chalk);
+  font: 700 1.0625rem/1 var(--text);
   text-decoration: none;
   cursor: pointer;
 }
@@ -182,20 +174,20 @@ h1 {
   padding: 1.1rem 1.2rem;
   border-radius: 24%;
   background: var(--watch-screen);
-  color: #ffffff;
+  color: var(--graphite);
   font-family: var(--display);
 }
 
 .w-ex {
   margin: 0;
-  color: #9aa6ff;
+  color: var(--plate);
   font-size: 1rem;
   font-weight: 600;
 }
 
 .w-set {
   margin: 0.1rem 0 0;
-  color: #8a8f98;
+  color: var(--steel);
   font-size: 0.8125rem;
 }
 
@@ -211,10 +203,10 @@ h1 {
   font-size: 4.25rem;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
-.w-unit { color: #8a8f98; font-size: 1rem; }
+.w-unit { color: var(--steel); font-size: 1rem; }
 
 .w-confirm {
   display: flex;
@@ -230,16 +222,17 @@ h1 {
   place-items: center;
   width: 2.75rem;
   height: 2.75rem;
-  border: 2px solid #6f8cff;
+  border: 2px solid var(--graphite);
   border-radius: 50%;
-  color: #6f8cff;
+  color: var(--graphite);
   font-size: 1.25rem;
   font-weight: 700;
   transition: background-color 200ms ease, color 200ms ease, transform 200ms ease;
 }
 
 .watch.done .w-tap {
-  background: #6f8cff;
+  background: var(--done);
+  border-color: var(--done);
   color: #000000;
   transform: scale(1.08);
 }
@@ -266,7 +259,7 @@ h2 {
   max-width: 36rem;
   margin: 0 0 1rem;
   font: 700 clamp(1.875rem, 4.5vw, 2.75rem)/1.05 var(--display);
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .section p { max-width: 36rem; }
@@ -337,7 +330,7 @@ h2 {
 .range-figure {
   margin: 0 0 1rem;
   font: 700 clamp(2.5rem, 7vw, 3.75rem)/1 var(--display);
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   font-variant-numeric: tabular-nums;
 }
 
@@ -356,7 +349,7 @@ h2 {
   width: 24%;
   height: 100%;
   border-radius: 999px;
-  background: var(--plate);
+  background: var(--food);
 }
 
 .range-scale {
@@ -375,7 +368,7 @@ h2 {
   max-width: 44rem;
   margin: 0 0 1.25rem;
   font: 600 clamp(1.625rem, 4vw, 2.5rem)/1.2 var(--display);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 /* FAQ */
@@ -423,7 +416,7 @@ h2 {
 .price {
   margin: 0 0 1.25rem;
   font: 700 2.5rem/1 var(--display);
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
 }
 
 .price span { display: block; margin-top: 0.5rem; color: var(--steel); font: 400 1rem/1.4 var(--text); letter-spacing: 0; }
@@ -436,7 +429,7 @@ h2 {
 
 .draft-banner {
   padding: 0.75rem 1rem;
-  border: 2px dashed var(--plate);
+  border: 2px dashed var(--rule);
   border-radius: 0.75rem;
   font-weight: 600;
 }

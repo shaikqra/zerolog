@@ -74,10 +74,10 @@ enum Style {
 /// The one main action on a screen: white, black text.
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        Body(configuration: configuration)
+        StyledLabel(configuration: configuration)
     }
 
-    private struct Body: View {
+    private struct StyledLabel: View {
         let configuration: Configuration
         @Environment(\.isEnabled) private var isEnabled
 
