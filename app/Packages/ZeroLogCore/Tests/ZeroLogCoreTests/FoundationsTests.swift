@@ -148,6 +148,16 @@ final class ProfileTests: XCTestCase {
         XCTAssertEqual(p.latestBodyweightKg, 80.4)
     }
 
+    /// Guideline 5.1.3(ii): no personal health information in iCloud.
+    /// If someone removes this conformance, a future sync layer loses the only
+    /// signal telling it not to upload bodyweight, height, DOB and sex.
+    func testHealthBearingTypesAreMarkedDeviceLocalOnly() {
+        XCTAssertTrue((profile(.maintain) as Any) is DeviceLocalOnly)
+        XCTAssertTrue((BodyweightEntry(date: "2026-10-29", kg: 80) as Any) is DeviceLocalOnly)
+        XCTAssertTrue((MacroTargets(caloriesLow: 2000, caloriesHigh: 2200, proteinG: 160,
+                                    fatG: 65, carbsG: 200) as Any) is DeviceLocalOnly)
+    }
+
     func testProfileSurvivesASaveAndLoad() throws {
         let p = profile(.buildMuscle)
         let data = try JSONEncoder().encode(p)

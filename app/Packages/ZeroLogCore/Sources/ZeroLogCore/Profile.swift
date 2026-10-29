@@ -1,5 +1,23 @@
 import Foundation
 
+/// Marks a type that must NEVER be written to CloudKit or any iCloud container.
+///
+/// App Store Review Guideline 5.1.3(ii): "Apps ... may not store personal
+/// health information in iCloud." Breaking this is a rejection, and it is far
+/// cheaper to honour the boundary in the schema than to retrofit it after sync
+/// ships.
+///
+/// The split for ZeroLog:
+///   - CloudKit IS allowed for app-authored training data: sets, reps,
+///     weights, dates, the exercise database. That is workout logging, not
+///     health information.
+///   - CloudKit is NOT allowed for anything health-derived: HealthKit reads
+///     (HRV, sleep, resting heart rate), bodyweight, height, date of birth and
+///     biological sex.
+///
+/// Any future sync layer must refuse to serialise a `DeviceLocalOnly` type.
+public protocol DeviceLocalOnly {}
+
 /// What the user tells us ONCE, during onboarding.
 ///
 /// ZeroLog's promise is zero *recurring* input, not zero input. You cannot
@@ -10,7 +28,10 @@ import Foundation
 /// Bodyweight is the one value that keeps changing, so it is stored as a dated
 /// series rather than a single number, and is meant to arrive passively from
 /// HealthKit or a smart scale rather than being typed.
-public struct UserProfile: Codable, Equatable, Sendable {
+/// DEVICE-LOCAL ONLY -- see `DeviceLocalOnly`. Height, date of birth,
+/// biological sex and bodyweight are personal health information under
+/// Guideline 5.1.3(ii) and must not sync to iCloud.
+public struct UserProfile: Codable, Equatable, Sendable, DeviceLocalOnly {
     public var birthYear: Int
     public var heightCm: Double
     /// Needed only by the Mifflin-St Jeor BMR equation below, which is defined
@@ -46,7 +67,8 @@ public enum Goal: String, Codable, Sendable {
     case loseFat, maintain, buildMuscle
 }
 
-public struct BodyweightEntry: Codable, Equatable, Sendable {
+/// DEVICE-LOCAL ONLY. Bodyweight is health information; keep it off iCloud.
+public struct BodyweightEntry: Codable, Equatable, Sendable, DeviceLocalOnly {
     public var date: String
     public var kg: Double
 
@@ -57,7 +79,9 @@ public struct BodyweightEntry: Codable, Equatable, Sendable {
 }
 
 /// Daily targets. Always a range, never a single fake-exact number.
-public struct MacroTargets: Codable, Equatable, Sendable {
+/// DEVICE-LOCAL ONLY. Derived from bodyweight and goal, so it carries the
+/// same health-information status as its inputs.
+public struct MacroTargets: Codable, Equatable, Sendable, DeviceLocalOnly {
     public var caloriesLow: Int
     public var caloriesHigh: Int
     public var proteinG: Int
