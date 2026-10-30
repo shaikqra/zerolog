@@ -10,6 +10,10 @@ struct ZeroLogWatchApp: App {
 }
 
 /// Picks the screen: start, the set in progress, or the summary.
+///
+/// @MainActor because the @State initialiser below constructs a main-actor view
+/// model, and a View's implicit init is otherwise nonisolated.
+@MainActor
 struct RootView: View {
     @State private var controller = WorkoutController()
 

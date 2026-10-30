@@ -4,7 +4,7 @@ import ZeroLogCore
 struct StartView: View {
     let plan: Workout?
     let problem: String?
-    let onStart: () -> Void
+    let onStart: @MainActor () -> Void
 
     var body: some View {
         ScrollView {

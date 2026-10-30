@@ -12,10 +12,10 @@ import ZeroLogCore
 struct DetectedSetCard: View {
     let note: String
     /// Present when the set was logged on its own and can be taken back.
-    let onUndo: (() -> Void)?
+    let onUndo: (@MainActor () -> Void)?
     /// Present when the watch wants one tap to accept the number.
-    let onAccept: (() -> Void)?
-    let onDismiss: () -> Void
+    let onAccept: (@MainActor () -> Void)?
+    let onDismiss: @MainActor () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {

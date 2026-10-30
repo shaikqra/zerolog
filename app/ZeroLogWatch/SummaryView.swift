@@ -3,7 +3,7 @@ import ZeroLogCore
 
 struct SummaryView: View {
     let workout: ActiveWorkout
-    let onDone: () -> Void
+    let onDone: @MainActor () -> Void
 
     private var anythingLogged: Bool { workout.totalSetsLogged > 0 }
 

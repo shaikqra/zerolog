@@ -6,9 +6,9 @@ import ZeroLogCore
 /// Once rep detection exists, the detected count replaces the pre-filled reps.
 struct SetView: View {
     let workout: ActiveWorkout
-    let onConfirm: (Double, Int) -> Void
-    let onSkip: () -> Void
-    let onEnd: () -> Void
+    let onConfirm: @MainActor (Double, Int) -> Void
+    let onSkip: @MainActor () -> Void
+    let onEnd: @MainActor () -> Void
 
     @State private var weight: Double = 0
     @State private var reps: Int = 0

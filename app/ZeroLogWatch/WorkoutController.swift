@@ -7,6 +7,7 @@ import ZeroLogCore
 /// history, counts sets from wrist motion, records what was lifted, saves at the
 /// end.
 @Observable
+@MainActor
 final class WorkoutController {
     private(set) var plan: Workout?
     private(set) var active: ActiveWorkout?
