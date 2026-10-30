@@ -9,6 +9,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "ZeroLogCore", resources: [.process("Resources")]),
-        .testTarget(name: "ZeroLogCoreTests", dependencies: ["ZeroLogCore"]),
+        .testTarget(name: "ZeroLogCoreTests", dependencies: ["ZeroLogCore"],
+                    resources: [.process("Fixtures")]),
     ]
 )
