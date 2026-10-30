@@ -14,13 +14,28 @@ on:
   push:
     paths:
       - "app/Packages/**"
+      - "app/**/PrivacyInfo.xcprivacy"
+      - "scripts/check_privacy_manifests.py"
       - ".github/workflows/core-tests.yml"
   pull_request:
     paths:
       - "app/Packages/**"
+      - "app/**/PrivacyInfo.xcprivacy"
   workflow_dispatch:
 
 jobs:
+  # A malformed or wrongly-declared privacy manifest is refused at UPLOAD time,
+  # so the symptom is a rejection weeks later rather than a build error. This is
+  # cheap to check on Linux and does not need a Mac. Its own job because the
+  # Swift container has no python3.
+  privacy-manifests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Validate privacy manifests
+        run: python3 scripts/check_privacy_manifests.py
+
   core:
     runs-on: ubuntu-latest
     container: swift:6.2          # official Swift image; no third-party action

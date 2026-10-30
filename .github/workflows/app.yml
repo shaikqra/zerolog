@@ -44,6 +44,7 @@ jobs:
         run: >
           xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLog
           -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath build
           CODE_SIGNING_ALLOWED=NO -quiet build
 
       - name: Build Watch app
@@ -51,4 +52,45 @@ jobs:
         run: >
           xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLogWatch
           -destination 'generic/platform=watchOS Simulator'
+          -derivedDataPath build
           CODE_SIGNING_ALLOWED=NO -quiet build
+
+      # A privacy manifest that exists in the repo but not in the BUNDLE is
+      # worth nothing: App Store Connect refuses the upload, and the only
+      # symptom is a rejection email weeks later. Checking the built product is
+      # the only check that means anything.
+      - name: Check privacy manifests reached the app bundles
+        working-directory: app
+        run: |
+          set -uo pipefail
+          fail=0
+          found=0
+          for app in build/Build/Products/*/*.app; do
+            [ -d "$app" ] || continue
+            found=$((found + 1))
+            manifest="$app/PrivacyInfo.xcprivacy"
+            if [ ! -f "$manifest" ]; then
+              echo "MISSING from bundle: $manifest"
+              fail=1
+              continue
+            fi
+            plutil -lint "$manifest" || fail=1
+            echo "--- $manifest ---"
+            plutil -p "$manifest"
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "No .app bundles found; the check did not actually run"
+            exit 1
+          fi
+          # Rep counting reads CMLogItem.timestamp, which is seconds since boot,
+          # so the watch bundle must declare it or the upload is refused.
+          watch=$(ls -d build/Build/Products/*/ZeroLogWatch.app 2>/dev/null | head -1)
+          if [ -n "$watch" ]; then
+            plutil -p "$watch/PrivacyInfo.xcprivacy" \
+              | grep -q "NSPrivacyAccessedAPICategorySystemBootTime" \
+              || { echo "watch manifest is missing the SystemBootTime declaration"; fail=1; }
+          else
+            echo "ZeroLogWatch.app not found; cannot verify the watch manifest"
+            fail=1
+          fi
+          exit $fail

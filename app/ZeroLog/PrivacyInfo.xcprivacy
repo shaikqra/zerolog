@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Privacy manifest for the iPhone app.
+
+  Required since 2024-05-01: App Store Connect refuses the UPLOAD, not merely
+  the review, for an app that uses a required-reason API without declaring it.
+
+  Every entry below is empty on purpose, and each emptiness is a fact that was
+  checked rather than assumed:
+
+  - No required-reason APIs. The phone app reads no file timestamps, no disk
+    space, no active keyboard, and no system boot time. It also uses no
+    UserDefaults: settings live in SettingsStore as JSON in Application Support,
+    which is not a covered API.
+  - No data collected. There is no analytics SDK, no crash reporter, no backend
+    and no URLSession anywhere in the codebase. Nothing leaves the device.
+  - No tracking, and no tracking domains.
+
+  This stays accurate only while that remains true. Adding analytics, a food
+  photo upload, RevenueCat, or a rest timer that reads systemUptime each means
+  editing this file in the same commit. Verify with
+  Product > Archive > Generate Privacy Report on the exact submission archive,
+  and diff it against the App Store Connect privacy answers.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array/>
+</dict>
+</plist>

@@ -23,7 +23,16 @@ targets:
   ZeroLog:
     type: application
     platform: iOS
-    sources: [ZeroLog, Shared]
+    sources:
+      # The privacy manifest is declared explicitly as a resource. XcodeGen
+      # infers build phases from file type, and a .xcprivacy left to inference
+      # can end up in the wrong phase or be dropped -- which fails silently at
+      # upload time rather than at build time.
+      - path: ZeroLog
+        excludes: ["PrivacyInfo.xcprivacy"]
+      - path: Shared
+      - path: ZeroLog/PrivacyInfo.xcprivacy
+        buildPhase: resources
     dependencies:
       - package: ZeroLogCore
     settings:
@@ -52,7 +61,14 @@ targets:
   ZeroLogWatch:
     type: application
     platform: watchOS
-    sources: [ZeroLogWatch, Shared]
+    sources:
+      - path: ZeroLogWatch
+        excludes: ["PrivacyInfo.xcprivacy"]
+      - path: Shared
+      # The watch is a separate bundle, so the phone's manifest does not cover
+      # it. This one declares system boot time for rep counting.
+      - path: ZeroLogWatch/PrivacyInfo.xcprivacy
+        buildPhase: resources
     dependencies:
       - package: ZeroLogCore
     settings:

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Privacy manifest for the Apple Watch app.
+
+  NOTE TO ANYONE EDITING THIS COMMENT: XML forbids a double hyphen inside a
+  comment. Using one here produces a malformed manifest, which fails the build
+  or, worse, ships something App Store Connect refuses.
+
+  The watch needs its OWN manifest. Apple: "For each executable or dynamic
+  library in an app that uses a required reason API, the bundle that includes
+  the executable or dynamic library needs to include a privacy manifest file
+  that reports the API." The watch app is a separate bundle, so the phone's
+  manifest does not cover it.
+
+  SYSTEM BOOT TIME is declared because rep counting is built on it.
+  CMLogItem.timestamp, which every accelerometer and device motion sample
+  carries, is seconds since device boot. WatchMotionCapture subtracts the first
+  sample's timestamp so everything downstream is an offset into the capture
+  session, and SetDetector measures the time elapsed between samples to work out
+  where a set begins and ends.
+
+  Reason 35F9.1, verbatim from Apple's documentation:
+
+    "Declare this reason to access the system boot time in order to measure the
+     amount of time that has elapsed between events that occurred within the app
+     or to perform calculations to enable timers. Information accessed for this
+     reason, or any derived information, may not be sent off-device. There is an
+     exception for information about the amount of time that has elapsed between
+     events that occurred within the app, which may be sent off-device."
+
+  That is exactly what we do, and the exception is what permits a detected set's
+  duration to sync to the phone.
+
+  NOT 8FFB.1. That reason is for turning boot time into ABSOLUTE timestamps for
+  in-app events. We deliberately never do this: session relative offsets avoid
+  the question entirely, and a test asserts DetectedSet.startedAt is an offset
+  rather than a date. If anyone ever makes sample timestamps absolute, this file
+  must change to 8FFB.1 in the same commit.
+
+  The hard rule either way: the raw boot time, and anything derived from it
+  other than elapsed durations, must never leave the watch.
+
+  Everything else is empty, and checked:
+  no file timestamp, disk space or active keyboard APIs; no UserDefaults, since
+  settings arrive from the phone and are cached as JSON; no data collected, no
+  network code, no tracking. Workouts are written to HealthKit on the user's own
+  device, which is not third party collection.
+-->
+<plist version="1.0">
+<dict>
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>35F9.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
