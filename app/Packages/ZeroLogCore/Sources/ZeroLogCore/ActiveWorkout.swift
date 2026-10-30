@@ -9,6 +9,23 @@ public struct ActiveWorkout: Equatable, Sendable {
     public private(set) var setNumber = 1
     public private(set) var logged: [LoggedExercise] = []
 
+    /// Where to step back to, one frame per confirmed set.
+    ///
+    /// Needed because the product rule is that EVERY automatic change can be
+    /// undone, and a set logged from wrist motion is the most automatic change
+    /// there is. Reconstructing the position afterwards is error-prone -- a set
+    /// can be the last of an exercise, which also advanced the index -- so the
+    /// position is recorded before it changes rather than inferred after.
+    private var undoFrames: [UndoFrame] = []
+
+    struct UndoFrame: Equatable, Sendable {
+        let exerciseIndex: Int
+        let setNumber: Int
+        /// True when this set created a new LoggedExercise, so undo removes it
+        /// rather than leaving an exercise with no sets in the history.
+        let startedNewExercise: Bool
+    }
+
     public init(plan: Workout, date: String) {
         self.plan = plan
         self.date = date
@@ -41,6 +58,8 @@ public struct ActiveWorkout: Equatable, Sendable {
     public mutating func confirmSet(weight: Double, reps: Int) -> Bool {
         guard let current, reps > 0, weight >= 0 else { return false }
         let set = LoggedSet(weightKg: plan.unit.toKg(weight), reps: reps)
+        undoFrames.append(UndoFrame(exerciseIndex: exerciseIndex, setNumber: setNumber,
+                                    startedNewExercise: setNumber == 1))
         if setNumber == 1 {
             logged.append(LoggedExercise(exerciseId: current.exerciseId, sets: [set]))
         } else {
@@ -53,6 +72,23 @@ public struct ActiveWorkout: Equatable, Sendable {
         }
         return true
     }
+
+    /// Takes back the last confirmed set, including one logged automatically.
+    /// Returns false when there is nothing to undo.
+    @discardableResult
+    public mutating func undoLastSet() -> Bool {
+        guard let frame = undoFrames.popLast(), !logged.isEmpty else { return false }
+        if frame.startedNewExercise {
+            logged.removeLast()
+        } else {
+            logged[logged.count - 1].sets.removeLast()
+        }
+        exerciseIndex = frame.exerciseIndex
+        setNumber = frame.setNumber
+        return true
+    }
+
+    public var canUndo: Bool { !undoFrames.isEmpty }
 
     public mutating func skipExercise() {
         guard !isFinished else { return }
