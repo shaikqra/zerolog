@@ -147,6 +147,41 @@ final class SetDetectorTests: XCTestCase {
                                  "the sample buffer must stay capped")
     }
 
+    /// Samples arrive off the main actor while the UI sets the exercise on it.
+    /// Those two really do race -- the watchOS build warned about exactly this,
+    /// and Swift 6 will reject it outright. The lock inside SetDetector is what
+    /// makes it safe; this proves the lock holds rather than trusting it.
+    func testConcurrentIngestAndProfileChangesDoNotCorruptState() {
+        let detector = SetDetector(currentRepProfile: "squats")
+        let producers = 4
+        let batchesEach = 40
+        let done = expectation(description: "all producers finished")
+        done.expectedFulfillmentCount = producers + 1
+
+        for producer in 0..<producers {
+            DispatchQueue.global().async {
+                for batch in 0..<batchesEach {
+                    let from = Double(producer * batchesEach + batch) * 1.5
+                    detector.ingest(self.lifting(reps: 3, seconds: 1.5, from: from))
+                    _ = detector.bufferedSampleCount
+                    _ = detector.didDropSamples
+                }
+                done.fulfill()
+            }
+        }
+        // Meanwhile the "UI" keeps changing which exercise is next.
+        DispatchQueue.global().async {
+            for i in 0..<200 {
+                detector.currentRepProfile = i.isMultiple(of: 2) ? "squats" : "bicep_curls"
+            }
+            done.fulfill()
+        }
+
+        wait(for: [done], timeout: 30)
+        XCTAssertLessThanOrEqual(detector.bufferedSampleCount, SetDetector.maxBufferedSamples,
+                                 "the buffer cap must hold under concurrent writers")
+    }
+
     /// Timestamps stay session-relative on purpose: converting watch uptime to
     /// wall-clock reads system boot time, a required-reason API whose declared
     /// reason forbids that value leaving the device.

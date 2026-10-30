@@ -49,8 +49,12 @@ final class WatchMotionCapture: MotionCapturing, @unchecked Sendable {
     /// Sample rate the hardware actually chose. Read-only, and only meaningful
     /// after `start()`; `SetDetector` derives rate from timestamps anyway, so
     /// this is for diagnostics rather than for the maths.
+    /// NOTE: `accelerometerDataFrequency` is an **Int**, not a Double. Assuming
+    /// otherwise failed the watchOS build.
     var reportedHz: Double {
-        useBatched ? batched.accelerometerDataFrequency : 1.0 / max(fallback.deviceMotionUpdateInterval, .ulpOfOne)
+        useBatched
+            ? Double(batched.accelerometerDataFrequency)
+            : 1.0 / max(fallback.deviceMotionUpdateInterval, .ulpOfOne)
     }
 
     func start(onBatch: @escaping @Sendable ([MotionSample]) -> Void) throws {

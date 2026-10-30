@@ -40,7 +40,10 @@ final class WorkoutSessionController: NSObject {
     private var builder: HKLiveWorkoutBuilder?
 
     private let capture: any MotionCapturing
-    private let detector: SetDetector
+    /// nonisolated because samples arrive off the main actor. SetDetector guards
+    /// its own state with a lock, which is what makes this safe rather than just
+    /// quiet -- Swift 6 would reject the main-actor version outright.
+    private nonisolated let detector: SetDetector
 
     /// Called on the main actor for every set the watch spots by itself.
     private let onSetDetected: @MainActor (DetectedSet) -> Void

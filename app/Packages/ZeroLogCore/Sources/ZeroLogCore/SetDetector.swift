@@ -57,7 +57,19 @@ public struct DetectedSet: Equatable, Sendable {
 /// BATTERY: this assumes the caller only captures during an active workout.
 /// High-rate accelerometer capture for a whole session is expensive and has NOT
 /// been measured on hardware yet.
-public final class SetDetector {
+public final class SetDetector: @unchecked Sendable {
+
+    /// Guards every piece of mutable state below.
+    ///
+    /// Needed because samples arrive off the main actor -- CoreMotion delivers
+    /// them on its own queue or Task -- while the exercise is set from the UI on
+    /// the main actor. Swift 6 rejects reaching main-actor state from a
+    /// `@Sendable` closure, and it is right to: the two really do race.
+    ///
+    /// A lock rather than an actor so `ingest` stays synchronous. The capture
+    /// callback has nowhere to await, and making it async would mean buffering
+    /// samples somewhere else instead -- the same problem, moved.
+    private let lock = NSLock()
 
     // MARK: Tuning
 
@@ -93,7 +105,12 @@ public final class SetDetector {
     /// Which exercise the engine says is next. Set this BEFORE the set happens:
     /// per-exercise calibration is the only defence against both estimators
     /// agreeing on a wrong number.
-    public var currentRepProfile: String?
+    public var currentRepProfile: String? {
+        get { lock.withLock { _currentRepProfile } }
+        set { lock.withLock { _currentRepProfile = newValue } }
+    }
+
+    private var _currentRepProfile: String?
 
     private var buffer: [MotionSample] = []
     private var lastKeptTime: TimeInterval?
@@ -104,7 +121,7 @@ public final class SetDetector {
     private var droppedForOverflow = false
 
     public init(currentRepProfile: String? = nil) {
-        self.currentRepProfile = currentRepProfile
+        self._currentRepProfile = currentRepProfile
     }
 
     // MARK: Input
@@ -115,6 +132,10 @@ public final class SetDetector {
     /// set -- a caller that resumes after a gap should not silently lose data.
     @discardableResult
     public func ingest(_ samples: [MotionSample]) -> [DetectedSet] {
+        lock.withLock { ingestLocked(samples) }
+    }
+
+    private func ingestLocked(_ samples: [MotionSample]) -> [DetectedSet] {
         var finished: [DetectedSet] = []
         for sample in samples {
             // 1. Thin to targetHz, using timestamps rather than assuming a rate.
@@ -158,11 +179,17 @@ public final class SetDetector {
     /// Closes any set still in progress, for when the user ends the workout
     /// while standing at the rack. Without this the final set would be lost.
     public func flush() -> DetectedSet? {
-        guard activeSince != nil, let last = buffer.last?.t else { return nil }
-        return closeSet(endingAt: last)
+        lock.withLock {
+            guard activeSince != nil, let last = buffer.last?.t else { return nil }
+            return closeSet(endingAt: last)
+        }
     }
 
     public func reset() {
+        lock.withLock { resetLocked() }
+    }
+
+    private func resetLocked() {
         buffer.removeAll()
         windowSamples.removeAll()
         lastKeptTime = nil
@@ -175,10 +202,10 @@ public final class SetDetector {
     /// True when samples were discarded to respect the memory cap, which means
     /// the next count covers less than the whole set. Surface it rather than
     /// reporting a confident number from partial data.
-    public var didDropSamples: Bool { droppedForOverflow }
+    public var didDropSamples: Bool { lock.withLock { droppedForOverflow } }
 
     /// Exposed so a test can prove the buffer stays capped.
-    public var bufferedSampleCount: Int { buffer.count }
+    public var bufferedSampleCount: Int { lock.withLock { buffer.count } }
 
     // MARK: Counting
 
@@ -202,7 +229,7 @@ public final class SetDetector {
                                      x: window.map(\.x),
                                      y: window.map(\.y),
                                      z: window.map(\.z),
-                                     exercise: currentRepProfile)
+                                     exercise: _currentRepProfile)
         guard count.reps > 0 else { return nil }
 
         // Partial data must never be presented as certain.
@@ -211,7 +238,7 @@ public final class SetDetector {
 
         return DetectedSet(reps: count.reps, confidence: confidence,
                            startedAt: begin, seconds: seconds,
-                           repProfile: currentRepProfile)
+                           repProfile: _currentRepProfile)
     }
 
     private func estimatedRate(of window: [MotionSample]) -> Double {
