@@ -32,6 +32,9 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: ZeroLog
         INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
         TARGETED_DEVICE_FAMILY: "1"
+        # The phone app reads workouts and bodyweight; it does not capture motion.
+        INFOPLIST_KEY_NSHealthShareUsageDescription: "ZeroLog reads your workouts and bodyweight from Health so your plan reflects where you actually are."
+        INFOPLIST_KEY_NSHealthUpdateUsageDescription: "ZeroLog saves your lifting workouts to Health so they appear alongside your other activity."
     scheme:
       testTargets: [ZeroLogUITests]
 
@@ -58,4 +61,21 @@ targets:
         INFOPLIST_KEY_CFBundleDisplayName: ZeroLog
         INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.getzerolog.app
         INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp: "YES"
+        # MANDATORY. Raw accelerometer streams have no permission-request API,
+        # so a missing NSMotionUsageDescription does not produce a denial -- the
+        # app CRASHES on first sensor access. App Review also rejects a binary
+        # that merely contains code touching a protected resource without a
+        # purpose string, even if that code never runs. Strings must be specific:
+        # "This app needs your motion data" is rejected as too vague.
+        INFOPLIST_KEY_NSMotionUsageDescription: "ZeroLog reads your wrist movement during a workout to count your reps, so you never have to type a set."
+        INFOPLIST_KEY_NSHealthShareUsageDescription: "ZeroLog reads your workouts from Health so your training history stays in one place."
+        INFOPLIST_KEY_NSHealthUpdateUsageDescription: "ZeroLog saves your lifting workouts to Health so they appear alongside your other activity."
+        # Keeps the app sampling while the wrist is down. Without a workout
+        # session watchOS suspends the app mid-set and the set is lost.
+        INFOPLIST_KEY_WKBackgroundModes: workout-processing
+    entitlements:
+      path: ZeroLogWatch/ZeroLogWatch.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.access: []
     scheme: {}
