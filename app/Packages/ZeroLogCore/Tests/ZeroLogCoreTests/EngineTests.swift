@@ -30,7 +30,7 @@ final class EngineTests: XCTestCase {
     // MARK: Database
 
     func testDatabaseLoads() {
-        XCTAssertEqual(catalog.exercises.count, 19)
+        XCTAssertEqual(catalog.exercises.count, 25)
         XCTAssertEqual(catalog.sessions["order"], ["push", "pull", "legs"])
     }
 

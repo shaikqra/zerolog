@@ -2,12 +2,9 @@ import Foundation
 import Observation
 import ZeroLogCore
 
-/// What the user told us about their gym.
-struct UserSettings: Codable, Equatable {
-    var equipment: Set<String>
-    var minutes: Int
-    var unit: WeightUnit
-
+// UserSettings now lives in ZeroLogCore, because the watch needs the identical
+// definition -- see the note on that type.
+extension UserSettings {
     /// Pounds on US phones, kilograms everywhere else (UK gyms use kg).
     static let fallback = UserSettings(equipment: [], minutes: 45,
                                        unit: Locale.current.measurementSystem == .us ? .lb : .kg)
@@ -32,22 +29,22 @@ final class AppModel {
     private var undone: Set<String> = []
 
     private let store: HistoryStore?
-    private let settingsKey = "settings"
+    /// Shared with the watch target, so both devices read one format.
+    private let settingsStore: SettingsStore?
 
     init() {
         store = try? HistoryStore.standard()
+        settingsStore = try? SettingsStore.standard()
         catalog = try? Catalog.bundled()
-        if let data = UserDefaults.standard.data(forKey: settingsKey) {
-            settings = try? JSONDecoder().decode(UserSettings.self, from: data)
-        }
+        settings = try? settingsStore?.load()
         refresh()
     }
 
     func updateSettings(_ new: UserSettings) {
         settings = new
-        if let data = try? JSONEncoder().encode(new) {
-            UserDefaults.standard.set(data, forKey: settingsKey)
-        }
+        // TODO(watch): once WCSession exists, push this to the watch here. Until
+        // then the watch correctly reports that it has not been set up.
+        try? settingsStore?.save(new)
         refresh()
     }
 

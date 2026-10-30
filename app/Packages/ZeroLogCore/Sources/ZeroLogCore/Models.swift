@@ -12,8 +12,18 @@ public struct Exercise: Decodable, Equatable, Sendable {
     public let incrementLb: Double
     public let sets: Int
     public let detectable: Bool
+    /// Names the tuned calibration in `RepCounter.profiles`. nil = use the generic
+    /// profile. ALWAYS pass this to the counter: per-exercise calibration is the
+    /// only defence against the estimators agreeing on a wrong number.
+    public let repProfile: String?
+    /// True ONLY when this exact movement was in the MM-Fit validation set. False
+    /// means the profile is borrowed from a similar movement and is an untested
+    /// transfer -- do not quote accuracy figures for these.
+    public let repProfileVerified: Bool?
     /// Short form tips shown on the "How to do it" screen.
     public let cues: [String]
+
+    public var hasVerifiedRepProfile: Bool { repProfileVerified ?? false }
 
     /// Smallest weight jump for this exercise in the given unit.
     public func increment(in unit: WeightUnit) -> Double {
@@ -111,6 +121,8 @@ public struct PlannedExercise: Equatable, Sendable {
     public let exerciseId: String
     public let name: String
     public let detectable: Bool
+    /// Passed straight to `RepCounter.count(exercise:)` when logging this exercise.
+    public let repProfile: String?
     public internal(set) var sets: Int
     /// In the workout's unit. nil means first time: the user picks a starting weight.
     public let weight: Double?

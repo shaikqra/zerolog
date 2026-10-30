@@ -105,7 +105,8 @@ public enum Engine {
         var previous: Double?
 
         func make(_ weight: Double?, _ target: Int, _ reason: String, change: WeightChange? = nil) -> PlannedExercise {
-            PlannedExercise(exerciseId: ex.id, name: ex.name, detectable: ex.detectable, sets: sets,
+            PlannedExercise(exerciseId: ex.id, name: ex.name, detectable: ex.detectable,
+                            repProfile: ex.repProfile, sets: sets,
                             weight: weight, targetReps: target, reason: reason, increment: inc,
                             previousWeight: previous, change: change, kind: ex.kind, repRange: ex.repRange)
         }
@@ -153,7 +154,8 @@ public enum Engine {
         let target = change == .increased ? item.repRange[1] : item.repRange[0]
         var exercises = workout.exercises
         exercises[index] = PlannedExercise(
-            exerciseId: item.exerciseId, name: item.name, detectable: item.detectable, sets: item.sets,
+            exerciseId: item.exerciseId, name: item.name, detectable: item.detectable,
+            repProfile: item.repProfile, sets: item.sets,
             weight: previous, targetReps: target,
             reason: "Kept at \(format(previous)) \(workout.unit.rawValue), as you asked. Aim for \(target) reps.",
             increment: item.increment, previousWeight: previous, change: nil, kind: item.kind, repRange: item.repRange)

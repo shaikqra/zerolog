@@ -10,9 +10,11 @@ final class WorkoutController {
     /// A plain-language problem to show the user, if any.
     private(set) var problem: String?
     private let store: HistoryStore?
+    private let settings: SettingsProviding?
 
-    init() {
-        store = try? HistoryStore.standard()
+    init(settings: SettingsProviding? = try? SettingsStore.standard()) {
+        self.store = try? HistoryStore.standard()
+        self.settings = settings
         replan()
     }
 
@@ -50,13 +52,28 @@ final class WorkoutController {
         if let saveProblem { problem = saveProblem }
     }
 
+    /// Plans from the user's OWN gym and session length.
+    ///
+    /// This used to pass a hardcoded sample gym containing every machine, plus a
+    /// fixed 45 minutes, ignoring everything the user set up on their phone. A
+    /// dumbbells-only user would have been shown barbell bench press with no hint
+    /// the equipment list was invented. Showing nothing is better than showing a
+    /// confident wrong plan, so an un-synced watch now says so.
     private func replan() {
         do {
             let catalog = try Catalog.bundled()
             let history = try store?.load() ?? []
-            plan = Engine.generateWorkout(catalog: catalog, gymEquipment: SampleData.gym,
-                                          minutes: 45, history: history)
-            problem = store == nil ? "Workouts can't be saved on this watch right now." : nil
+            switch PlanRequest.resolve(catalog: catalog,
+                                       settings: settings?.currentSettings(),
+                                       history: history,
+                                       isWatch: true) {
+            case .ready(let workout):
+                plan = workout
+                problem = store == nil ? "Workouts can't be saved on this watch right now." : nil
+            case .needsSetup(let message):
+                plan = nil
+                problem = message
+            }
         } catch {
             plan = nil
             problem = "Your workout history couldn't be read, so today's plan isn't ready."
