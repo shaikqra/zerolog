@@ -93,6 +93,20 @@ public final class SetDetector: @unchecked Sendable {
     /// re-grip mid-set, short enough that the summary appears promptly.
     public static let quietSecondsToEndSet: Double = 4.0
 
+    /// A gap in sample DELIVERY longer than this ends any set in progress.
+    ///
+    /// Absence of data is not evidence of stillness, and it is certainly not
+    /// evidence of continued lifting. Without this the detector stitches across
+    /// a suspension: a set interrupted at 12 s and resumed ten minutes later
+    /// came out as a single 626-second set with a meaningless rep count. The
+    /// workout session makes that unlikely, not impossible -- and a wrong set
+    /// silently written to history is worse than a missing one, because the user
+    /// has to find and delete it.
+    ///
+    /// Same value as the stillness threshold: no data for four seconds is at
+    /// least as strong a signal as four seconds of measured stillness.
+    static let maxDeliveryGapSeconds: Double = 4.0
+
     /// Energy is measured over a window this long, stepped every second.
     ///
     /// Must be LONGER than the slowest plausible rep or slow lifting reads as
@@ -145,6 +159,9 @@ public final class SetDetector: @unchecked Sendable {
 
     private var buffer: [MotionSample] = []
     private var lastKeptTime: TimeInterval?
+    /// Last RAW sample time, used to spot a delivery gap. Distinct from
+    /// `lastKeptTime`, which only advances for samples that survive thinning.
+    private var lastSampleTime: TimeInterval?
     /// Rolling tail of kept samples, trimmed to `energyWindowSeconds`.
     private var windowSamples: [MotionSample] = []
     private var lastEvaluated: TimeInterval?
@@ -171,6 +188,23 @@ public final class SetDetector: @unchecked Sendable {
         var finished: [DetectedSet] = []
         samplesSeen += samples.count
         for sample in samples {
+            // 0. A gap in delivery ends the set, at the last moment we have
+            // evidence for. Forward gaps only: a sample arriving out of order
+            // from the past is disorder, not an outage.
+            if let last = lastSampleTime, sample.t - last > Self.maxDeliveryGapSeconds {
+                if activeSince != nil, let set = closeSet(endingAt: last) {
+                    finished.append(set)
+                }
+                activeSince = nil
+                quietSince = nil
+                windowSamples.removeAll(keepingCapacity: true)
+                lastEvaluated = nil
+                lastKeptTime = nil
+                trimBuffer(before: sample.t)
+            }
+            if lastSampleTime == nil || sample.t > lastSampleTime! {
+                lastSampleTime = sample.t
+            }
             // 1. Thin to targetHz, using timestamps rather than assuming a rate.
             //
             // The 0.999 is not noise. Comparing against the exact interval drops
@@ -255,6 +289,7 @@ public final class SetDetector: @unchecked Sendable {
         buffer.removeAll()
         windowSamples.removeAll()
         lastKeptTime = nil
+        lastSampleTime = nil
         lastEvaluated = nil
         activeSince = nil
         quietSince = nil
