@@ -61,8 +61,11 @@ final class WorkoutController {
         }
         replan()
         // Rebuild the plan the moment settings arrive, so the user does not have
-        // to back out and return to see their gym appear.
-        sync?.onChange = { [weak self] in self?.replan() }
+        // to back out and return to see their gym appear. The callback lands off
+        // the main actor, so the hop is explicit.
+        sync?.onChange = { [weak self] in
+            Task { @MainActor in self?.replan() }
+        }
         sync?.start()
 
         // watchOS terminates apps routinely, and a gym session cannot be redone.
