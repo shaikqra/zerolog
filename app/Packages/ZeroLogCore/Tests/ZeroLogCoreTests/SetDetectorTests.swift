@@ -71,6 +71,30 @@ final class SetDetectorTests: XCTestCase {
         }
     }
 
+    /// SLOW HEAVY REPS MUST NOT SPLIT. This is the case that matters most,
+    /// because it is what a real working set looks like near failure.
+    ///
+    /// The original one-second energy window read a grinding squat as rest: at
+    /// three seconds per rep the wrist spends whole seconds barely moving, so a
+    /// 1 s window lands inside the slow phase, scores quiet, and cuts the set in
+    /// half. It was caught only because an unrelated sample-rate fix shifted the
+    /// numbers -- the old test had been passing by luck, not by design.
+    func testSlowGrindingRepsStayOneSet() {
+        for secondsPerRep in [2.0, 2.5, 3.0, 3.5] {
+            let detector = SetDetector(currentRepProfile: "squats")
+            let reps = 5
+            let duration = Double(reps) * secondsPerRep
+            var found = detector.ingest(lifting(reps: reps, seconds: duration, from: 0))
+            found += detector.ingest(resting(seconds: 8, from: duration))
+            XCTAssertEqual(found.count, 1,
+                           "at \(secondsPerRep)s per rep the set split into \(found.count)")
+            if let set = found.first {
+                XCTAssertLessThanOrEqual(abs(set.reps - reps), 1,
+                                         "at \(secondsPerRep)s per rep counted \(set.reps)")
+            }
+        }
+    }
+
     /// Racking a bar or adjusting a pin is a short burst, not a set.
     func testBriefMovementIsNotASet() {
         let detector = SetDetector()

@@ -93,6 +93,17 @@ public final class SetDetector: @unchecked Sendable {
     /// re-grip mid-set, short enough that the summary appears promptly.
     public static let quietSecondsToEndSet: Double = 4.0
 
+    /// Energy is measured over a window this long, stepped every second.
+    ///
+    /// Must be LONGER than the slowest plausible rep or slow lifting reads as
+    /// rest. A one-second window was the original choice and it was wrong: a
+    /// grindy squat at three seconds per rep spends whole seconds barely
+    /// moving, so a 1 s window lands inside the slow phase, scores as quiet,
+    /// and splits one set into two. Three seconds comfortably covers reps down
+    /// to about 0.33 Hz, which is slower than anyone grinds out a single.
+    static let energyWindowSeconds: Double = 3.0
+    static let energyStepSeconds: Double = 1.0
+
     /// Shorter bursts than this are racking the weight, not a set.
     public static let minSetSeconds: Double = 4.0
 
@@ -112,10 +123,31 @@ public final class SetDetector: @unchecked Sendable {
 
     private var _currentRepProfile: String?
 
+    /// When on, each counted set is kept with the motion that produced it, so a
+    /// real workout can be replayed through the tuner offline. This is how the
+    /// barbell data finally gets collected: as a by-product of using the app.
+    public var recordsWindows: Bool {
+        get { lock.withLock { _recordsWindows } }
+        set { lock.withLock { _recordsWindows = newValue } }
+    }
+
+    private var _recordsWindows = false
+    private var recorded: [RecordedSet] = []
+    private var samplesSeen = 0
+    private var setsDetected = 0
+    private var candidatesRejected = 0
+    private var lastMeasuredHz: Double = 0
+    private var lastSet: DetectedSet?
+
+    /// Capped because this is debugging data on a device with little storage.
+    /// It must never be the reason a workout cannot be saved.
+    static let maxRecordedSets = 40
+
     private var buffer: [MotionSample] = []
     private var lastKeptTime: TimeInterval?
-    private var windowStart: TimeInterval?
+    /// Rolling tail of kept samples, trimmed to `energyWindowSeconds`.
     private var windowSamples: [MotionSample] = []
+    private var lastEvaluated: TimeInterval?
     private var activeSince: TimeInterval?
     private var quietSince: TimeInterval?
     private var droppedForOverflow = false
@@ -137,9 +169,19 @@ public final class SetDetector: @unchecked Sendable {
 
     private func ingestLocked(_ samples: [MotionSample]) -> [DetectedSet] {
         var finished: [DetectedSet] = []
+        samplesSeen += samples.count
         for sample in samples {
             // 1. Thin to targetHz, using timestamps rather than assuming a rate.
-            if let last = lastKeptTime, sample.t - last < 1.0 / Self.targetHz { continue }
+            //
+            // The 0.999 is not noise. Comparing against the exact interval drops
+            // one extra sample whenever the input rate is a clean multiple of
+            // the target: at 100 Hz, `0.02 - 0.0` computes just under 0.02 in
+            // floating point, so that sample is skipped and the next one lands
+            // 0.03 apart -- yielding 33 Hz where the code claims 50. Accuracy
+            // survived either way, but the effective rate should match the
+            // documented intent rather than drift below it.
+            if let last = lastKeptTime,
+               sample.t - last < 0.999 / Self.targetHz { continue }
             lastKeptTime = sample.t
 
             buffer.append(sample)
@@ -148,23 +190,30 @@ public final class SetDetector: @unchecked Sendable {
                 droppedForOverflow = true
             }
 
-            // 2. Accumulate one-second windows and classify each as work or rest.
-            if windowStart == nil { windowStart = sample.t }
+            // 2. Classify work vs rest over a ROLLING window, stepped each second.
             windowSamples.append(sample)
-            guard let start = windowStart, sample.t - start >= 1.0 else { continue }
+            let cutoff = sample.t - Self.energyWindowSeconds
+            if let first = windowSamples.first?.t, first < cutoff {
+                windowSamples.removeAll { $0.t < cutoff }
+            }
+
+            if lastEvaluated == nil { lastEvaluated = sample.t }
+            guard let previous = lastEvaluated,
+                  sample.t - previous >= Self.energyStepSeconds else { continue }
+            lastEvaluated = sample.t
 
             let energy = (0..<3)
                 .map { axis in RepCounter.standardDeviation(windowSamples.map { $0.axes[axis] }) }
                 .reduce(0, +) / 3.0
             let windowEnd = sample.t
-            windowSamples.removeAll(keepingCapacity: true)
-            windowStart = nil
+            // The window looks BACK, so movement in it began at least this early.
+            let windowStart = max(windowEnd - Self.energyWindowSeconds, 0)
 
             if energy > Self.activeThresholdG {
-                if activeSince == nil { activeSince = start }
+                if activeSince == nil { activeSince = windowStart }
                 quietSince = nil
             } else if activeSince != nil {
-                if quietSince == nil { quietSince = start }
+                if quietSince == nil { quietSince = windowEnd }
                 if let quiet = quietSince, windowEnd - quiet >= Self.quietSecondsToEndSet {
                     if let set = closeSet(endingAt: quiet) { finished.append(set) }
                 }
@@ -189,11 +238,24 @@ public final class SetDetector: @unchecked Sendable {
         lock.withLock { resetLocked() }
     }
 
+    /// Clears everything, including recorded sets. For a NEW workout.
+    public func resetSession() {
+        lock.withLock {
+            resetLocked()
+            recorded.removeAll()
+            samplesSeen = 0
+            setsDetected = 0
+            candidatesRejected = 0
+            lastMeasuredHz = 0
+            lastSet = nil
+        }
+    }
+
     private func resetLocked() {
         buffer.removeAll()
         windowSamples.removeAll()
         lastKeptTime = nil
-        windowStart = nil
+        lastEvaluated = nil
         activeSince = nil
         quietSince = nil
         droppedForOverflow = false
@@ -207,6 +269,36 @@ public final class SetDetector: @unchecked Sendable {
     /// Exposed so a test can prove the buffer stays capped.
     public var bufferedSampleCount: Int { lock.withLock { buffer.count } }
 
+    /// Live numbers for the diagnostics screen.
+    public var diagnostics: CaptureDiagnostics {
+        lock.withLock {
+            var d = CaptureDiagnostics()
+            d.isCapturing = samplesSeen > 0
+            d.samplesReceived = samplesSeen
+            d.measuredHz = lastMeasuredHz
+            d.setsDetected = setsDetected
+            d.candidatesRejected = candidatesRejected
+            d.lastSet = lastSet
+            d.droppedSamples = droppedForOverflow
+            return d
+        }
+    }
+
+    /// Sets recorded this session, for export. Empty unless `recordsWindows`.
+    public var recordedSets: [RecordedSet] { lock.withLock { recorded } }
+
+    /// Attaches the user's correction to the most recent recorded set.
+    ///
+    /// An explicit correction is the strongest label we can get: it says what
+    /// the set really was, from someone who just did it. Far better evidence
+    /// than a silent acceptance.
+    public func noteCorrection(reps: Int) {
+        lock.withLock {
+            guard !recorded.isEmpty else { return }
+            recorded[recorded.count - 1].confirmedReps = reps
+        }
+    }
+
     // MARK: Counting
 
     private func closeSet(endingAt end: TimeInterval) -> DetectedSet? {
@@ -217,28 +309,54 @@ public final class SetDetector: @unchecked Sendable {
         }
         guard let begin = activeSince else { return nil }
         let seconds = end - begin
-        guard seconds >= Self.minSetSeconds else { return nil }
+        guard seconds >= Self.minSetSeconds else {
+            candidatesRejected += 1
+            return nil
+        }
 
         let window = buffer.filter { $0.t >= begin && $0.t <= end }
-        guard window.count > 8 else { return nil }
+        guard window.count > 8 else {
+            candidatesRejected += 1
+            return nil
+        }
 
         let fs = estimatedRate(of: window)
-        guard fs > 0 else { return nil }
+        guard fs > 0 else {
+            candidatesRejected += 1
+            return nil
+        }
+        lastMeasuredHz = fs
 
         let count = RepCounter.count(sampleRateHz: fs,
                                      x: window.map(\.x),
                                      y: window.map(\.y),
                                      z: window.map(\.z),
                                      exercise: _currentRepProfile)
-        guard count.reps > 0 else { return nil }
+        guard count.reps > 0 else {
+            candidatesRejected += 1
+            return nil
+        }
 
         // Partial data must never be presented as certain.
         let confidence: RepConfidence = droppedForOverflow && count.confidence == .high
             ? .medium : count.confidence
 
-        return DetectedSet(reps: count.reps, confidence: confidence,
-                           startedAt: begin, seconds: seconds,
-                           repProfile: _currentRepProfile)
+        let set = DetectedSet(reps: count.reps, confidence: confidence,
+                              startedAt: begin, seconds: seconds,
+                              repProfile: _currentRepProfile)
+        setsDetected += 1
+        lastSet = set
+
+        if _recordsWindows && recorded.count < Self.maxRecordedSets {
+            recorded.append(RecordedSet(
+                reps: set.reps, confidence: set.confidence.rawValue,
+                peakEstimate: count.peakEstimate, autocorrEstimate: count.autocorrEstimate,
+                sampleRateHz: fs, repProfile: _currentRepProfile,
+                startedAt: begin, seconds: seconds,
+                x: window.map(\.x), y: window.map(\.y), z: window.map(\.z),
+                confirmedReps: nil))
+        }
+        return set
     }
 
     private func estimatedRate(of window: [MotionSample]) -> Double {
