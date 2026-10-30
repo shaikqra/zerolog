@@ -42,9 +42,10 @@ final class AppModel {
 
     func updateSettings(_ new: UserSettings) {
         settings = new
-        // TODO(watch): once WCSession exists, push this to the watch here. Until
-        // then the watch correctly reports that it has not been set up.
         try? settingsStore?.save(new)
+        // The watch has its own container, so this is the only way the equipment
+        // list and session length reach it.
+        PhoneSettingsSync.shared.send(new)
         refresh()
     }
 

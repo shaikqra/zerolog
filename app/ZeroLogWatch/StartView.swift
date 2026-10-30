@@ -5,6 +5,9 @@ struct StartView: View {
     let plan: Workout?
     let problem: String?
     let onStart: @MainActor () -> Void
+    let diagnostics: CaptureDiagnostics
+    let recordedSets: Int
+    let captureState: String
 
     var body: some View {
         ScrollView {
@@ -26,6 +29,14 @@ struct StartView: View {
                         .buttonStyle(.borderedProminent)
                         .tint(.plate)
                 }
+                // Reachable without a debugger, because the first tester is on a
+                // wrist in a gym and this is the only window into the algorithm.
+                NavigationLink("Detection") {
+                    DiagnosticsView(diagnostics: diagnostics,
+                                    recordedSets: recordedSets,
+                                    captureState: captureState)
+                }
+                .font(.footnote)
             }
         }
     }

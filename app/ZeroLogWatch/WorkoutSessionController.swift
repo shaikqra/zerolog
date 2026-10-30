@@ -57,6 +57,30 @@ final class WorkoutSessionController: NSObject {
         super.init()
     }
 
+    /// Live numbers for the diagnostics screen.
+    var diagnostics: CaptureDiagnostics { detector.diagnostics }
+
+    /// Sets recorded this session, for export after the workout.
+    var recordedSets: [RecordedSet] { detector.recordedSets }
+
+    /// Keeps each counted set with the motion that produced it, so a real
+    /// workout can be replayed through the tuner. This is how barbell data gets
+    /// collected without a separate recording app.
+    func setRecording(_ enabled: Bool) {
+        detector.recordsWindows = enabled
+    }
+
+    /// Attaches the user's corrected rep count to the set just recorded. The
+    /// strongest label available: ground truth from someone who just did it.
+    func noteCorrection(reps: Int) {
+        detector.noteCorrection(reps: reps)
+    }
+
+    /// Clears counters and recordings for a NEW workout.
+    func resetSession() {
+        detector.resetSession()
+    }
+
     /// Throws away motion buffered for a set that has NOT been closed yet.
     ///
     /// Needed because logging a set by hand does not tell the detector anything.

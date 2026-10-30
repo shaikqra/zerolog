@@ -9,6 +9,8 @@ struct SetView: View {
     let onConfirm: @MainActor (Double, Int) -> Void
     let onSkip: @MainActor () -> Void
     let onEnd: @MainActor () -> Void
+    /// Drives the recording indicator guideline 2.5.14 asks for.
+    var isCapturing: Bool = false
 
     @State private var weight: Double = 0
     @State private var reps: Int = 0
@@ -24,9 +26,14 @@ struct SetView: View {
                     .foregroundStyle(Color.plate)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text("Set \(workout.setNumber) of \(item.sets)")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 6) {
+                    Text("Set \(workout.setNumber) of \(item.sets)")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    if isCapturing {
+                        RecordingIndicator()
+                    }
+                }
 
                 Spacer(minLength: 0)
 

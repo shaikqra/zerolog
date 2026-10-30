@@ -6,6 +6,9 @@ struct ZeroLogApp: App {
 
     init() {
         Style.apply()
+        // Opened early so the watch can receive settings even if the user never
+        // visits Settings again this launch.
+        PhoneSettingsSync.shared.start()
     }
 
     var body: some Scene {

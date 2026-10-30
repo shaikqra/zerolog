@@ -26,17 +26,44 @@ final class WorkoutController {
         let note: String
     }
 
+    /// True when the user has not yet been asked about reading their wrist
+    /// movement. The workout cannot start capture until this is answered.
+    private(set) var needsMotionConsent = false
+    /// Live detection numbers, for the diagnostics screen.
+    private(set) var diagnostics = CaptureDiagnostics()
+
     private let store: HistoryStore?
     private let settings: SettingsProviding?
     /// Survives the app being killed mid-workout.
     private let inProgress: InProgressStore?
+    private let consentStore: ConsentStore?
+    private let sessions: DiagnosticsStore?
     private var session: WorkoutSessionController?
 
-    init(settings: SettingsProviding? = try? SettingsStore.standard()) {
+    /// Kept alive for the lifetime of the controller: it is the WCSession
+    /// delegate, and letting it go would silently stop settings arriving.
+    private let sync: WatchSettingsSync?
+
+    init(settings: SettingsProviding? = nil) {
         self.store = try? HistoryStore.standard()
-        self.settings = settings
         self.inProgress = try? InProgressStore.standard()
+        self.consentStore = try? ConsentStore.standard()
+        self.sessions = try? DiagnosticsStore.standard()
+
+        if let settings {
+            // Tests inject a provider directly.
+            self.settings = settings
+            self.sync = nil
+        } else {
+            let sync = WatchSettingsSync()
+            self.settings = sync
+            self.sync = sync
+        }
         replan()
+        // Rebuild the plan the moment settings arrive, so the user does not have
+        // to back out and return to see their gym appear.
+        sync?.onChange = { [weak self] in self?.replan() }
+        sync?.start()
 
         // watchOS terminates apps routinely, and a gym session cannot be redone.
         // If one was interrupted today, resume it rather than silently losing it.
@@ -58,23 +85,51 @@ final class WorkoutController {
 
     func start() {
         guard let plan else { return }
+        // Ask before reading movement, per guideline 2.5.14. The workout itself
+        // is not blocked -- see grantMotionConsent.
+        if consentStore?.load().needsAsking == true {
+            needsMotionConsent = true
+            return
+        }
         let workout = ActiveWorkout(plan: plan, date: Today.dateString())
         active = workout
         persist()
         resumeCapture(for: workout)
     }
 
+    /// Records the answer and starts the workout either way.
+    ///
+    /// Refusing must not block the workout: manual logging stays fully
+    /// functional, which guideline 5.1.1(ii) requires of anything paid.
+    func grantMotionConsent(_ granted: Bool) {
+        try? consentStore?.save(MotionConsent(granted: granted))
+        needsMotionConsent = false
+        start()
+    }
+
+    /// True when the user agreed and capture should run.
+    private var motionAllowed: Bool { consentStore?.load().allowsCapture ?? false }
+
     /// Starts motion capture for a workout, whether new or resumed.
     private func resumeCapture(for workout: ActiveWorkout) {
+        guard motionAllowed else {
+            // No consent: the workout runs, logging is by hand. Nothing is read.
+            problem = "Reps aren't being counted. You can log sets by hand, or turn counting on in Settings."
+            return
+        }
         // The workout session is what keeps the app sampling once the wrist
         // drops; without it watchOS suspends us mid-set and the set is lost.
         let controller = WorkoutSessionController { [weak self] detected in
             self?.handle(detected)
         }
         session = controller
+        controller.resetSession()
+        // Every workout doubles as data collection for the tuner.
+        controller.setRecording(true)
         controller.setCurrentExercise(repProfile: workout.current?.repProfile)
         Task { @MainActor in
             await controller.start()
+            self.diagnostics = controller.diagnostics
             if case .failed(let message) = controller.state {
                 // Automatic counting is a bonus, not a precondition. The manual
                 // card still works, which Guideline 5.1.1(ii) also requires:
@@ -88,6 +143,8 @@ final class WorkoutController {
 
     private func handle(_ detected: DetectedSet) {
         guard let active else { return }
+        // Refresh the diagnostics screen whenever something is detected.
+        if let live = session?.diagnostics { diagnostics = live }
         switch AutoLog.decide(detected: detected,
                               exercise: active.current,
                               suggestedWeight: active.suggestedWeight,
@@ -118,6 +175,19 @@ final class WorkoutController {
         }
     }
 
+    /// True while wrist movement is being read, so the UI can say so.
+    var isCapturing: Bool { session != nil && motionAllowed }
+
+    /// How many sets of this session have been kept for replay.
+    var recordedSetCount: Int { session?.recordedSets.count ?? 0 }
+
+    /// Plain-language capture state for the diagnostics screen.
+    var captureState: String {
+        if session == nil { return "not started" }
+        if !motionAllowed { return "off (not allowed)" }
+        return diagnostics.isCapturing ? "running" : "starting" 
+    }
+
     func dismissCard() {
         awaitingConfirmation = nil
         loggedAutomatically = nil
@@ -136,6 +206,11 @@ final class WorkoutController {
     // MARK: The manual path, which never goes away
 
     func confirm(weightKg: Double, reps: Int) {
+        // A hand-entered count that differs from what the watch suggested is
+        // the best training label we can get.
+        if let suggested = awaitingConfirmation?.reps, suggested != reps {
+            session?.noteCorrection(reps: reps)
+        }
         _ = record(weight: weightKg, reps: reps)
         // The tap settled this set, so the motion still buffered for it must go.
         // Otherwise stillness closes the same physical set seconds later and it
@@ -179,6 +254,13 @@ final class WorkoutController {
     /// Saves the finished workout (if anything was logged) and plans the next one.
     func finish() {
         guard let finished = active else { return }
+        // Save the recorded windows before tearing the session down, so the
+        // workout becomes replayable data for tuning.
+        if let recorded = session?.recordedSets, !recorded.isEmpty {
+            try? sessions?.save(recorded, date: finished.date,
+                                sessionType: finished.plan.sessionType)
+            sessions?.prune(keeping: 8)
+        }
         session?.requestStop()
         session = nil
         var saveProblem: String?
@@ -206,7 +288,7 @@ final class WorkoutController {
     /// dumbbells-only user would have been shown barbell bench press with no hint
     /// the equipment list was invented. Showing nothing is better than showing a
     /// confident wrong plan, so an un-synced watch now says so.
-    private func replan() {
+    func replan() {
         do {
             let catalog = try Catalog.bundled()
             let history = try store?.load() ?? []
