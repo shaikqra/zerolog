@@ -57,6 +57,17 @@ final class WorkoutSessionController: NSObject {
         super.init()
     }
 
+    /// Throws away motion buffered for a set that has NOT been closed yet.
+    ///
+    /// Needed because logging a set by hand does not tell the detector anything.
+    /// Without this, a user who taps confirm mid-set gets the set recorded
+    /// twice: once by their tap, then again four seconds later when stillness
+    /// closes the same physical set. Same for skipping an exercise, where the
+    /// buffered motion would otherwise be attributed to the next one.
+    func discardInProgressSet() {
+        detector.reset()
+    }
+
     /// The exercise the engine planned next, so the right calibration is used.
     /// Must be set BEFORE the set happens -- per-exercise calibration is the
     /// only guard against both rep estimators agreeing on a wrong number.

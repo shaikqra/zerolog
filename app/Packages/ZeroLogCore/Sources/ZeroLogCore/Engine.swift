@@ -179,13 +179,25 @@ public enum Engine {
         }
     }
 
-    /// First trim sets (last exercise first, down to 2), then drop exercises from the end.
+    /// Trims sets EVENLY, then drops whole exercises from the end.
+    ///
+    /// The old version walked backwards draining each exercise to the floor
+    /// before touching the one before it, so a short legs day came out as full
+    /// squats, full hinge, and the last movement gutted to two sets. Spreading
+    /// the cut keeps the session balanced: every set removed comes off whichever
+    /// exercise currently has the most, preferring later exercises on a tie so
+    /// the opening compounds stay intact.
     static func fitToTime(_ plan: inout [PlannedExercise], minutes: Int, skipped: inout [SkippedItem]) {
         let budget = minutes * 60
-        for index in plan.indices.reversed() {
-            while estimateSeconds(plan) > budget && plan[index].sets > minSets {
-                plan[index].sets -= 1
+        while estimateSeconds(plan) > budget {
+            // The exercise with the most sets, latest in the plan on a tie.
+            var target: Int?
+            for index in plan.indices where plan[index].sets > minSets {
+                if let current = target, plan[index].sets < plan[current].sets { continue }
+                target = index
             }
+            guard let index = target else { break }
+            plan[index].sets -= 1
         }
         while estimateSeconds(plan) > budget && plan.count > 1 {
             let dropped = plan.removeLast()

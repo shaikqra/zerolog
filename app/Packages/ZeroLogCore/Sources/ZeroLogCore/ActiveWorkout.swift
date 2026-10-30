@@ -1,7 +1,7 @@
 import Foundation
 
 /// A workout in progress. Walks through the plan set by set and records what was actually lifted.
-public struct ActiveWorkout: Equatable, Sendable {
+public struct ActiveWorkout: Codable, Equatable, Sendable {
     public let plan: Workout
     public let date: String
     public private(set) var exerciseIndex = 0
@@ -18,7 +18,7 @@ public struct ActiveWorkout: Equatable, Sendable {
     /// position is recorded before it changes rather than inferred after.
     private var undoFrames: [UndoFrame] = []
 
-    struct UndoFrame: Equatable, Sendable {
+    struct UndoFrame: Codable, Equatable, Sendable {
         let exerciseIndex: Int
         let setNumber: Int
         /// True when this set created a new LoggedExercise, so undo removes it

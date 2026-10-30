@@ -113,11 +113,11 @@ public struct Session: Codable, Equatable, Sendable {
 // MARK: - Output (today's workout)
 
 /// A weight change the engine made from last time. The app shows it with its reason and an Undo.
-public enum WeightChange: String, Sendable {
+public enum WeightChange: String, Codable, Sendable {
     case increased, deloaded
 }
 
-public struct PlannedExercise: Equatable, Sendable {
+public struct PlannedExercise: Codable, Equatable, Sendable {
     public let exerciseId: String
     public let name: String
     public let detectable: Bool
@@ -138,12 +138,12 @@ public struct PlannedExercise: Equatable, Sendable {
     let repRange: [Int]
 }
 
-public struct SkippedItem: Equatable, Sendable {
+public struct SkippedItem: Codable, Equatable, Sendable {
     public let name: String
     public let reason: String
 }
 
-public struct Workout: Equatable, Sendable {
+public struct Workout: Codable, Equatable, Sendable {
     public let sessionType: String
     public let unit: WeightUnit
     public let estimatedMinutes: Int

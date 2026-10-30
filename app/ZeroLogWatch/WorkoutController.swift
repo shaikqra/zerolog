@@ -28,19 +28,44 @@ final class WorkoutController {
 
     private let store: HistoryStore?
     private let settings: SettingsProviding?
+    /// Survives the app being killed mid-workout.
+    private let inProgress: InProgressStore?
     private var session: WorkoutSessionController?
 
     init(settings: SettingsProviding? = try? SettingsStore.standard()) {
         self.store = try? HistoryStore.standard()
         self.settings = settings
+        self.inProgress = try? InProgressStore.standard()
         replan()
+
+        // watchOS terminates apps routinely, and a gym session cannot be redone.
+        // If one was interrupted today, resume it rather than silently losing it.
+        if let resumed = try? inProgress?.resumable(today: Today.dateString()) {
+            active = resumed
+            resumeCapture(for: resumed)
+        }
+    }
+
+    /// Writes the session after every change. A crash then costs one set, not
+    /// the whole workout.
+    private func persist() {
+        guard let active else {
+            inProgress?.clear()
+            return
+        }
+        try? inProgress?.save(active)
     }
 
     func start() {
         guard let plan else { return }
         let workout = ActiveWorkout(plan: plan, date: Today.dateString())
         active = workout
+        persist()
+        resumeCapture(for: workout)
+    }
 
+    /// Starts motion capture for a workout, whether new or resumed.
+    private func resumeCapture(for workout: ActiveWorkout) {
         // The workout session is what keeps the app sampling once the wrist
         // drops; without it watchOS suspends us mid-set and the set is lost.
         let controller = WorkoutSessionController { [weak self] detected in
@@ -103,6 +128,7 @@ final class WorkoutController {
     func undoAutomaticLog() {
         guard var current = active, current.undoLastSet() else { return }
         active = current
+        persist()
         loggedAutomatically = nil
         session?.setCurrentExercise(repProfile: current.current?.repProfile)
     }
@@ -111,6 +137,10 @@ final class WorkoutController {
 
     func confirm(weightKg: Double, reps: Int) {
         _ = record(weight: weightKg, reps: reps)
+        // The tap settled this set, so the motion still buffered for it must go.
+        // Otherwise stillness closes the same physical set seconds later and it
+        // is logged a second time.
+        session?.discardInProgressSet()
         dismissCard()
     }
 
@@ -119,6 +149,7 @@ final class WorkoutController {
         guard var current = active else { return false }
         guard current.confirmSet(weight: weight, reps: reps) else { return false }
         active = current
+        persist()
         // The next exercise needs its own calibration before its first set.
         session?.setCurrentExercise(repProfile: current.current?.repProfile)
         return true
@@ -128,7 +159,11 @@ final class WorkoutController {
         guard var current = active else { return }
         current.skipExercise()
         active = current
+        persist()
         dismissCard()
+        // Motion buffered for the abandoned exercise must not be credited to the
+        // next one.
+        session?.discardInProgressSet()
         session?.setCurrentExercise(repProfile: current.current?.repProfile)
     }
 
@@ -136,6 +171,7 @@ final class WorkoutController {
         guard var current = active else { return }
         current.endEarly()
         active = current
+        persist()
         dismissCard()
         session?.requestStop()
     }
@@ -155,6 +191,9 @@ final class WorkoutController {
             }
         }
         active = nil
+        // The session is in history now (or had nothing worth keeping), so the
+        // resume file must go -- otherwise it would be offered again on launch.
+        inProgress?.clear()
         dismissCard()
         replan()
         if let saveProblem { problem = saveProblem }
