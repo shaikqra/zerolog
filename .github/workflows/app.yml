@@ -55,6 +55,39 @@ jobs:
           -derivedDataPath build
           CODE_SIGNING_ALLOWED=NO -quiet build
 
+      # Taps through the real app on a simulator and asserts what it DOES: a
+      # logged set reaches history with the right numbers, history survives a
+      # relaunch, an automatic change explains itself and undoes, and no screen
+      # shames the user. Until now nothing had ever tapped a button except a
+      # human looking at screenshots, so no UI regression was caught
+      # automatically.
+      #
+      # Only the behaviour tests run here. The screenshot tour stays on manual
+      # dispatch: it is slow, and its output is images for a human rather than
+      # an assertion.
+      - name: Run phone behaviour tests
+        working-directory: app
+        run: |
+          set -uo pipefail
+          # Pick a concrete simulator rather than hardcoding a device name that
+          # a future runner image may not have.
+          DEST=$(xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLog \
+                   -showdestinations 2>/dev/null \
+                 | grep 'platform:iOS Simulator' \
+                 | grep -vi 'placeholder\|Any iOS' \
+                 | head -1 \
+                 | sed -E 's/.*id:([0-9A-Fa-f-]+).*/\1/')
+          if [ -z "$DEST" ]; then
+            echo "No iOS simulator destination found"
+            xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLog -showdestinations
+            exit 1
+          fi
+          echo "Testing on simulator id=$DEST"
+          xcodebuild test -project ZeroLog.xcodeproj -scheme ZeroLog \
+            -destination "id=$DEST" -derivedDataPath build \
+            -only-testing:ZeroLogUITests/BehaviourTests \
+            CODE_SIGNING_ALLOWED=NO -quiet
+
       # A privacy manifest that exists in the repo but not in the BUNDLE is
       # worth nothing: App Store Connect refuses the upload, and the only
       # symptom is a rejection email weeks later. Checking the built product is

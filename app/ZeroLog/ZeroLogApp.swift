@@ -5,6 +5,8 @@ struct ZeroLogApp: App {
     @State private var model = AppModel()
 
     init() {
+        // Must run before any store is read. DEBUG-only; see TestSupport.
+        TestSupport.resetStateIfRequested()
         Style.apply()
         // Opened early so the watch can receive settings even if the user never
         // visits Settings again this launch.
