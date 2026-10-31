@@ -135,14 +135,27 @@ jobs:
       # app. simctl can install, launch and screenshot it; what it cannot do is
       # tap. So a DEBUG-only launch argument puts the app straight into one
       # screen, one launch per screen.
+      # Compile errors are written INTO THE REPO, because GitHub requires a
+      # sign-in to read Actions logs even on a public repository. Without this
+      # the only signal reaching the agent is "exit code 65", which says a
+      # compile failed and nothing about where. Committing the error lines turns
+      # a blind guess into a one-line diagnosis.
       - name: Build the watch app for the simulator
         working-directory: app
         run: |
-          set -euo pipefail
+          set -uo pipefail
+          mkdir -p ../docs/ci
+          set +e
           xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLogWatch \
             -destination 'generic/platform=watchOS Simulator' \
             -derivedDataPath build -configuration Debug \
-            CODE_SIGNING_ALLOWED=NO -quiet build
+            CODE_SIGNING_ALLOWED=NO build 2>&1 | tail -400 > ../docs/ci/watch-build.log
+          STATUS=${PIPESTATUS[0]}
+          set -e
+          grep -E "error:|warning: .*actor" ../docs/ci/watch-build.log \
+            | sort -u | head -40 > ../docs/ci/watch-build-errors.txt || true
+          echo "--- errors ---"; cat ../docs/ci/watch-build-errors.txt
+          exit $STATUS
 
       - name: Photograph every watch screen
         run: |
@@ -226,7 +239,7 @@ jobs:
           set -euo pipefail
           git config user.name "zerolog-ci"
           git config user.email "ci@users.noreply.github.com"
-          git add docs/screens
+          git add docs/screens docs/ci 2>/dev/null || git add docs/screens
           if git diff --cached --quiet; then
             echo "nothing changed"
           else

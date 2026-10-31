@@ -27,11 +27,17 @@ struct RootView: View {
 
     var body: some View {
         NavigationStack {
-            // DEBUG-only photo studio. The watch app cannot be reached any other
-            // way: XCUITest does not support watchOS, and no real watch can run
-            // it until the developer account exists.
-            if let screen = previewScreen {
-                ScreenPreviewHost(screen: screen)
+            // DEBUG-only photo studio. The watch app cannot be reached any
+            // other way: XCUITest does not support watchOS, and no real watch
+            // can run it until the developer account exists.
+            //
+            // The use site needs its own #if: ScreenPreviewHost does not exist
+            // in a release build, so an unguarded reference here would fail to
+            // compile the moment anyone builds Release.
+            if previewScreen != nil {
+                #if DEBUG
+                ScreenPreviewHost(screen: previewScreen ?? "start")
+                #endif
             } else if controller.needsMotionConsent {
                 // Asked once, before any movement is read. Refusing still starts
                 // the workout -- see WorkoutController.grantMotionConsent.
