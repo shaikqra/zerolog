@@ -16,8 +16,7 @@ struct TodayView: View {
                         // every exercise row equally. A screen reads flat when
                         // it opts out of its own best move for the thing that
                         // matters most, which is exactly what this did.
-                        SessionHero(plan: plan,
-                                    summary: summary(plan),
+                        SessionHero(summary: summary(plan),
                                     upcoming: model.upcoming)
                             .listRowBackground(Color.clear)
                         // Hidden until there is something true to say; a fresh
@@ -75,10 +74,12 @@ struct TodayView: View {
                         }
                     }
                     .darkList()
-                    // "Today" as the large title; the hero carries the session
-                    // identity, so repeating it here would be the same fact
-                    // twice at two different weights.
-                    .navigationTitle("Today")
+                    // The large title already renders in the scoreboard face,
+                    // so it IS the focal point -- my first attempt added a hero
+                    // heading underneath and produced two large headings, with
+                    // the less important one ("Today") set larger. The session
+                    // name belongs here; the hero carries only what supports it.
+                    .navigationTitle("\(plan.sessionType.capitalized) day")
                     .safeAreaInset(edge: .bottom) {
                         Button("Start workout", action: model.start)
                             .buttonStyle(PrimaryButtonStyle())
@@ -110,19 +111,18 @@ struct TodayView: View {
     }
 }
 
-/// Today's session, at the weight the rest of the screen implies.
+/// What supports the title: how long today is, and what follows it.
+///
+/// Deliberately carries NO heading of its own. The navigation large title
+/// already sets the session name in the scoreboard face, and an earlier
+/// version repeated it here -- two large headings, the less important one
+/// bigger. One focal point per screen.
 struct SessionHero: View {
-    let plan: Workout
     let summary: String
     let upcoming: [UpcomingSession]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("\(plan.sessionType.capitalized) day")
-                .font(.score(56))
-                .foregroundStyle(Color.textPrimary)
-                .minimumScaleFactor(0.6)
-                .lineLimit(1)
             Text(summary)
                 .font(.ui(16))
                 .foregroundStyle(Color.textSecondary)

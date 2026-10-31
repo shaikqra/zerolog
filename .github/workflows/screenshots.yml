@@ -72,6 +72,12 @@ jobs:
         run: |
           set -uo pipefail
           UDID="${{ steps.sim.outputs.udid }}"
+          # Delete last run's frames FIRST. Without this, old frames survive
+          # (each run writes frame-NN.png but never removes leftovers) and sit
+          # alongside the new ones, indistinguishable. A two-build-old frame
+          # then reads as current evidence -- it already cost one wrong
+          # diagnosis of a fix that had actually worked.
+          rm -rf ../docs/screens/phone
           mkdir -p ../docs/screens/phone ../media
 
           # Video of the whole run, for a human to watch.
@@ -160,6 +166,7 @@ jobs:
       - name: Photograph every watch screen
         run: |
           set -uo pipefail
+          rm -rf docs/screens/watch   # same stale-frame rule as the phone
           mkdir -p docs/screens/watch
           APP=$(find app/build/Build/Products -name 'ZeroLogWatch.app' -maxdepth 3 | head -1)
           if [ -z "$APP" ]; then echo "watch app not found"; exit 1; fi
@@ -239,7 +246,10 @@ jobs:
           set -euo pipefail
           git config user.name "zerolog-ci"
           git config user.email "ci@users.noreply.github.com"
-          git add docs/screens docs/ci 2>/dev/null || git add docs/screens
+          # -A, not plain add: deletions must be staged too, otherwise frames
+          # removed above stay in the repo and the stale-frame bug returns via
+          # git rather than via the filesystem.
+          git add -A docs/screens docs/ci 2>/dev/null || git add -A docs/screens
           if git diff --cached --quiet; then
             echo "nothing changed"
           else
