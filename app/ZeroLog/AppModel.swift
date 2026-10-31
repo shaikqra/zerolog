@@ -57,6 +57,44 @@ final class AppModel {
         refresh()
     }
 
+    /// Corrects a logged set and rebuilds the plan from the corrected history.
+    ///
+    /// Rebuilding matters as much as the edit: the engine reads history to pick
+    /// the next weight, so a fix that did not refresh the plan would leave the
+    /// user staring at a number derived from the mistake they just corrected.
+    func editSet(at address: SetAddress, weightKg: Double, reps: Int) {
+        let updated = HistoryEdit.update(history, at: address, weightKg: weightKg, reps: reps)
+        guard updated != history else { return }   // refused, or nothing changed
+        persist(updated)
+    }
+
+    func deleteSet(at address: SetAddress) {
+        let updated = HistoryEdit.delete(history, at: address)
+        guard updated != history else { return }
+        persist(updated)
+    }
+
+    /// Tells the user what a delete will take with it, before it happens.
+    func describeDelete(at address: SetAddress) -> String? {
+        HistoryEdit.describeDelete(history, at: address,
+                                   unit: settings?.unit ?? .kg)
+    }
+
+    private func persist(_ updated: [Session]) {
+        do {
+            try store?.replaceAll(updated)
+            history = updated
+            problem = nil
+        } catch {
+            // The file is the source of truth. Reloading rather than keeping
+            // the edit in memory stops the screen showing a change that was
+            // never saved.
+            history = (try? store?.load()) ?? history
+            problem = "Couldn't save that change. Your workout history is unchanged."
+        }
+        refresh()
+    }
+
     func exercise(_ id: String) -> Exercise? {
         catalog?.exercises.first { $0.id == id }
     }

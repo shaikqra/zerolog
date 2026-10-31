@@ -162,7 +162,9 @@ private struct ProgressSegments: View {
 }
 
 /// A giant number with its unit, round minus and plus buttons, and a hint underneath.
-private struct BigNumber: View {
+/// Shared with the edit-set sheet, so a correction uses the same control as
+/// the original entry. Two different steppers for the same job would drift.
+struct BigNumber: View {
     let value: String
     let unit: String
     let hint: String

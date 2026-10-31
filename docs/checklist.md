@@ -30,7 +30,7 @@ is not worth opening produces no data, and then nothing else matters.
       exercises. Not used after the first session; your last session is.
 - [ ] Last time's numbers shown on each exercise row
 - [ ] App icon (currently blank — see docs/screens)
-- [ ] Edit or delete a logged set (no way to fix a mistake today)
+- [x] Edit or delete a logged set
 - [ ] Empty states that say what will appear
 
 **Not collecting height.** It affects form cues, not programming. It would add
