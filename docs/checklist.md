@@ -86,23 +86,32 @@ a signup field and change no number.
 
 Judged from the committed screenshots, not from imagination.
 
-### 1. No hierarchy — everything has the same visual weight
-Today's screen is a uniform list where the session title, the plan, the warnings
-and the exercise rows all read at the same level. The most important thing on
-the screen should dominate it.
+### 1. ~~No hierarchy~~ — DONE on Today, still open mid-workout
+Today's screen now has a single focal point: the session name in the scoreboard
+face, with duration, what follows and the week's totals supporting it.
 
-- Today: one hero block — day name, duration, exercise count, Start — then the
-  detail below, rather than a row among rows.
-- Mid-workout: the current set should own the screen; everything else recedes.
+Part of this item was wrong. It claimed the session title "read at the same
+level" as the rows; it did not — the navigation large title already rendered it
+large, because `Style.apply()` styles the bar globally. Acting on the claim
+produced TWO large headings before I checked. Diagnose from the running screen,
+not from the description of it.
 
-### 2. The colour system is defined but unused
-Red for workouts, green for done, yellow for wins, blue for food — all defined
-in Theme, almost none of it visible. Completed exercises should go green as you
-go; a weight increase should read as a win, not as body text.
+- [x] Today: one focal point, supporting detail beneath.
+- [ ] Mid-workout: the current set should own the screen; everything else
+      recedes. Still genuinely true.
 
-### 3. Not enough data per row
-Lifters want numbers. Each exercise row should carry last time's result
-("Last: 60 kg x 8") so the next weight has visible context.
+### 2. ~~Colour defined but unused~~ — DONE, by using LESS of it
+The accent was on every prescription row, so it carried no information. It now
+marks only rows the engine changed, which is what makes it readable as a
+signal. "If every element got louder, the section got flatter."
+
+- [x] Accent means "this changed", not "this is a number".
+- [ ] Completed exercises go green as you work through them. Still open.
+
+### 3. ~~Not enough data per row~~ — DONE
+Each row now carries "Last time: 45 lb". The value was already in the model and
+simply never displayed, which made it the cheapest improvement on this list —
+worth checking for before reaching for styling.
 
 ### 4. Empty states are blank rather than explanatory
 A new install shows almost nothing and says nothing about what will appear.
