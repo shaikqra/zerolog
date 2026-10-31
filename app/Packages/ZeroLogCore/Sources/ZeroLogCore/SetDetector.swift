@@ -37,6 +37,20 @@ public struct DetectedSet: Equatable, Sendable {
 
     /// Whether this can be logged without asking. Everything else gets a tap.
     public var isSilentlyLoggable: Bool { confidence == .high }
+
+    /// Explicit because a struct's SYNTHESISED memberwise init is `internal`
+    /// even when every stored property is `public`. Without this the watch and
+    /// phone targets cannot construct a `DetectedSet` at all — which is how the
+    /// screen-preview harness failed to compile, in a public type that looked
+    /// perfectly public.
+    public init(reps: Int, confidence: RepConfidence, startedAt: TimeInterval,
+                seconds: Double, repProfile: String?) {
+        self.reps = reps
+        self.confidence = confidence
+        self.startedAt = startedAt
+        self.seconds = seconds
+        self.repProfile = repProfile
+    }
 }
 
 /// Watches a continuous stream of wrist motion and decides where sets begin and
