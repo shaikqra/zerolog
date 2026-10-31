@@ -188,21 +188,48 @@ jobs:
           xcrun simctl install "$UDID" "$APP"
 
           BUNDLE=com.getzerolog.app.watchkitapp
-          shot=0
-          for screen in start notsetup consent set dimmed card diagnostics selftest summary; do
-            xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
-            if xcrun simctl launch "$UDID" "$BUNDLE" -previewScreen "$screen"; then
-              sleep 6   # let SwiftUI lay out and the self-test finish
-              if xcrun simctl io "$UDID" screenshot "docs/screens/watch/$screen.png"; then
-                shot=$((shot + 1)); echo "captured $screen"
+          SCREENS="start notsetup consent set dimmed card diagnostics selftest summary"
+          mkdir -p docs/ci
+          : > docs/ci/watch-capture-errors.txt
+          shot=0; missed=""
+
+          for screen in $SCREENS; do
+            ok=0
+            # Two attempts. The simulator gets unreliable after a run of
+            # launch/terminate cycles -- the previous version silently lost
+            # every screen from the fifth onward, which only became visible
+            # once stale files stopped being left behind to hide it.
+            for attempt in 1 2; do
+              xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
+              sleep 2   # terminate is async; launching into a dying process fails
+              if xcrun simctl launch "$UDID" "$BUNDLE" -previewScreen "$screen"; then
+                sleep 6   # let SwiftUI lay out and the self-test finish
+                if xcrun simctl io "$UDID" screenshot "docs/screens/watch/$screen.png"; then
+                  ok=1; break
+                fi
               fi
+              echo "attempt $attempt failed for $screen" >> docs/ci/watch-capture-errors.txt
+              # Give the simulator a chance to recover before trying again.
+              xcrun simctl shutdown "$UDID" 2>/dev/null || true
+              xcrun simctl boot "$UDID" 2>/dev/null || true
+              xcrun simctl bootstatus "$UDID" -b 2>/dev/null || true
+            done
+            if [ "$ok" = "1" ]; then
+              shot=$((shot + 1)); echo "captured $screen"
             else
-              echo "launch failed for $screen"
+              missed="$missed $screen"; echo "MISSED $screen"
             fi
           done
-          echo "watch screenshots: $shot"
-          # Zero is a real signal: the watch app will not start at all.
-          [ "$shot" -gt 0 ]
+
+          total=$(echo $SCREENS | wc -w | tr -d " ")
+          echo "watch screenshots: $shot of $total"
+          if [ -n "$missed" ]; then
+            echo "missed screens:$missed" >> docs/ci/watch-capture-errors.txt
+          fi
+          # A PARTIAL capture must fail. The old guard accepted anything above
+          # zero, so losing four of eight screens reported success and the gap
+          # was only noticed by counting files by hand days later.
+          [ "$shot" = "$total" ]
 
       # ----------------------------------------------------------------- index
       - name: Build an index page
