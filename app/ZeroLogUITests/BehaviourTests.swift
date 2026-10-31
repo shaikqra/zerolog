@@ -53,14 +53,14 @@ final class BehaviourTests: XCTestCase {
         XCTAssertTrue(start.waitForExistence(timeout: 12))
         start.tap()
 
-        let confirm = app.buttons["Confirm set"]
+        let confirm = app.buttons["Log set"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 12))
 
         let addRep = app.buttons["Add rep"]
         for _ in 0..<3 where addRep.exists { addRep.tap() }
 
         confirm.tap()
-        app.buttons["End"].tap()
+        endWorkout()
         let save = app.buttons["Save workout"]
         XCTAssertTrue(save.waitForExistence(timeout: 12))
         save.tap()
@@ -113,13 +113,13 @@ final class BehaviourTests: XCTestCase {
 
         // Top of the rep range on every set tells the engine to add weight.
         app.buttons["Start workout"].tap()
-        let confirm = app.buttons["Confirm set"]
+        let confirm = app.buttons["Log set"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 12))
         let addRep = app.buttons["Add rep"]
         for _ in 0..<4 { addRep.tap() }
         confirm.tap()
         for _ in 0..<3 where confirm.exists { confirm.tap() }
-        app.buttons["End"].tap()
+        endWorkout()
         let save = app.buttons["Save workout"]
         XCTAssertTrue(save.waitForExistence(timeout: 12))
         save.tap()
@@ -204,14 +204,28 @@ final class BehaviourTests: XCTestCase {
         let start = app.buttons["Start workout"]
         XCTAssertTrue(start.waitForExistence(timeout: 12))
         start.tap()
-        let confirm = app.buttons["Confirm set"]
+        let confirm = app.buttons["Log set"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 12))
         confirm.tap()
-        app.buttons["End"].tap()
+        endWorkout()
         let save = app.buttons["Save workout"]
         XCTAssertTrue(save.waitForExistence(timeout: 12))
         save.tap()
         XCTAssertTrue(start.waitForExistence(timeout: 12))
+    }
+
+    /// Ends the session through the confirmation dialog.
+    ///
+    /// "End" deliberately asks before ending -- it sits where the back button
+    /// lives, so a single tap must not bin a workout. The tests go through the
+    /// same door a person does; asserting the dialog appears is part of the
+    /// protection, since silently losing it would restore the original bug.
+    private func endWorkout() {
+        app.buttons["End"].tap()
+        let confirm = app.buttons["End workout"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5),
+                      "Ending a workout must ask first.")
+        confirm.tap()
     }
 
     private func waitForDisappearance(of element: XCUIElement, timeout: TimeInterval) -> Bool {

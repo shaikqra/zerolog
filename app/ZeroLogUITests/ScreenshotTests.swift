@@ -29,7 +29,7 @@ final class ScreenshotTests: XCTestCase {
         startButton.tap()
 
         // 3. Logging: first set, then the second set pre-filled from the first.
-        let confirmButton = app.buttons["Confirm set"]
+        let confirmButton = app.buttons["Log set"]
         XCTAssertTrue(confirmButton.waitForExistence(timeout: 10))
         snap("04 Workout, first set")
 
@@ -50,7 +50,7 @@ final class ScreenshotTests: XCTestCase {
         confirmButton.tap()
 
         // 4. End early and save.
-        app.buttons["End"].tap()
+        endWorkout()
         let saveButton = app.buttons["Save workout"]
         XCTAssertTrue(saveButton.waitForExistence(timeout: 10))
         snap("06 Workout done")
@@ -83,19 +83,45 @@ final class ScreenshotTests: XCTestCase {
         app.tabBars.buttons["Settings"].tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 10))
         snap("10 Settings")
+        // The training-day picker sits below the fold, so the tour never
+        // photographed it and it shipped unseen. Scroll to it deliberately:
+        // a control nobody has looked at is a control nobody has checked.
+        let dayPicker = app.buttons["Monday"].firstMatch
+        scrollUntilVisible(dayPicker)
+        if dayPicker.exists {
+            dayPicker.tap()
+            app.buttons["Wednesday"].firstMatch.tap()
+            app.buttons["Friday"].firstMatch.tap()
+        }
+        snap("11 Training days")
     }
 
     /// Logs one set of whatever comes first and saves it, to move the rotation on.
     private func logOneSetAndSave() {
         app.buttons["Start workout"].tap()
-        let confirm = app.buttons["Confirm set"]
+        let confirm = app.buttons["Log set"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 10))
         confirm.tap()
-        app.buttons["End"].tap()
+        endWorkout()
         let save = app.buttons["Save workout"]
         XCTAssertTrue(save.waitForExistence(timeout: 10))
         save.tap()
         XCTAssertTrue(app.buttons["Start workout"].waitForExistence(timeout: 10))
+    }
+
+
+    /// Ends the session through the confirmation dialog.
+    ///
+    /// "End" deliberately asks before ending -- it sits where the back button
+    /// lives, so a single tap must not bin a workout. The tests go through the
+    /// same door a person does; asserting the dialog appears is part of the
+    /// protection, since silently losing it would restore the original bug.
+    private func endWorkout() {
+        app.buttons["End"].tap()
+        let confirm = app.buttons["End workout"]
+        XCTAssertTrue(confirm.waitForExistence(timeout: 5),
+                      "Ending a workout must ask first.")
+        confirm.tap()
     }
 
     private func scrollUntilVisible(_ element: XCUIElement) {
