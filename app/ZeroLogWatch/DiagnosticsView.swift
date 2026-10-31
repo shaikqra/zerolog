@@ -84,12 +84,16 @@ struct DiagnosticsView: View {
                 if !selfTest.isEmpty {
                     Text(SelfTest.summary(selfTest))
                         .font(.caption.bold())
-                        .foregroundStyle(selfTest.allSatisfy(\.passed) ? Color.plate : .orange)
+                        // BOTH branches must name Color explicitly. A bare
+                        // `.orange` against a `Color` makes the compiler infer
+                        // HierarchicalShapeStyle for the ternary and then reject
+                        // the mismatch -- which is what broke the watch build.
+                        .foregroundStyle(selfTest.allSatisfy(\.passed) ? Color.plate : Color.orange)
                     ForEach(selfTest, id: \.name) { result in
                         HStack(alignment: .top, spacing: 4) {
                             Text(result.passed ? "ok" : "FAIL")
                                 .font(.caption2.bold())
-                                .foregroundStyle(result.passed ? .secondary : .orange)
+                                .foregroundStyle(result.passed ? Color.secondary : Color.orange)
                             VStack(alignment: .leading, spacing: 0) {
                                 Text(result.name).font(.caption2)
                                 Text(result.detail)
