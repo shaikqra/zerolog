@@ -26,7 +26,9 @@ public enum Engine {
         history: [Session],
         recovery: Recovery = .normal,
         sessionType: String? = nil,
-        unit: WeightUnit = .kg
+        unit: WeightUnit = .kg,
+        bodyweightKg: Double? = nil,
+        experience: TrainingExperience = .novice
     ) -> Workout {
         let type = sessionType ?? nextSessionType(catalog: catalog, history: history)
 
@@ -43,7 +45,10 @@ public enum Engine {
         }
 
         // 2. Decide weight, reps and sets for each one from past sessions.
-        var plan = chosen.map { prescribe($0, history: history, recovery: recovery, unit: unit) }
+        var plan = chosen.map {
+            prescribe($0, history: history, recovery: recovery, unit: unit,
+                      bodyweightKg: bodyweightKg, experience: experience)
+        }
 
         // 3. Shrink the workout until it fits the time available.
         fitToTime(&plan, minutes: minutes, skipped: &skipped)
@@ -98,7 +103,9 @@ public enum Engine {
         sets.filter { $0.weight == weight }.map { $0.reps }
     }
 
-    static func prescribe(_ ex: Exercise, history: [Session], recovery: Recovery, unit: WeightUnit) -> PlannedExercise {
+    static func prescribe(_ ex: Exercise, history: [Session], recovery: Recovery, unit: WeightUnit,
+                          bodyweightKg: Double? = nil,
+                          experience: TrainingExperience = .novice) -> PlannedExercise {
         let low = ex.repRange[0], high = ex.repRange[1]
         let inc = ex.increment(in: unit)
         let sets = recovery == .normal ? ex.sets : max(minSets, ex.sets - 1)
@@ -113,6 +120,17 @@ public enum Engine {
 
         let past = sessionsWith(history, exerciseId: ex.id).map { inUnit($0, unit: unit, step: inc) }
         guard let last = past.first else {
+            // Day one. Suggest a weight when there is a defensible basis for
+            // one, because the alternative -- asking the user to guess four or
+            // five numbers -- is the worst moment in an app whose promise is
+            // that they never type anything.
+            if let suggested = StartingWeight.suggest(for: ex, bodyweightKg: bodyweightKg,
+                                                      experience: experience, unit: unit) {
+                return make(suggested, low, StartingWeight.reason(target: low, unit: unit))
+            }
+            if ex.isBodyweightLoaded {
+                return make(0, low, "Just your bodyweight. Aim for \(low)-\(high) reps.")
+            }
             return make(nil, low, "First time: pick a weight you can lift for \(low)-\(high) reps with 2 to spare.")
         }
 

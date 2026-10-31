@@ -10,11 +10,47 @@ public struct UserSettings: Codable, Equatable, Sendable {
     public var equipment: Set<String>
     public var minutes: Int
     public var unit: WeightUnit
+    /// Used ONLY to suggest opening weights on day one, and to load bodyweight
+    /// movements. After the first session the previous session sets the weight.
+    /// Optional because the app must work without it.
+    public var bodyweightKg: Double?
+    /// Decides how hard the first suggestion is, and nothing else -- double
+    /// progression already self-regulates for experience after that.
+    public var experience: TrainingExperience
 
-    public init(equipment: Set<String>, minutes: Int, unit: WeightUnit) {
+    public init(equipment: Set<String>, minutes: Int, unit: WeightUnit,
+                bodyweightKg: Double? = nil,
+                experience: TrainingExperience = .novice) {
         self.equipment = equipment
         self.minutes = minutes
         self.unit = unit
+        self.bodyweightKg = bodyweightKg
+        self.experience = experience
+    }
+
+    /// Turns typed text into kilograms, or nil if it is not a sane bodyweight.
+    ///
+    /// Rejects rather than clamps. A typo of "7" or "800" must not silently
+    /// become a real number that then drives every opening weight -- the app
+    /// asks again instead.
+    public static func parseBodyweight(_ text: String, unit: WeightUnit) -> Double? {
+        let cleaned = text.trimmingCharacters(in: .whitespaces).replacingOccurrences(of: ",", with: ".")
+        guard let value = Double(cleaned), value > 0 else { return nil }
+        let kg = unit == .kg ? value : value / 2.20462
+        guard (25...300).contains(kg) else { return nil }
+        return kg
+    }
+
+    // Decoded leniently so settings saved before these fields existed still
+    // load. A failed decode here would make an existing user look un-set-up
+    // and silently lose their gym.
+    public init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        equipment = try c.decode(Set<String>.self, forKey: .equipment)
+        minutes = try c.decode(Int.self, forKey: .minutes)
+        unit = try c.decode(WeightUnit.self, forKey: .unit)
+        bodyweightKg = try c.decodeIfPresent(Double.self, forKey: .bodyweightKg)
+        experience = try c.decodeIfPresent(TrainingExperience.self, forKey: .experience) ?? .novice
     }
 }
 
@@ -107,6 +143,8 @@ public enum PlanRequest {
                                              minutes: settings.minutes,
                                              history: history,
                                              recovery: recovery,
-                                             unit: settings.unit))
+                                             unit: settings.unit,
+                                             bodyweightKg: settings.bodyweightKg,
+                                             experience: settings.experience))
     }
 }

@@ -22,8 +22,18 @@ public struct Exercise: Decodable, Equatable, Sendable {
     public let repProfileVerified: Bool?
     /// Short form tips shown on the "How to do it" screen.
     public let cues: [String]
+    /// Fraction of bodyweight for a NOVICE's first working set. nil means we
+    /// have no defensible basis and must ask instead of guessing.
+    ///
+    /// Every value is deliberately below common novice standards: starting too
+    /// light costs one easy session, starting too heavy risks injury on an
+    /// unfamiliar movement.
+    public let startRatio: Double?
+    /// The body is the load, so there is no weight to suggest.
+    public let bodyweightLoaded: Bool?
 
     public var hasVerifiedRepProfile: Bool { repProfileVerified ?? false }
+    public var isBodyweightLoaded: Bool { bodyweightLoaded ?? false }
 
     /// Smallest weight jump for this exercise in the given unit.
     public func increment(in unit: WeightUnit) -> Double {

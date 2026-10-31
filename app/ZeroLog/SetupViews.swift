@@ -7,6 +7,11 @@ struct OnboardingView: View {
     @State private var equipment: Set<String> = []
     @State private var minutes = 45
     @State private var unit = UserSettings.fallback.unit
+    /// Optional on purpose. Used ONLY to suggest opening weights on day one --
+    /// after the first session, the previous session sets the weight. Leaving
+    /// it blank must not block setup.
+    @State private var bodyweight = ""
+    @State private var experience: TrainingExperience = .novice
 
     var body: some View {
         NavigationStack {
@@ -28,12 +33,32 @@ struct OnboardingView: View {
                     SectionTitle("Weights in")
                 }
                 .listRowBackground(Color.surface)
+                Section {
+                    ExperiencePicker(experience: $experience)
+                } header: {
+                    SectionTitle("How long have you been lifting?")
+                }
+                .listRowBackground(Color.surface)
+                Section {
+                    BodyweightField(text: $bodyweight, unit: unit)
+                } header: {
+                    SectionTitle("Your bodyweight (optional)")
+                } footer: {
+                    Text("Only used to suggest your first weights, so you aren't "
+                         + "guessing on day one. After that your last session decides.")
+                        .font(.ui(13))
+                        .foregroundStyle(Color.textSecondary)
+                }
+                .listRowBackground(Color.surface)
             }
             .darkList()
             .navigationTitle("Your gym")
             .safeAreaInset(edge: .bottom) {
                 Button("Plan my first workout") {
-                    model.updateSettings(UserSettings(equipment: equipment, minutes: minutes, unit: unit))
+                    model.updateSettings(UserSettings(
+                        equipment: equipment, minutes: minutes, unit: unit,
+                        bodyweightKg: UserSettings.parseBodyweight(bodyweight, unit: unit),
+                        experience: experience))
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .padding(20)
