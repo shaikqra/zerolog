@@ -69,10 +69,13 @@ a signup field and change no number.
 
 ## Later — deliberately deferred, with reasons
 
-- [ ] **Food logging.** Needs a paid vision API (no card until 18), a server,
-      and a privacy review for health-adjacent images. Turns a local app into a
-      company. The brief itself calls it a commodity; MyFitnessPal works today.
-      Nothing else counts barbell reps.
+- [ ] **Food logging.** Needs a paid vision API (no card until 18) and a
+      privacy review for health-adjacent data. The brief itself calls it a
+      commodity; MyFitnessPal works today. Nothing else counts barbell reps.
+      **Calorie data is solved and free** — USDA FoodData Central is CC0 public
+      domain and can be bundled in the app, so the lookup needs no server and
+      costs nothing. See `docs/food-data.md`. The remaining blocker is the
+      lawyer, not the data.
 - [ ] AI coach — depends on food plus training plus recovery all existing
 - [ ] Paywall and subscriptions
 - [ ] Recipes that fit macro targets
