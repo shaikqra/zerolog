@@ -77,22 +77,64 @@ public struct UpcomingSession: Equatable, Sendable {
     public let sessionType: String
     /// 0 is today's session, 1 the one after it.
     public let position: Int
+    /// The calendar day this session lands on, or nil when the user has not
+    /// told us which days they train. Nil is a real answer, not a gap to fill:
+    /// the UI must say "next" rather than name a day we were never given.
+    public let date: Date?
 
-    public init(sessionType: String, position: Int) {
+    public init(sessionType: String, position: Int, date: Date? = nil) {
         self.sessionType = sessionType
         self.position = position
+        self.date = date
     }
 }
 
 extension Engine {
+    /// Lays the next few sessions onto real calendar days.
+    ///
+    /// Position 0 is always TODAY, because today is what the Today screen is
+    /// offering and the app never refuses to let someone train. Later positions
+    /// land on the next chosen weekdays strictly after today.
+    static func sessionDates(count: Int, trainingDays: Set<Int>,
+                             today: Date, calendar: Calendar) -> [Date?] {
+        guard !trainingDays.isEmpty else {
+            return Array(repeating: nil, count: count)   // we were never told
+        }
+        let startOfToday = calendar.startOfDay(for: today)
+        var result: [Date?] = [startOfToday]
+        var cursor = startOfToday
+        // Bounded: with at least one chosen weekday a match arrives within 7
+        // steps, so this cannot spin even on a malformed calendar.
+        var steps = 0
+        while result.count < count && steps < count * 7 + 7 {
+            steps += 1
+            guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else { break }
+            cursor = next
+            if trainingDays.contains(calendar.component(.weekday, from: cursor)) {
+                result.append(cursor)
+            }
+        }
+        while result.count < count { result.append(nil) }
+        return result
+    }
+
+    /// `today` and `calendar` are parameters rather than `Date()` and
+    /// `.current` read inside, so the result is deterministic and the tests can
+    /// stand on a Tuesday without waiting for one.
     public static func upcoming(catalog: Catalog, history: [Session],
-                                count: Int = 3) -> [UpcomingSession] {
+                                count: Int = 3,
+                                trainingDays: Set<Int> = [],
+                                today: Date = Date(),
+                                calendar: Calendar = .current) -> [UpcomingSession] {
         let order = catalog.sessions["order"] ?? []
         guard !order.isEmpty, count > 0 else { return [] }
         let next = nextSessionType(catalog: catalog, history: history)
         guard let start = order.firstIndex(of: next) else { return [] }
+        let dates = sessionDates(count: count, trainingDays: trainingDays,
+                                 today: today, calendar: calendar)
         return (0..<count).map { step in
-            UpcomingSession(sessionType: order[(start + step) % order.count], position: step)
+            UpcomingSession(sessionType: order[(start + step) % order.count],
+                            position: step, date: dates[step])
         }
     }
 }

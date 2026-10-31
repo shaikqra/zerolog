@@ -77,11 +77,25 @@ struct UpcomingRow: View {
 
     var body: some View {
         if upcoming.count > 1 {
-            let names = upcoming.dropFirst().map { "\($0.sessionType.capitalized) day" }
+            let names = upcoming.dropFirst().map(Self.describe)
             Text("Next: \(names.joined(separator: ", then "))")
                 .font(.ui(15))
                 .foregroundStyle(Color.textSecondary)
         }
+    }
+
+    /// "Pull day on Monday" once we know the days, "Pull day" before that.
+    ///
+    /// Says "tomorrow" rather than the weekday name when it IS tomorrow --
+    /// more precise, and how a person would actually say it.
+    static func describe(_ session: UpcomingSession) -> String {
+        let name = "\(session.sessionType.capitalized) day"
+        guard let date = session.date else { return name }
+        let calendar = Calendar.current
+        if calendar.isDateInTomorrow(date) { return "\(name) tomorrow" }
+        let formatter = DateFormatter()
+        formatter.setLocalizedDateFormatFromTemplate("EEEE")   // translated
+        return "\(name) on \(formatter.string(from: date))"
     }
 }
 

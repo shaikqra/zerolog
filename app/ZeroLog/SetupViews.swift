@@ -88,6 +88,16 @@ struct SettingsView: View {
                 }
                 .listRowBackground(Color.surface)
                 Section {
+                    TrainingDaysPicker(days: setting(\.trainingDays))
+                } header: {
+                    SectionTitle("Days you train")
+                } footer: {
+                    Text("Used to name the days on your plan. Leave it blank and ZeroLog just says what comes next. You can always train on a day you didn't pick.")
+                        .font(.ui(14))
+                        .foregroundStyle(Color.textTertiary)
+                }
+                .listRowBackground(Color.surface)
+                Section {
                     UnitPicker(unit: setting(\.unit))
                 } header: {
                     SectionTitle("Weights in")

@@ -17,15 +17,25 @@ public struct UserSettings: Codable, Equatable, Sendable {
     /// Decides how hard the first suggestion is, and nothing else -- double
     /// progression already self-regulates for experience after that.
     public var experience: TrainingExperience
+    /// Which weekdays the user trains, as `Calendar` weekday numbers
+    /// (1 = Sunday ... 7 = Saturday).
+    ///
+    /// EMPTY MEANS "NOT ASKED YET", not "trains no days". Everything that reads
+    /// this must fall back to describing sessions by order rather than invent a
+    /// schedule -- claiming "Monday" to someone who never said they train on
+    /// Monday is the same class of error as the watch inventing a gym.
+    public var trainingDays: Set<Int>
 
     public init(equipment: Set<String>, minutes: Int, unit: WeightUnit,
                 bodyweightKg: Double? = nil,
-                experience: TrainingExperience = .novice) {
+                experience: TrainingExperience = .novice,
+                trainingDays: Set<Int> = []) {
         self.equipment = equipment
         self.minutes = minutes
         self.unit = unit
         self.bodyweightKg = bodyweightKg
         self.experience = experience
+        self.trainingDays = trainingDays
     }
 
     /// Turns typed text into kilograms, or nil if it is not a sane bodyweight.
@@ -51,6 +61,10 @@ public struct UserSettings: Codable, Equatable, Sendable {
         unit = try c.decode(WeightUnit.self, forKey: .unit)
         bodyweightKg = try c.decodeIfPresent(Double.self, forKey: .bodyweightKg)
         experience = try c.decodeIfPresent(TrainingExperience.self, forKey: .experience) ?? .novice
+        // Absent for anyone who set up before this field existed. They get the
+        // old order-only wording until they answer, which is correct: we still
+        // do not know their days.
+        trainingDays = try c.decodeIfPresent(Set<Int>.self, forKey: .trainingDays) ?? []
     }
 }
 

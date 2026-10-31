@@ -118,11 +118,14 @@ final class AppModel {
                           elapsedSeconds: Int(now.timeIntervalSince(since)))
     }
 
-    /// What the rotation does after today. Order, not dates -- the app has
-    /// never asked which days this user trains.
+    /// What the rotation does after today, on real weekdays once the user has
+    /// said which days they train. Until they answer, `trainingDays` is empty
+    /// and the engine returns no dates, so the UI says "next" instead of
+    /// naming a day nobody chose.
     var upcoming: [UpcomingSession] {
         guard let catalog else { return [] }
-        return Engine.upcoming(catalog: catalog, history: history, count: 3)
+        return Engine.upcoming(catalog: catalog, history: history, count: 3,
+                               trainingDays: settings?.trainingDays ?? [])
     }
 
     var progress: ProgressSummary {
