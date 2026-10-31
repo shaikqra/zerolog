@@ -16,6 +16,14 @@ public struct RestAdvice: Equatable, Sendable {
     public let suggestedSeconds: Int
     public let elapsedSeconds: Int
 
+    /// Explicit because a struct's synthesised memberwise init is INTERNAL even
+    /// when every stored property is public. Without it the app target cannot
+    /// build one, and the failure only appears on a Mac.
+    public init(suggestedSeconds: Int, elapsedSeconds: Int) {
+        self.suggestedSeconds = suggestedSeconds
+        self.elapsedSeconds = elapsedSeconds
+    }
+
     public var remainingSeconds: Int { max(0, suggestedSeconds - elapsedSeconds) }
     public var isReady: Bool { elapsedSeconds >= suggestedSeconds }
     /// 0...1, clamped, for a progress ring.
@@ -69,6 +77,11 @@ public struct UpcomingSession: Equatable, Sendable {
     public let sessionType: String
     /// 0 is today's session, 1 the one after it.
     public let position: Int
+
+    public init(sessionType: String, position: Int) {
+        self.sessionType = sessionType
+        self.position = position
+    }
 }
 
 extension Engine {
@@ -96,6 +109,14 @@ public struct ProgressSummary: Equatable, Sendable {
     /// Sum of reps x weight, in kilograms, for sets logged this week.
     public let volumeThisWeek: Double
     public let volumeLastWeek: Double
+
+    public init(workoutsThisWeek: Int, setsThisWeek: Int,
+                volumeThisWeek: Double, volumeLastWeek: Double) {
+        self.workoutsThisWeek = workoutsThisWeek
+        self.setsThisWeek = setsThisWeek
+        self.volumeThisWeek = volumeThisWeek
+        self.volumeLastWeek = volumeLastWeek
+    }
 
     /// nil when there is nothing to compare against, which is NOT the same as
     /// zero change. A first week must not read as "0%".
