@@ -15,6 +15,10 @@ import ZeroLogCore
 struct RestTimerCard: View {
     let advice: RestAdvice
     let onSkip: () -> Void
+    /// A progress ring that animates every second is exactly the kind of
+    /// continuous motion Reduce Motion exists to stop. The number still
+    /// updates; only the sweep does not animate.
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 14) {
@@ -26,7 +30,8 @@ struct RestTimerCard: View {
                     .stroke(advice.isReady ? Color.done : Color.load,
                             style: StrokeStyle(lineWidth: 4, lineCap: .round))
                     .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 0.3), value: advice.progress)
+                    .animation(reduceMotion ? nil : .linear(duration: 0.3),
+                               value: advice.progress)
             }
             .frame(width: 44, height: 44)
 
@@ -48,6 +53,9 @@ struct RestTimerCard: View {
                 Button("Skip", action: onSkip)
                     .font(.ui(15))
                     .foregroundStyle(Color.textSecondary)
+                    // Bare text is a ~20pt tap target. Apple's floor is 44.
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
             }
         }
         .padding(14)

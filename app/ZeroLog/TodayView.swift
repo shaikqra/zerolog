@@ -10,13 +10,16 @@ struct TodayView: View {
             Group {
                 if let plan = model.plan {
                     List {
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(summary(plan))
-                                .font(.ui(17))
-                                .foregroundStyle(Color.textSecondary)
-                            UpcomingRow(upcoming: model.upcoming)
-                        }
-                        .listRowBackground(Color.clear)
+                        // THE one decisive move. What today is was previously a
+                        // navigation title in chrome type, while the scoreboard
+                        // font -- the system's strongest device -- was spent on
+                        // every exercise row equally. A screen reads flat when
+                        // it opts out of its own best move for the thing that
+                        // matters most, which is exactly what this did.
+                        SessionHero(plan: plan,
+                                    summary: summary(plan),
+                                    upcoming: model.upcoming)
+                            .listRowBackground(Color.clear)
                         // Hidden until there is something true to say; a fresh
                         // install must not greet anyone with zeros.
                         if model.progress.hasAnything {
@@ -72,7 +75,10 @@ struct TodayView: View {
                         }
                     }
                     .darkList()
-                    .navigationTitle("\(plan.sessionType.capitalized) day")
+                    // "Today" as the large title; the hero carries the session
+                    // identity, so repeating it here would be the same fact
+                    // twice at two different weights.
+                    .navigationTitle("Today")
                     .safeAreaInset(edge: .bottom) {
                         Button("Start workout", action: model.start)
                             .buttonStyle(PrimaryButtonStyle())
@@ -104,6 +110,30 @@ struct TodayView: View {
     }
 }
 
+/// Today's session, at the weight the rest of the screen implies.
+struct SessionHero: View {
+    let plan: Workout
+    let summary: String
+    let upcoming: [UpcomingSession]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("\(plan.sessionType.capitalized) day")
+                .font(.score(56))
+                .foregroundStyle(Color.textPrimary)
+                .minimumScaleFactor(0.6)
+                .lineLimit(1)
+            Text(summary)
+                .font(.ui(16))
+                .foregroundStyle(Color.textSecondary)
+            UpcomingRow(upcoming: upcoming)
+                .padding(.top, 2)
+        }
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+    }
+}
+
 struct ExerciseRow: View {
     let item: PlannedExercise
     let unit: WeightUnit
@@ -114,13 +144,29 @@ struct ExerciseRow: View {
                 .font(.ui(18, bold: true))
                 .foregroundStyle(Color.textPrimary)
             Text(prescription)
-                .font(.score(28, relativeTo: .title2))
-                .foregroundStyle(Color.load)
+                .font(.score(26, relativeTo: .title2))
+                // Red when the engine changed something, plain otherwise.
+                // Every row in the accent colour meant the accent carried no
+                // information -- "if every element got louder, the section got
+                // flatter". Now the colour marks the rows worth looking at.
+                .foregroundStyle(item.change != nil ? Color.load : Color.textPrimary)
+            if let lastTime {
+                // The number lifters actually want next to today's: what they
+                // did last time. It was in the model all along and never shown.
+                Text(lastTime)
+                    .font(.ui(14))
+                    .foregroundStyle(Color.textTertiary)
+            }
             Text(item.reason)
                 .font(.ui(15))
                 .foregroundStyle(Color.textSecondary)
         }
         .padding(.vertical, 6)
+    }
+
+    private var lastTime: String? {
+        guard let previous = item.previousWeight else { return nil }
+        return "Last time: \(previous.formatted()) \(unit.rawValue)"
     }
 
     /// "3 × 6 at 62.5 kg", or "3 × 6, choose a weight" the first time.
