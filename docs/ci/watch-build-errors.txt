@@ -1,2 +1,0 @@
-/Users/runner/work/zerolog/zerolog/app/ZeroLogWatch/DiagnosticsView.swift:92:80: error: member 'orange' in 'HierarchicalShapeStyle' produces result of type 'Color', but context expects 'HierarchicalShapeStyle'
-/Users/runner/work/zerolog/zerolog/app/ZeroLogWatch/DiagnosticsView.swift:92:80: error: static property 'orange' requires the types 'HierarchicalShapeStyle' and 'Color' be equivalent
