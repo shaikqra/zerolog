@@ -20,14 +20,17 @@ struct ConsentView: View {
                     .font(.headline)
                     .foregroundStyle(Color.plate)
 
-                Text("While a workout is running, ZeroLog reads how your wrist moves "
-                     + "so it can count your reps and log them without you typing.")
+                // Short line, then the CHOICE, then the detail.
+                //
+                // The first version put two paragraphs above the buttons and a
+                // screenshot of a 41mm watch showed the result: the headline and
+                // body filled the whole screen and BOTH buttons sat below the
+                // fold. A consent screen whose only visible content is the ask,
+                // with the choice hidden, is a dark pattern by accident -- the
+                // user has to scroll to find "Not now".
+                Text("ZeroLog reads how your wrist moves during a workout, so it "
+                     + "can count reps without you typing.")
                     .font(.footnote)
-
-                Text("It only reads movement during a workout. Nothing is recorded "
-                     + "between workouts, and your movement stays on your devices.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
 
                 Button("Count my reps") { onDecision(true) }
                     .buttonStyle(.borderedProminent)
@@ -36,7 +39,9 @@ struct ConsentView: View {
                 Button("Not now") { onDecision(false) }
                     .buttonStyle(.bordered)
 
-                Text("You can still log sets by hand, and change this in Settings.")
+                Text("It only reads movement during a workout. Nothing is recorded "
+                     + "between workouts, and your movement stays on your devices. "
+                     + "You can still log sets by hand, and change this in Settings.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }

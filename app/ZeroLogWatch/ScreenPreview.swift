@@ -100,6 +100,13 @@ struct ScreenPreviewHost: View {
                     }
             }
 
+        case "selftest":
+            // The whole point of the self-test is to prove the engine behaves on
+            // Apple's runtime exactly as it does on Linux. On the diagnostics
+            // screen the results sit below the fold, so a screenshot cannot show
+            // them; this renders them alone.
+            SelfTestPreview()
+
         case "diagnostics":
             // Runs the real self-test, so the screenshot shows actual results
             // from this build rather than a mock-up.
@@ -113,6 +120,46 @@ struct ScreenPreviewHost: View {
         default:
             Text("Unknown preview screen: \(screen)")
                 .font(.footnote)
+        }
+    }
+}
+
+/// Runs the self-test on appear and shows every line.
+private struct SelfTestPreview: View {
+    @State private var results: [SelfTest.Result] = []
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Engine self-test")
+                    .font(.headline)
+                    .foregroundStyle(Color.plate)
+                if results.isEmpty {
+                    Text("Running…").font(.caption2)
+                } else {
+                    Text(SelfTest.summary(results))
+                        .font(.caption.bold())
+                        .foregroundStyle(results.allSatisfy(\.passed) ? Color.plate : Color.orange)
+                    ForEach(results, id: \.name) { result in
+                        HStack(alignment: .top, spacing: 4) {
+                            Text(result.passed ? "ok" : "FAIL")
+                                .font(.system(size: 11).bold())
+                                .foregroundStyle(result.passed ? Color.secondary : Color.orange)
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(result.name).font(.system(size: 11))
+                                Text(result.detail)
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(Color.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 3)
+        }
+        .task {
+            let computed = await Task.detached { SelfTest.run() }.value
+            results = computed
         }
     }
 }
