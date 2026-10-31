@@ -50,10 +50,13 @@ struct SetView: View {
                 Spacer(minLength: 0)
 
                 HStack {
-                    // The steppers are touch targets, and the screen is not
-                    // accepting touches while dimmed. Hiding them gives the
-                    // count the full width instead of framing it with two
-                    // controls nobody can press.
+                    // NOT because the screen stops taking touches -- it does
+                    // not; a tap on the Always On display wakes the watch. The
+                    // reason is hierarchy: dimmed, a lifter gets one glance
+                    // between reps, so the count takes the full width and the
+                    // secondary adjustments step back. The primary action (the
+                    // tick) deliberately STAYS, so what is available does not
+                    // change shape when the wrist comes up.
                     if !isDimmed {
                         stepButton("minus", label: "One rep fewer") { reps = max(1, reps - 1) }
                     }
