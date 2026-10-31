@@ -1,1 +1,1 @@
-/Users/runner/work/zerolog/zerolog/app/ZeroLog/AppModel.swift:79:16: error: 'RestAdvice' initializer is inaccessible due to 'internal' protection level
+/Users/runner/work/zerolog/zerolog/app/ZeroLog/AppModel.swift:117:16: error: 'RestAdvice' initializer is inaccessible due to 'internal' protection level
