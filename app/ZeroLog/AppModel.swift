@@ -24,6 +24,14 @@ final class AppModel {
     private(set) var active: ActiveWorkout?
     /// A plain-language problem to show the user, if any.
     private(set) var problem: String?
+    /// When the last set was confirmed. Drives the rest timer.
+    ///
+    /// Stored as a Date rather than a running counter so the countdown stays
+    /// correct across the app being backgrounded -- a timer that pauses when
+    /// the user locks their phone is wrong exactly when they are resting.
+    private(set) var lastSetLoggedAt: Date?
+    /// The exercise that set belonged to, because rest length depends on it.
+    private(set) var lastSetRestSeconds: Int = 0
 
     /// Exercises whose automatic weight change the user undid. Cleared once a workout is saved.
     private var undone: Set<String> = []
@@ -65,12 +73,34 @@ final class AppModel {
 
     // MARK: Workout in progress
 
+    /// Rest advice right now, or nil before the first set of a session.
+    func restAdvice(now: Date = Date()) -> RestAdvice? {
+        guard let since = lastSetLoggedAt else { return nil }
+        return RestAdvice(suggestedSeconds: lastSetRestSeconds,
+                          elapsedSeconds: Int(now.timeIntervalSince(since)))
+    }
+
+    /// What the rotation does after today. Order, not dates -- the app has
+    /// never asked which days this user trains.
+    var upcoming: [UpcomingSession] {
+        guard let catalog else { return [] }
+        return Engine.upcoming(catalog: catalog, history: history, count: 3)
+    }
+
+    var progress: ProgressSummary {
+        Progress.summary(history: history, today: Today.dateString())
+    }
+
     func start() {
         guard let plan else { return }
         active = ActiveWorkout(plan: plan, date: Today.dateString())
     }
 
     func confirm(weight: Double, reps: Int) {
+        if let item = active?.current {
+            lastSetRestSeconds = item.restSeconds
+            lastSetLoggedAt = Date()
+        }
         active?.confirmSet(weight: weight, reps: reps)
     }
 
@@ -83,7 +113,14 @@ final class AppModel {
     }
 
     /// Saves the finished workout (if anything was logged) and plans the next one.
+    /// Clears the timer so a new session does not inherit the last one's rest.
+    private func clearRest() {
+        lastSetLoggedAt = nil
+        lastSetRestSeconds = 0
+    }
+
     func finish() {
+        clearRest()
         guard let finished = active else { return }
         var saveProblem: String?
         if finished.totalSetsLogged > 0 {

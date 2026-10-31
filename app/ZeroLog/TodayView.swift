@@ -10,10 +10,23 @@ struct TodayView: View {
             Group {
                 if let plan = model.plan {
                     List {
-                        Text(summary(plan))
-                            .font(.ui(17))
-                            .foregroundStyle(Color.textSecondary)
-                            .listRowBackground(Color.clear)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(summary(plan))
+                                .font(.ui(17))
+                                .foregroundStyle(Color.textSecondary)
+                            UpcomingRow(upcoming: model.upcoming)
+                        }
+                        .listRowBackground(Color.clear)
+                        // Hidden until there is something true to say; a fresh
+                        // install must not greet anyone with zeros.
+                        if model.progress.hasAnything {
+                            Section {
+                                ProgressCard(summary: model.progress, unit: plan.unit)
+                            } header: {
+                                SectionTitle("This week")
+                            }
+                            .listRowBackground(Color.surface)
+                        }
                         if let problem = model.problem {
                             Section {
                                 Label(problem, systemImage: "exclamationmark.triangle")

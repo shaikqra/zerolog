@@ -7,6 +7,11 @@ struct WorkoutView: View {
     @State private var weight = 20.0
     @State private var reps = 8
     @State private var showingHowTo = false
+    /// Ticks once a second purely to redraw the countdown. The time itself
+    /// comes from a stored Date, so a missed tick cannot drift the clock.
+    @State private var now = Date()
+    private let tick = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State private var restDismissed = false
 
     /// Starting weight when there's no history: an empty barbell (20 kg or 45 lb).
     private func startingWeight(_ unit: WeightUnit) -> Double {
@@ -30,6 +35,9 @@ struct WorkoutView: View {
         return ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 ProgressSegments(count: active.plan.exercises.count, current: active.exerciseIndex)
+                if !restDismissed, let advice = model.restAdvice(now: now), !advice.isReady {
+                    RestTimerCard(advice: advice) { restDismissed = true }
+                }
                 VStack(alignment: .leading, spacing: 4) {
                     Text(item.name)
                         .font(.score(44))
@@ -78,6 +86,10 @@ struct WorkoutView: View {
         .safeAreaInset(edge: .bottom) {
             Button {
                 model.confirm(weight: weight, reps: reps)
+                // A new set restarts the rest, so an earlier dismissal must not
+                // suppress the next countdown.
+                restDismissed = false
+                now = Date()
             } label: {
                 Label("Confirm set", systemImage: "checkmark")
             }
@@ -85,6 +97,7 @@ struct WorkoutView: View {
             .padding(20)
             .background(Color.base)
         }
+        .onReceive(tick) { now = $0 }
         // A sheet, not a push: pushing would re-run the refill below and undo the user's changes.
         .sheet(isPresented: $showingHowTo) {
             NavigationStack {
