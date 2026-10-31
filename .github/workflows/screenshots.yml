@@ -1,14 +1,35 @@
-# Runs the phone app on an iPhone simulator, taps through it and saves a photo of each screen.
-# Manual only (Actions tab -> Screenshots -> Run workflow), to save free Mac minutes.
+# Photographs the app and commits the pictures into the repo.
+#
+# Why committed rather than uploaded as artifacts: artifact downloads need an
+# authenticated API call, so neither the founder (who would have to dig through
+# the Actions UI) nor the CTO agent (whose deploy key has no API access) can
+# actually look at them. Files in docs/screens/ render directly on GitHub and are
+# readable over raw.githubusercontent.com with no login at all.
+#
+# Runs on every push while the repo is public, because public repos get free
+# unlimited Actions minutes. If visibility goes back to private this must return
+# to workflow_dispatch only -- macOS bills at 10x there and this job is the most
+# expensive one in the repo.
 name: Screenshots
 
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/screens/**"      # never photograph a commit that was just photos
   workflow_dispatch:
+
+permissions:
+  contents: write              # needed to commit the pictures back
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   screenshots:
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
 
@@ -19,24 +40,171 @@ jobs:
         working-directory: app
         run: xcodegen generate
 
-      - name: Available iPhone simulators
-        run: xcrun simctl list devices available | grep -i iphone | head -20
-
-      - name: Tap through the app
+      # ---------------------------------------------------------------- phone
+      - name: Tap through the phone app
+        id: phone
         working-directory: app
-        run: >
-          xcodebuild test -project ZeroLog.xcodeproj -scheme ZeroLog
-          -destination 'platform=iOS Simulator,name=iPhone 16'
-          -resultBundlePath ../screens.xcresult
-          CODE_SIGNING_ALLOWED=NO -quiet
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          DEST=$(xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLog \
+                   -showdestinations 2>/dev/null \
+                 | grep 'platform:iOS Simulator' \
+                 | grep -vi 'placeholder\|Any iOS' | head -1 \
+                 | sed -E 's/.*id:([0-9A-Fa-f-]+).*/\1/')
+          echo "Using simulator id=$DEST"
+          xcodebuild test -project ZeroLog.xcodeproj -scheme ZeroLog \
+            -destination "id=$DEST" \
+            -only-testing:ZeroLogUITests/ScreenshotTests \
+            -resultBundlePath ../phone.xcresult \
+            CODE_SIGNING_ALLOWED=NO -quiet
 
-      - name: Pull the photos out
+      - name: Pull the phone pictures out
         if: always()
-        run: xcrun xcresulttool export attachments --path screens.xcresult --output-path screenshots
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          mkdir -p docs/screens/phone
+          xcrun xcresulttool export attachments \
+            --path phone.xcresult --output-path raw-phone || true
+          # Attachments are exported with generated names plus a manifest that
+          # maps them back to the labels the test gave them. Without the manifest
+          # the files are unreadable noise, so the rename is not cosmetic.
+          python3 - <<'PY'
+          import json, pathlib, shutil, re
+          src = pathlib.Path("raw-phone")
+          out = pathlib.Path("docs/screens/phone")
+          out.mkdir(parents=True, exist_ok=True)
+          manifest = src / "manifest.json"
+          moved = 0
+          if manifest.exists():
+              data = json.loads(manifest.read_text())
+              for entry in data if isinstance(data, list) else [data]:
+                  for att in entry.get("attachments", []):
+                      name = att.get("suggestedHumanReadableName") or att.get("exportedFileName")
+                      exported = att.get("exportedFileName")
+                      if not (name and exported):
+                          continue
+                      f = src / exported
+                      if not f.exists():
+                          continue
+                      safe = re.sub(r"[^0-9A-Za-z._-]+", "-", name)
+                      if not safe.lower().endswith(".png"):
+                          safe += ".png"
+                      shutil.copy(f, out / safe)
+                      moved += 1
+          if moved == 0:
+              for f in sorted(src.rglob("*.png")):
+                  shutil.copy(f, out / f.name)
+                  moved += 1
+          print(f"phone screenshots: {moved}")
+          PY
 
-      - uses: actions/upload-artifact@v4
+      # ---------------------------------------------------------------- watch
+      # The watch app cannot be driven by XCUITest -- watchOS has no UI-testing
+      # support at all -- and no real watch can run it until the developer
+      # account exists. So the app is launched STRAIGHT INTO each screen with a
+      # DEBUG-only launch argument, one launch per screen. simctl can install,
+      # launch and screenshot a watch simulator; the one thing it cannot do is
+      # tap, and this removes the need to.
+      - name: Build the watch app for the simulator
+        working-directory: app
+        run: |
+          set -uo pipefail
+          xcodebuild -project ZeroLog.xcodeproj -scheme ZeroLogWatch \
+            -destination 'generic/platform=watchOS Simulator' \
+            -derivedDataPath build -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO -quiet build
+
+      - name: Photograph every watch screen
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          mkdir -p docs/screens/watch
+          APP=$(find app/build/Build/Products -name 'ZeroLogWatch.app' -maxdepth 3 | head -1)
+          if [ -z "$APP" ]; then echo "watch app not found"; exit 1; fi
+          echo "watch app: $APP"
+
+          UDID=$(xcrun simctl list devices available -j \
+            | python3 -c "
+          import json,sys
+          data = json.load(sys.stdin)['devices']
+          for runtime, devices in data.items():
+              if 'watchOS' not in runtime: continue
+              for d in devices:
+                  if d.get('isAvailable'):
+                      print(d['udid']); sys.exit(0)
+          sys.exit(1)")
+          echo "watch simulator: $UDID"
+
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b || true
+          xcrun simctl install "$UDID" "$APP"
+
+          BUNDLE=com.getzerolog.app.watchkitapp
+          shot=0
+          for screen in start notsetup consent set card diagnostics summary; do
+            xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
+            if xcrun simctl launch "$UDID" "$BUNDLE" -previewScreen "$screen"; then
+              sleep 6   # let SwiftUI lay out and the self-test finish
+              if xcrun simctl io "$UDID" screenshot "docs/screens/watch/$screen.png"; then
+                shot=$((shot + 1))
+                echo "captured $screen"
+              fi
+            else
+              echo "launch failed for $screen"
+            fi
+          done
+          echo "watch screenshots: $shot"
+          # Zero is a real signal: it means the watch app will not start at all.
+          [ "$shot" -gt 0 ]
+
+      # ----------------------------------------------------------------- index
+      - name: Build an index page
         if: always()
-        with:
-          name: screenshots
-          path: screenshots
-          retention-days: 7
+        run: |
+          set -uo pipefail
+          python3 - <<'PY'
+          import pathlib, datetime, os
+          root = pathlib.Path("docs/screens")
+          sha = (os.environ.get("GITHUB_SHA") or "")[:7]
+          lines = ["# ZeroLog, as it actually looks",
+                   "",
+                   "Generated by `.github/workflows/screenshots.yml` from commit "
+                   f"`{sha}` on {datetime.date.today().isoformat()}.",
+                   "",
+                   "Phone screens come from tapping through the real app on an "
+                   "iPhone simulator. Watch screens are each launched directly, "
+                   "because watchOS cannot be UI-tested; they use a real plan "
+                   "from the real engine, not mock-ups.",
+                   ""]
+          for section, title in [("phone", "iPhone"), ("watch", "Apple Watch")]:
+              folder = root / section
+              shots = sorted(folder.glob("*.png")) if folder.exists() else []
+              lines += [f"## {title}", ""]
+              if not shots:
+                  lines += ["_No screenshots captured this run._", ""]
+                  continue
+              for shot in shots:
+                  lines += [f"### {shot.stem}", "",
+                            f"![{shot.stem}]({section}/{shot.name})", ""]
+          root.mkdir(parents=True, exist_ok=True)
+          (root / "README.md").write_text("\n".join(lines))
+          print("\n".join(lines[:12]))
+          PY
+
+      - name: Commit the pictures
+        if: always()
+        run: |
+          set -uo pipefail
+          git config user.name "zerolog-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add docs/screens
+          if git diff --cached --quiet; then
+            echo "nothing changed"
+            exit 0
+          fi
+          # [skip ci] is belt and braces: a push made with GITHUB_TOKEN does not
+          # trigger workflows, and paths-ignore already excludes this folder.
+          git commit -q -m "Screenshots from ${GITHUB_SHA::7} [skip ci]"
+          git push

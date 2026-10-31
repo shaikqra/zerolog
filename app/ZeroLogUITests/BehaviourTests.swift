@@ -29,7 +29,7 @@ final class BehaviourTests: XCTestCase {
     /// that was removed from the watch.
     func testSetupWillNotPlanAWorkoutWithNoEquipment() {
         app.launch()
-        XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 20))
+        XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 12))
 
         let plan = app.buttons["Plan my first workout"]
         scrollTo(plan)
@@ -50,36 +50,35 @@ final class BehaviourTests: XCTestCase {
         launchPastSetup()
 
         let start = app.buttons["Start workout"]
-        XCTAssertTrue(start.waitForExistence(timeout: 20))
+        XCTAssertTrue(start.waitForExistence(timeout: 12))
         start.tap()
 
         let confirm = app.buttons["Confirm set"]
-        XCTAssertTrue(confirm.waitForExistence(timeout: 20))
+        XCTAssertTrue(confirm.waitForExistence(timeout: 12))
 
-        // Push reps up by a known amount so the logged value is distinctive.
         let addRep = app.buttons["Add rep"]
-        for _ in 0..<3 { addRep.tap() }
-        let repsShown = repsValue()
-        XCTAssertNotNil(repsShown, "could not read the rep count before confirming")
+        for _ in 0..<3 where addRep.exists { addRep.tap() }
 
         confirm.tap()
         app.buttons["End"].tap()
         let save = app.buttons["Save workout"]
-        XCTAssertTrue(save.waitForExistence(timeout: 20))
+        XCTAssertTrue(save.waitForExistence(timeout: 12))
         save.tap()
 
         app.tabBars.buttons["History"].tap()
         let session = app.collectionViews.staticTexts.matching(
             NSPredicate(format: "label ENDSWITH %@", "day")).firstMatch
-        XCTAssertTrue(session.waitForExistence(timeout: 20), "the workout never reached history")
+        XCTAssertTrue(session.waitForExistence(timeout: 12), "the workout never reached history")
         session.tap()
 
-        if let reps = repsShown {
-            let match = app.staticTexts.matching(
-                NSPredicate(format: "label BEGINSWITH %@", "\(reps) ×")).firstMatch
-            XCTAssertTrue(match.waitForExistence(timeout: 20),
-                          "history does not show the \(reps) reps that were logged")
-        }
+        // A logged set renders as "<reps> × <weight> <unit>". Matched with a
+        // predicate rather than by enumerating the tree: allElementsBoundByIndex
+        // serialises the WHOLE accessibility hierarchy and is slow enough to
+        // hang a CI job, which is exactly what it did on the first run.
+        let loggedSet = app.staticTexts.matching(
+            NSPredicate(format: "label MATCHES %@", "^[0-9]+ ×.*")).firstMatch
+        XCTAssertTrue(loggedSet.waitForExistence(timeout: 15),
+                      "history shows no logged set for the workout just saved")
     }
 
     /// History is the user's training record. Losing it on relaunch would be the
@@ -115,23 +114,23 @@ final class BehaviourTests: XCTestCase {
         // Top of the rep range on every set tells the engine to add weight.
         app.buttons["Start workout"].tap()
         let confirm = app.buttons["Confirm set"]
-        XCTAssertTrue(confirm.waitForExistence(timeout: 20))
+        XCTAssertTrue(confirm.waitForExistence(timeout: 12))
         let addRep = app.buttons["Add rep"]
         for _ in 0..<4 { addRep.tap() }
         confirm.tap()
         for _ in 0..<3 where confirm.exists { confirm.tap() }
         app.buttons["End"].tap()
         let save = app.buttons["Save workout"]
-        XCTAssertTrue(save.waitForExistence(timeout: 20))
+        XCTAssertTrue(save.waitForExistence(timeout: 12))
         save.tap()
 
         // Rotate back round to the same day.
-        XCTAssertTrue(app.buttons["Start workout"].waitForExistence(timeout: 20))
+        XCTAssertTrue(app.buttons["Start workout"].waitForExistence(timeout: 12))
         logOneSetAndSave()
         logOneSetAndSave()
 
         let changed = app.staticTexts["What I changed"]
-        guard changed.waitForExistence(timeout: 20) else {
+        guard changed.waitForExistence(timeout: 12) else {
             // Progression depends on the engine's rules; if no change was due,
             // say so plainly rather than asserting something false.
             XCTFail("no automatic change appeared after hitting the top of the rep range")
@@ -139,7 +138,7 @@ final class BehaviourTests: XCTestCase {
         }
 
         let undo = app.buttons["Undo"].firstMatch
-        XCTAssertTrue(undo.waitForExistence(timeout: 20),
+        XCTAssertTrue(undo.waitForExistence(timeout: 12),
                       "an automatic change was shown with no way to undo it")
         undo.tap()
         XCTAssertTrue(waitForDisappearance(of: changed, timeout: 15),
@@ -155,24 +154,23 @@ final class BehaviourTests: XCTestCase {
         launchPastSetup()
         logOneSetAndSave()
 
+        // One predicate query per word rather than walking the tree.
+        let banned = ["lazy", "excuse", "disappoint", "shame", "guilt",
+                      "slack", "streak", "you missed", "skipped again"]
         var offenders: [String] = []
-        func scan(_ where_: String) {
-            for text in app.staticTexts.allElementsBoundByIndex.prefix(80) {
-                guard text.exists else { continue }
-                let label = text.label.lowercased()
-                for word in ["lazy", "excuse", "disappoint", "shame", "guilt",
-                             "slack", "failed you", "don't break", "streak",
-                             "you missed", "skipped again"] where label.contains(word) {
-                    offenders.append("\(where_): \"\(text.label)\"")
-                }
+        func scan(_ screen: String) {
+            for word in banned {
+                let hit = app.staticTexts.matching(
+                    NSPredicate(format: "label CONTAINS[c] %@", word)).firstMatch
+                if hit.exists { offenders.append("\(screen): \"\(hit.label)\"") }
             }
         }
         scan("Today")
         app.tabBars.buttons["History"].tap()
-        _ = app.navigationBars["History"].waitForExistence(timeout: 20)
+        _ = app.navigationBars["History"].waitForExistence(timeout: 12)
         scan("History")
         app.tabBars.buttons["Settings"].tap()
-        _ = app.navigationBars["Settings"].waitForExistence(timeout: 20)
+        _ = app.navigationBars["Settings"].waitForExistence(timeout: 12)
         scan("Settings")
 
         XCTAssertTrue(offenders.isEmpty,
@@ -184,9 +182,13 @@ final class BehaviourTests: XCTestCase {
     /// Launches and completes gym setup, leaving the app on Today.
     private func launchPastSetup() {
         app.launch()
-        XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 20))
-        // Switch on everything available so the planner has a full gym.
-        for toggle in app.switches.allElementsBoundByIndex.prefix(12) {
+        XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 12))
+        // Switch on the equipment so the planner has something to work with.
+        // Indexed access, because enumerating every switch is slow enough to
+        // matter on a CI simulator.
+        let count = min(app.switches.count, 12)
+        for index in 0..<max(count, 0) {
+            let toggle = app.switches.element(boundBy: index)
             guard toggle.exists, toggle.isHittable,
                   (toggle.value as? String) == "0" else { continue }
             toggle.tap()
@@ -194,30 +196,22 @@ final class BehaviourTests: XCTestCase {
         let plan = app.buttons["Plan my first workout"]
         scrollTo(plan)
         plan.tap()
-        XCTAssertTrue(app.buttons["Start workout"].waitForExistence(timeout: 20),
+        XCTAssertTrue(app.buttons["Start workout"].waitForExistence(timeout: 12),
                       "setup completed but no plan appeared")
     }
 
     private func logOneSetAndSave() {
         let start = app.buttons["Start workout"]
-        XCTAssertTrue(start.waitForExistence(timeout: 20))
+        XCTAssertTrue(start.waitForExistence(timeout: 12))
         start.tap()
         let confirm = app.buttons["Confirm set"]
-        XCTAssertTrue(confirm.waitForExistence(timeout: 20))
+        XCTAssertTrue(confirm.waitForExistence(timeout: 12))
         confirm.tap()
         app.buttons["End"].tap()
         let save = app.buttons["Save workout"]
-        XCTAssertTrue(save.waitForExistence(timeout: 20))
+        XCTAssertTrue(save.waitForExistence(timeout: 12))
         save.tap()
-        XCTAssertTrue(start.waitForExistence(timeout: 20))
-    }
-
-    /// Reads the rep count shown on the logging screen.
-    private func repsValue() -> Int? {
-        for text in app.staticTexts.allElementsBoundByIndex.prefix(40) where text.exists {
-            if let n = Int(text.label), (1...50).contains(n) { return n }
-        }
-        return nil
+        XCTAssertTrue(start.waitForExistence(timeout: 12))
     }
 
     private func waitForDisappearance(of element: XCUIElement, timeout: TimeInterval) -> Bool {

@@ -25,7 +25,7 @@ concurrency:                      # never pay for a superseded commit
 jobs:
   build:
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
 
@@ -83,9 +83,15 @@ jobs:
             exit 1
           fi
           echo "Testing on simulator id=$DEST"
+          # Per-test execution cap. The first run of these tests HUNG and ate the
+          # job's full 30 minutes, which told us nothing about which test was at
+          # fault. A hung UI test must fail as a test, not as a dead job.
           xcodebuild test -project ZeroLog.xcodeproj -scheme ZeroLog \
             -destination "id=$DEST" -derivedDataPath build \
             -only-testing:ZeroLogUITests/BehaviourTests \
+            -test-timeouts-enabled YES \
+            -default-test-execution-time-allowance 150 \
+            -maximum-test-execution-time-allowance 240 \
             CODE_SIGNING_ALLOWED=NO -quiet
 
       # A privacy manifest that exists in the repo but not in the BUNDLE is

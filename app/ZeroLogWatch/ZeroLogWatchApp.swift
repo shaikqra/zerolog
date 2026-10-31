@@ -17,9 +17,22 @@ struct ZeroLogWatchApp: App {
 struct RootView: View {
     @State private var controller = WorkoutController()
 
+    private var previewScreen: String? {
+        #if DEBUG
+        return ScreenPreview.requested
+        #else
+        return nil
+        #endif
+    }
+
     var body: some View {
         NavigationStack {
-            if controller.needsMotionConsent {
+            // DEBUG-only photo studio. The watch app cannot be reached any other
+            // way: XCUITest does not support watchOS, and no real watch can run
+            // it until the developer account exists.
+            if let screen = previewScreen {
+                ScreenPreviewHost(screen: screen)
+            } else if controller.needsMotionConsent {
                 // Asked once, before any movement is read. Refusing still starts
                 // the workout -- see WorkoutController.grantMotionConsent.
                 ConsentView(onDecision: controller.grantMotionConsent)
