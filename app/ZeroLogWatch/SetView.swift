@@ -14,6 +14,14 @@ struct SetView: View {
 
     @State private var weight: Double = 0
     @State private var reps: Int = 0
+    /// True when the watch has dimmed to the Always On display.
+    ///
+    /// This is NOT an edge case for ZeroLog -- it is the state the app is in
+    /// during the most important moment it has. Mid-set the wrist is under a
+    /// barbell, not raised to read a screen, so the dimmed view is what a
+    /// lifter actually glances at between reps. It gets the rep count large
+    /// and drops everything else, which is also the lower-power path.
+    @Environment(\.isLuminanceReduced) private var isDimmed
 
     /// Starting weight when there's no history: an empty barbell.
     private let defaultWeightKg = 20.0
@@ -30,6 +38,10 @@ struct SetView: View {
                     Text("Set \(workout.setNumber) of \(item.sets)")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                    // Guideline 2.5.14 wants the recording indicator visible
+                    // WHENEVER sensors are being read, and the watch is still
+                    // reading them while dimmed -- so this stays in both
+                    // states rather than being treated as chrome.
                     if isCapturing {
                         RecordingIndicator()
                     }
@@ -38,13 +50,21 @@ struct SetView: View {
                 Spacer(minLength: 0)
 
                 HStack {
-                    stepButton("minus", label: "One rep fewer") { reps = max(1, reps - 1) }
+                    // The steppers are touch targets, and the screen is not
+                    // accepting touches while dimmed. Hiding them gives the
+                    // count the full width instead of framing it with two
+                    // controls nobody can press.
+                    if !isDimmed {
+                        stepButton("minus", label: "One rep fewer") { reps = max(1, reps - 1) }
+                    }
                     Text("\(reps)")
-                        .font(.system(size: 40, weight: .bold, design: .rounded))
+                        .font(.system(size: isDimmed ? 52 : 40, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .frame(maxWidth: .infinity)
                         .accessibilityLabel("\(reps) reps")
-                    stepButton("plus", label: "One more rep") { reps += 1 }
+                    if !isDimmed {
+                        stepButton("plus", label: "One more rep") { reps += 1 }
+                    }
                 }
 
                 HStack {

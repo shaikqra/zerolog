@@ -90,6 +90,16 @@ struct ScreenPreviewHost: View {
                         onEnd: {}, isCapturing: true)
             }
 
+        case "dimmed":
+            // The Always On state, forced, so it can be photographed. This is
+            // the view a lifter actually sees mid-set -- wrist down under a
+            // bar, screen dimmed -- and it had never been looked at once.
+            if let active = ScreenPreview.demoActive {
+                SetView(workout: active, onConfirm: { _, _ in }, onSkip: {},
+                        onEnd: {}, isCapturing: true)
+                    .environment(\.isLuminanceReduced, true)
+            }
+
         case "card":
             if let active = ScreenPreview.demoActive {
                 SetView(workout: active, onConfirm: { _, _ in }, onSkip: {},

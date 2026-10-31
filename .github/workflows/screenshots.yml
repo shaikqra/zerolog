@@ -189,7 +189,7 @@ jobs:
 
           BUNDLE=com.getzerolog.app.watchkitapp
           shot=0
-          for screen in start notsetup consent set card diagnostics selftest summary; do
+          for screen in start notsetup consent set dimmed card diagnostics selftest summary; do
             xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
             if xcrun simctl launch "$UDID" "$BUNDLE" -previewScreen "$screen"; then
               sleep 6   # let SwiftUI lay out and the self-test finish
