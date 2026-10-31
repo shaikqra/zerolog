@@ -16,6 +16,9 @@ struct DiagnosticsView: View {
     let recordedSets: Int
     let captureState: String
 
+    @State private var selfTest: [SelfTest.Result] = []
+    @State private var running = false
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 6) {
@@ -48,6 +51,53 @@ struct DiagnosticsView: View {
                     Text("No set counted yet this session.")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
+                }
+
+                Divider()
+
+                // The engine has never executed on Apple hardware. arm64
+                // floating point, a different Swift runtime and a different
+                // Foundation all sit between the tested code and this watch, so
+                // this runs the same traces the Linux tests run and says whether
+                // the answers match. A failure here means a platform difference,
+                // which is worth knowing in ten seconds rather than after a
+                // confusing session in a gym.
+                //
+                // It proves the pipeline computes what it computed on Linux. It
+                // proves nothing about whether a real bench press looks like
+                // what the tuner expects.
+                Button(running ? "Running…" : "Run self-test") {
+                    running = true
+                    // Off the main actor: six traces is a few hundred thousand
+                    // samples and would visibly stall the screen.
+                    Task.detached {
+                        let results = SelfTest.run()
+                        await MainActor.run {
+                            selfTest = results
+                            running = false
+                        }
+                    }
+                }
+                .font(.footnote)
+                .disabled(running)
+
+                if !selfTest.isEmpty {
+                    Text(SelfTest.summary(selfTest))
+                        .font(.caption.bold())
+                        .foregroundStyle(selfTest.allSatisfy(\.passed) ? Color.plate : .orange)
+                    ForEach(selfTest, id: \.name) { result in
+                        HStack(alignment: .top, spacing: 4) {
+                            Text(result.passed ? "ok" : "FAIL")
+                                .font(.caption2.bold())
+                                .foregroundStyle(result.passed ? .secondary : .orange)
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(result.name).font(.caption2)
+                                Text(result.detail)
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                 }
             }
             .padding(.horizontal, 4)
