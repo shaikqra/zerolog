@@ -9,11 +9,16 @@ struct HistoryView: View {
         NavigationStack {
             Group {
                 if model.history.isEmpty {
-                    ContentUnavailableView(
-                        "No workouts yet",
-                        systemImage: "clock",
-                        description: Text("Finish a workout and it shows up here.")
-                    )
+                    // "An empty screen is an invitation to act." The old copy
+                    // described the screen's own emptiness and then waited.
+                    // This says what will be here and what it is FOR -- every
+                    // logged set is what the next plan is calculated from, so
+                    // the first one is worth doing rather than merely possible.
+                    ContentUnavailableView {
+                        Label("Your lifting record", systemImage: "list.bullet.rectangle")
+                    } description: {
+                        Text("Every set you log lands here, and the next workout is built from it. Start today's session to make the first entry.")
+                    }
                 } else {
                     List {
                         ForEach(model.history.indices.reversed(), id: \.self) { index in

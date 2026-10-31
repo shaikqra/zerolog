@@ -12,6 +12,7 @@ struct WorkoutView: View {
     @State private var now = Date()
     private let tick = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var restDismissed = false
+    @State private var confirmingEnd = false
 
     /// Starting weight when there's no history: an empty barbell (20 kg or 45 lb).
     private func startingWeight(_ unit: WeightUnit) -> Double {
@@ -38,13 +39,16 @@ struct WorkoutView: View {
                 if !restDismissed, let advice = model.restAdvice(now: now), !advice.isReady {
                     RestTimerCard(advice: advice) { restDismissed = true }
                 }
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 8) {
+                    // Was .score(44), the same weight as the numbers below, so
+                    // the screen had two peaks. Mid-set the exercise name is
+                    // the one thing you already know -- it is context, and the
+                    // weight and reps are the decision. Still large enough to
+                    // read from a bench at arm's length.
                     Text(item.name)
-                        .font(.score(44))
+                        .font(.score(30))
                         .foregroundStyle(Color.textPrimary)
-                    Text("Set \(active.setNumber) of \(item.sets)")
-                        .font(.ui(17))
-                        .foregroundStyle(Color.textSecondary)
+                    SetDots(total: item.sets, current: active.setNumber)
                 }
                 HStack(alignment: .top, spacing: 20) {
                     BigNumber(value: weight.formatted(), unit: unit.rawValue,
@@ -77,7 +81,12 @@ struct WorkoutView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("End", action: model.endEarly)
+                // Sits exactly where the back button lives, so a misplaced tap
+                // used to end the session outright. It asks now. The wording
+                // states what actually happens -- endEarly() goes to the
+                // summary and keeps logged sets -- because a confirmation that
+                // implies losing work is its own kind of lie.
+                Button("End") { confirmingEnd = true }
             }
             ToolbarItem(placement: .primaryAction) {
                 Button("Skip exercise", action: model.skipExercise)
@@ -91,11 +100,18 @@ struct WorkoutView: View {
                 restDismissed = false
                 now = Date()
             } label: {
-                Label("Confirm set", systemImage: "checkmark")
+                Label("Log set", systemImage: "checkmark")
             }
             .buttonStyle(PrimaryButtonStyle())
             .padding(20)
             .background(Color.base)
+        }
+        .confirmationDialog("End this workout?", isPresented: $confirmingEnd,
+                            titleVisibility: .visible) {
+            Button("End workout", role: .destructive, action: model.endEarly)
+            Button("Keep going", role: .cancel) { }
+        } message: {
+            Text("Sets you have already logged are kept.")
         }
         .onReceive(tick) { now = $0 }
         // A sheet, not a push: pushing would re-run the refill below and undo the user's changes.
@@ -144,6 +160,43 @@ struct WorkoutView: View {
 }
 
 /// One bar per exercise: green for done, red for the current one, grey for what's left.
+/// One dot per set: done, doing, still to do.
+///
+/// Replaces the line "Set 1 of 3", which stated the same fact without showing
+/// it. The dots are the only place green appears during a working set, which
+/// is what makes finishing one feel like something happened.
+///
+/// Not numbered markers -- sets genuinely ARE a sequence, so the shape earns
+/// its place rather than decorating.
+private struct SetDots: View {
+    let total: Int
+    /// 1-based: the set being worked on right now.
+    let current: Int
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(1...max(total, 1), id: \.self) { index in
+                Circle()
+                    .strokeBorder(index == current ? Color.textPrimary : .clear, lineWidth: 2)
+                    .background(Circle().fill(fill(index)))
+                    .frame(width: 12, height: 12)
+            }
+            Text("Set \(current) of \(total)")
+                .font(.ui(16))
+                .foregroundStyle(Color.textSecondary)
+                .padding(.leading, 4)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Set \(current) of \(total), \(current - 1) done")
+    }
+
+    private func fill(_ index: Int) -> Color {
+        if index < current { return .done }        // finished
+        if index == current { return .clear }      // in progress: outline only
+        return .line                               // still to come
+    }
+}
+
 private struct ProgressSegments: View {
     let count: Int
     let current: Int
