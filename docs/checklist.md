@@ -20,18 +20,18 @@ is not worth opening produces no data, and then nothing else matters.
 - [x] This week: workouts, sets, volume, change vs last week
 - [x] Crash recovery (a killed app no longer loses the session)
 - [x] Undo on every automatic change
-- [ ] **Training experience at signup** (novice / returning / experienced)
+- [x] **Training experience at signup** (novice / returning / experienced)
       — the single biggest gap. Decides progression RATE: a novice adds weight
       every session, an intermediate cannot and will stall and quit if told to.
-- [ ] **Which days you train** — makes "Tomorrow: Pull day" honest instead of
+- [x] **Which days you train** — makes "Tomorrow: Pull day" honest instead of
       invented, and lets the engine plan a real week
 - [ ] **Goal: strength or size** — changes rep ranges and rest length
-- [ ] **Bodyweight** — ONLY to suggest opening weights and to load bodyweight
+- [x] **Bodyweight** — ONLY to suggest opening weights and to load bodyweight
       exercises. Not used after the first session; your last session is.
-- [ ] Last time's numbers shown on each exercise row
+- [x] Last time's numbers shown on each exercise row
 - [ ] App icon (currently blank — see docs/screens)
 - [x] Edit or delete a logged set
-- [ ] Empty states that say what will appear
+- [x] Empty states that say what will appear (History done; Today/Settings still plain)
 
 **Not collecting height.** It affects form cues, not programming. It would add
 a signup field and change no number.
@@ -45,6 +45,7 @@ a signup field and change no number.
 - [x] Motion consent + visible recording indicator
 - [x] On-watch diagnostics and engine self-test (6/6 on Apple's runtime)
 - [x] Every workout saves its raw windows for offline re-tuning
+- [x] Always-On (dimmed) handling — the state the watch is in mid-set
 - [ ] **Apple Developer account** ($99/yr, needs 18) — hard gate
 - [ ] **An actual Apple Watch** — UNCONFIRMED whether one is owned
 - [ ] Code signing + TestFlight
@@ -97,7 +98,7 @@ produced TWO large headings before I checked. Diagnose from the running screen,
 not from the description of it.
 
 - [x] Today: one focal point, supporting detail beneath.
-- [ ] Mid-workout: the current set should own the screen; everything else
+- [x] Mid-workout: the current set owns the screen; everything else
       recedes. Still genuinely true.
 
 ### 2. ~~Colour defined but unused~~ — DONE, by using LESS of it
@@ -106,7 +107,7 @@ marks only rows the engine changed, which is what makes it readable as a
 signal. "If every element got louder, the section got flatter."
 
 - [x] Accent means "this changed", not "this is a number".
-- [ ] Completed exercises go green as you work through them. Still open.
+- [x] Completed sets go green as you work through them (SetDots).
 
 ### 3. ~~Not enough data per row~~ — DONE
 Each row now carries "Last time: 45 lb". The value was already in the model and
