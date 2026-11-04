@@ -34,6 +34,8 @@ struct RootView: View {
             TabView {
                 TodayView()
                     .tabItem { Label("Today", systemImage: "figure.strengthtraining.traditional") }
+                LiftProgressView()
+                    .tabItem { Label("Progress", systemImage: "chart.line.uptrend.xyaxis") }
                 HistoryView()
                     .tabItem { Label("History", systemImage: "clock") }
                 SettingsView()

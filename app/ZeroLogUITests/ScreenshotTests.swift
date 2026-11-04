@@ -88,6 +88,18 @@ final class ScreenshotTests: XCTestCase {
         sleep(1)
         snap("09 Past workout")
 
+        // Progress: the new tab. A screen nobody photographs is a screen
+        // nobody has checked -- the lesson from the watch consent screen.
+        app.tabBars.buttons["Progress"].tap()
+        XCTAssertTrue(app.navigationBars["Progress"].waitForExistence(timeout: 10))
+        snap("09a Progress")
+        let firstLift = app.cells.firstMatch
+        if firstLift.waitForExistence(timeout: 5) {
+            firstLift.tap()
+            snap("09b One lift over time")
+            app.navigationBars.buttons.firstMatch.tap()
+        }
+
         // 7. Settings.
         app.tabBars.buttons["Settings"].tap()
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 10))

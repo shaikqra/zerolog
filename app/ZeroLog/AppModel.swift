@@ -174,6 +174,25 @@ final class AppModel {
         active?.confirmSet(weight: weight, reps: reps)
     }
 
+    /// Exercises the user has actually logged, most recently trained first.
+    func trainedExercises() -> [Exercise] {
+        guard let catalog else { return [] }
+        return Engine.trainedExercises(history: history, catalog: catalog)
+    }
+
+    func progress(for exercise: Exercise) -> ExerciseProgress {
+        progress(forId: exercise.id, name: exercise.name)
+    }
+
+    func progress(forId id: String, name: String) -> ExerciseProgress {
+        let unit = settings?.unit ?? .kg
+        // Snap to the step this exercise actually loads in, so the chart shows
+        // plate-real weights rather than conversion artefacts like 62.4 kg.
+        let step = catalog?.exercise(id: id)?.increment(in: unit) ?? 2.5
+        return Engine.progress(for: id, name: name, history: history,
+                               unit: unit, step: step)
+    }
+
     /// Other movements that train the same thing, with the equipment this gym
     /// has, excluding anything already in today's session.
     func swapOptions() -> [Exercise] {
