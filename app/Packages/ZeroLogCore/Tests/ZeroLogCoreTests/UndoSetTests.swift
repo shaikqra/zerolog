@@ -43,18 +43,36 @@ final class UndoSetTests: XCTestCase {
         XCTAssertEqual(w.current?.exerciseId, "back_squat")
     }
 
-    /// The case that breaks naive implementations.
-    func testUndoingTheFinalSetOfAnExerciseComesBackToThatExercise() {
+    /// The case that breaks naive implementations: undoing across an exercise
+    /// boundary must come back to the exercise you were on.
+    ///
+    /// Advancing is now an explicit step, so this crosses the boundary via
+    /// nextExercise() rather than as a side effect of the last set.
+    func testUndoingAcrossAnExerciseBoundaryComesBack() {
         var w = workout(sets: 2)
         w.confirmSet(weight: 60, reps: 8)
         w.confirmSet(weight: 60, reps: 8)
+        XCTAssertTrue(w.nextExercise())
         XCTAssertEqual(w.current?.exerciseId, "romanian_deadlift", "should have advanced")
         XCTAssertEqual(w.setNumber, 1)
 
         XCTAssertTrue(w.undoLastSet())
         XCTAssertEqual(w.current?.exerciseId, "back_squat", "undo must come back to the squat")
         XCTAssertEqual(w.setNumber, 2, "and to the set that was undone")
-        XCTAssertEqual(w.totalSetsLogged, 1)
+        XCTAssertEqual(w.totalSetsLogged, 1, "exactly one set removed, not two")
+    }
+
+    /// Moving to the next exercise must not become an undoable "action" that
+    /// eats a set. Undo means one thing: take back the last SET.
+    func testMovingOnThenUndoingRemovesExactlyOneSet() {
+        var w = workout(sets: 2)
+        w.confirmSet(weight: 60, reps: 8)
+        w.confirmSet(weight: 60, reps: 8)
+        XCTAssertEqual(w.totalSetsLogged, 2)
+        XCTAssertTrue(w.nextExercise())
+        XCTAssertTrue(w.undoLastSet())
+        XCTAssertEqual(w.totalSetsLogged, 1,
+                       "one undo, one set -- moving on must not consume an undo")
     }
 
     /// Undoing the only set of an exercise must not leave an empty exercise
@@ -84,7 +102,10 @@ final class UndoSetTests: XCTestCase {
         w.confirmSet(weight: 60, reps: 8)
         w.confirmSet(weight: 60, reps: 8)
         w.confirmSet(weight: 60, reps: 8)
-        XCTAssertEqual(w.current?.exerciseId, "romanian_deadlift")
+        // Stays put now: finishing the planned sets no longer moves you on by
+        // itself, so an extra set is always possible.
+        XCTAssertEqual(w.current?.exerciseId, "back_squat")
+        XCTAssertTrue(w.hasFinishedPlannedSets)
 
         XCTAssertTrue(w.undoLastSet())
         XCTAssertTrue(w.undoLastSet())

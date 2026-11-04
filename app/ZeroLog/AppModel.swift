@@ -178,6 +178,22 @@ final class AppModel {
         active?.skipExercise()
     }
 
+    /// Moves on when the lifter says so.
+    ///
+    /// Different from skipExercise: this KEEPS the sets just logged. Skipping
+    /// means "I am not doing this today"; moving on means "I am done with it".
+    func nextExercise() {
+        active?.nextExercise()
+        clearRestTimerForNewExercise()
+    }
+
+    private func clearRestTimerForNewExercise() {
+        // The rest that matters is between sets of the same movement; walking
+        // to another station is its own break.
+        lastSetLoggedAt = nil
+        lastSetRestSeconds = 0
+    }
+
     func endEarly() {
         active?.endEarly()
     }

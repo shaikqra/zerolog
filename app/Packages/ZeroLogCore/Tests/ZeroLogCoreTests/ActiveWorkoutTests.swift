@@ -14,7 +14,13 @@ final class ActiveWorkoutTests: XCTestCase {
                                sessionType: "push", unit: unit)
     }
 
-    func testWalksThroughSetsThenExercisesInOrder() {
+    /// Moving on is now the LIFTER's decision, not the engine's.
+    ///
+    /// This test used to assert that logging the last planned set jumped
+    /// straight to the next exercise. That made a fourth set impossible to
+    /// record on a three-set exercise, so the history was quietly wrong about
+    /// what the person actually did. The plan is a suggestion, not a cage.
+    func testStaysOnTheExerciseUntilTheLifterMovesOn() {
         var w = ActiveWorkout(plan: pushPlan(), date: "2026-10-28")
         XCTAssertEqual(w.current?.exerciseId, "bench_press")
         XCTAssertEqual(w.setNumber, 1)
@@ -22,11 +28,28 @@ final class ActiveWorkoutTests: XCTestCase {
         XCTAssertEqual(w.setNumber, 2)
         w.confirmSet(weight: 50, reps: 8)
         w.confirmSet(weight: 50, reps: 7)
+        XCTAssertEqual(w.current?.exerciseId, "bench_press",
+                       "all planned sets done, but still the lifter's call")
+        XCTAssertTrue(w.hasFinishedPlannedSets)
+        XCTAssertTrue(w.nextExercise())
         XCTAssertEqual(w.current?.exerciseId, "overhead_press")
         XCTAssertEqual(w.setNumber, 1)
         XCTAssertEqual(w.logged, [LoggedExercise(exerciseId: "bench_press", sets: [
             LoggedSet(weightKg: 50, reps: 8), LoggedSet(weightKg: 50, reps: 8), LoggedSet(weightKg: 50, reps: 7),
         ])])
+    }
+
+    /// The reason the change was made: a fourth set on a three-set exercise.
+    func testAnExtraSetBeyondThePlanIsRecorded() {
+        var w = ActiveWorkout(plan: pushPlan(), date: "2026-10-28")
+        w.confirmSet(weight: 50, reps: 8)
+        w.confirmSet(weight: 50, reps: 8)
+        w.confirmSet(weight: 50, reps: 7)
+        XCTAssertTrue(w.hasFinishedPlannedSets)
+        XCTAssertTrue(w.confirmSet(weight: 50, reps: 5), "a fourth set must be allowed")
+        XCTAssertEqual(w.logged.first?.sets.count, 4,
+                       "history must record what was actually lifted")
+        XCTAssertEqual(w.totalSetsLogged, 4)
     }
 
     func testFirstSetIsPrefilledFromThePlanThenFromWhatYouJustDid() {

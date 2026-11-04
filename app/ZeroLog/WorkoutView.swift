@@ -93,16 +93,20 @@ struct WorkoutView: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            Button {
-                model.confirm(weight: weight, reps: reps)
-                // A new set restarts the rest, so an earlier dismissal must not
-                // suppress the next countdown.
-                restDismissed = false
-                now = Date()
-            } label: {
-                Label("Log set", systemImage: "checkmark")
+            VStack(spacing: 10) {
+                // Appears only once the planned sets are done. The engine no
+                // longer advances on its own -- that is what makes a fourth set
+                // possible -- so this is how the lifter moves on, and it has to
+                // be unmissable or the workout cannot progress.
+                if active.hasFinishedPlannedSets {
+                    Button(action: model.nextExercise) {
+                        Label(isLastExercise(active) ? "Finish workout" : "Next exercise",
+                              systemImage: "arrow.right")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                }
+                logButton()
             }
-            .buttonStyle(PrimaryButtonStyle())
             .padding(20)
             .background(Color.base)
         }
@@ -130,6 +134,23 @@ struct WorkoutView: View {
             weight = active.suggestedWeight ?? startingWeight(unit)
             reps = active.suggestedReps
         }
+    }
+
+    private func isLastExercise(_ active: ActiveWorkout) -> Bool {
+        active.exerciseIndex >= active.plan.exercises.count - 1
+    }
+
+    private func logButton() -> some View {
+        Button {
+            model.confirm(weight: weight, reps: reps)
+            // A new set restarts the rest, so an earlier dismissal must not
+            // suppress the next countdown.
+            restDismissed = false
+            now = Date()
+        } label: {
+            Label("Log set", systemImage: "checkmark")
+        }
+        .buttonStyle(PrimaryButtonStyle())
     }
 
     private func summary(_ active: ActiveWorkout) -> some View {

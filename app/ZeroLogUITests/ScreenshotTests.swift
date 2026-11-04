@@ -49,6 +49,15 @@ final class ScreenshotTests: XCTestCase {
         confirmButton.tap()
         confirmButton.tap()
 
+        // Finishing the planned sets no longer advances by itself -- that is
+        // what makes a fourth set possible -- so the tour takes the same step a
+        // lifter does, and photographs it.
+        let nextExercise = app.buttons["Next exercise"]
+        XCTAssertTrue(nextExercise.waitForExistence(timeout: 10),
+                      "the workout must offer a way to move on")
+        snap("05b Planned sets done")
+        nextExercise.tap()
+
         // 4. End early and save.
         endWorkout()
         let saveButton = app.buttons["Save workout"]

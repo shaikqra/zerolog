@@ -52,6 +52,18 @@ public struct ActiveWorkout: Codable, Equatable, Sendable {
 
     public var totalSetsLogged: Int { logged.reduce(0) { $0 + $1.sets.count } }
 
+    /// True once every planned set of the current exercise is done.
+    ///
+    /// The plan is a suggestion, not a cage: a lifter who feels strong should
+    /// be able to add a fourth set to a three-set exercise. Previously the app
+    /// advanced the moment the last planned set was logged, so an extra set was
+    /// impossible to record and the history was quietly wrong about what the
+    /// person actually did.
+    public var hasFinishedPlannedSets: Bool {
+        guard let current else { return false }
+        return setsDoneForCurrent.count >= current.sets
+    }
+
     /// Records one set (weight in the plan's unit; history keeps kg) and moves on.
     /// Returns false and changes nothing for impossible values.
     @discardableResult
@@ -65,11 +77,30 @@ public struct ActiveWorkout: Codable, Equatable, Sendable {
         } else {
             logged[logged.count - 1].sets.append(set)
         }
-        if setNumber >= current.sets {
-            moveToNextExercise()
-        } else {
-            setNumber += 1
-        }
+        // Always advance the set counter and STAY on the exercise. Moving on is
+        // now the user's decision (nextExercise()), because only they know
+        // whether they are done. The engine must record what happened, not
+        // decide when it stopped happening.
+        setNumber += 1
+        return true
+    }
+
+    /// Finishes the current exercise and moves to the next one.
+    ///
+    /// Separate from confirmSet so an extra set is possible. Returns false when
+    /// there is no exercise in progress.
+    @discardableResult
+    public mutating func nextExercise() -> Bool {
+        guard current != nil else { return false }
+        // Deliberately does NOT push an undo frame. undoLastSet() always
+        // deletes a set when it pops one, so recording navigation here would
+        // make "Undo" silently destroy a set the lifter asked to keep. Undo
+        // means one thing only: take back the last set you logged.
+        //
+        // Position is still restored correctly across the boundary, because
+        // each set's frame stores the exercise and set number from the moment
+        // that set was logged.
+        moveToNextExercise()
         return true
     }
 

@@ -119,6 +119,13 @@ final class BehaviourTests: XCTestCase {
         for _ in 0..<4 { addRep.tap() }
         confirm.tap()
         for _ in 0..<3 where confirm.exists { confirm.tap() }
+        // Moving on is now explicit. Assert it exists rather than tapping
+        // blindly: if this button ever disappears the workout becomes a dead
+        // end, and a lifter would be stuck on bench press forever.
+        let nextExercise = app.buttons["Next exercise"]
+        XCTAssertTrue(nextExercise.waitForExistence(timeout: 10),
+                      "a finished exercise must offer a way forward")
+        nextExercise.tap()
         endWorkout()
         let save = app.buttons["Save workout"]
         XCTAssertTrue(save.waitForExistence(timeout: 12))
