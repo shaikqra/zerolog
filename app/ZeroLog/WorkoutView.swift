@@ -13,6 +13,7 @@ struct WorkoutView: View {
     private let tick = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var restDismissed = false
     @State private var confirmingEnd = false
+    @State private var showingSwap = false
 
     /// Starting weight when there's no history: an empty barbell (20 kg or 45 lb).
     private func startingWeight(_ unit: WeightUnit) -> Double {
@@ -89,7 +90,19 @@ struct WorkoutView: View {
                 Button("End") { confirmingEnd = true }
             }
             ToolbarItem(placement: .primaryAction) {
-                Button("Skip exercise", action: model.skipExercise)
+                Menu {
+                    // Offered only before a set is logged. Afterwards the sets
+                    // belong to this movement and swapping would rewrite
+                    // history rather than change a plan.
+                    if active.setsLoggedForCurrentExercise == 0 {
+                        Button("Swap exercise", systemImage: "arrow.triangle.swap") {
+                            showingSwap = true
+                        }
+                    }
+                    Button("Skip exercise", systemImage: "forward.end", action: model.skipExercise)
+                } label: {
+                    Label("More", systemImage: "ellipsis.circle")
+                }
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -118,6 +131,9 @@ struct WorkoutView: View {
             Text("Sets you have already logged are kept.")
         }
         .onReceive(tick) { now = $0 }
+        .sheet(isPresented: $showingSwap) {
+            SwapExerciseSheet(currentName: item.name)
+        }
         // A sheet, not a push: pushing would re-run the refill below and undo the user's changes.
         .sheet(isPresented: $showingHowTo) {
             NavigationStack {

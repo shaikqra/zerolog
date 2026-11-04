@@ -2,7 +2,9 @@ import Foundation
 
 /// A workout in progress. Walks through the plan set by set and records what was actually lifted.
 public struct ActiveWorkout: Codable, Equatable, Sendable {
-    public let plan: Workout
+    /// `internal(set)` so an exercise can be swapped mid-workout; the app
+    /// still cannot rewrite the plan.
+    public internal(set) var plan: Workout
     public let date: String
     public private(set) var exerciseIndex = 0
     /// 1-based set number within the current exercise.
@@ -101,6 +103,32 @@ public struct ActiveWorkout: Codable, Equatable, Sendable {
         // each set's frame stores the exercise and set number from the moment
         // that set was logged.
         moveToNextExercise()
+        return true
+    }
+
+    /// Sets recorded against the exercise in progress.
+    public var setsLoggedForCurrentExercise: Int {
+        guard let current else { return 0 }
+        guard let last = logged.last, last.exerciseId == current.exerciseId else { return 0 }
+        return last.sets.count
+    }
+
+    /// Replaces the exercise in progress with another.
+    ///
+    /// Lives here rather than beside the rest of the swap logic because
+    /// `setNumber`'s setter is private to this file -- and it should stay that
+    /// way, since uncontrolled writes to it are how a workout loses its place.
+    ///
+    /// Refuses once sets have been logged against the current exercise. Those
+    /// sets really happened, and silently reassigning them to a different
+    /// movement would corrupt the record the whole app exists to keep.
+    ///
+    /// Returns false when the swap is not allowed, changing nothing.
+    @discardableResult
+    public mutating func swapCurrentExercise(for replacement: PlannedExercise) -> Bool {
+        guard current != nil, setsLoggedForCurrentExercise == 0 else { return false }
+        plan.exercises[exerciseIndex] = replacement
+        setNumber = 1
         return true
     }
 

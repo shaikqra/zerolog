@@ -69,6 +69,10 @@ public struct Catalog: Decodable, Sendable {
     /// In display order. Kept as a list (not a dictionary) because snake_case key conversion would rename ids.
     public let equipmentTypes: [EquipmentType]
     public let exercises: [Exercise]
+
+    public func exercise(id: String) -> Exercise? {
+        exercises.first { $0.id == id }
+    }
     public let sessions: [String: [String]]
 
     /// Loads the database that ships inside the app.
@@ -157,6 +161,9 @@ public struct Workout: Codable, Equatable, Sendable {
     public let sessionType: String
     public let unit: WeightUnit
     public let estimatedMinutes: Int
-    public let exercises: [PlannedExercise]
+    /// Mutable within the package so a lifter can swap one exercise for
+    /// another mid-session. Still `let` to the app, which must not rewrite a
+    /// plan the engine produced.
+    public internal(set) var exercises: [PlannedExercise]
     public let skipped: [SkippedItem]
 }

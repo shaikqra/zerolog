@@ -174,6 +174,33 @@ final class AppModel {
         active?.confirmSet(weight: weight, reps: reps)
     }
 
+    /// Other movements that train the same thing, with the equipment this gym
+    /// has, excluding anything already in today's session.
+    func swapOptions() -> [Exercise] {
+        guard let catalog, let active, let current = active.current else { return [] }
+        let alreadyPlanned = Set(active.plan.exercises.map(\.exerciseId))
+        return ExerciseSwap.alternatives(to: current.exerciseId,
+                                         catalog: catalog,
+                                         equipment: settings?.equipment ?? [],
+                                         excluding: alreadyPlanned)
+    }
+
+    /// Swaps the exercise in progress. The replacement's weight comes from its
+    /// OWN history, never from the exercise being replaced.
+    @discardableResult
+    func swapCurrentExercise(to replacement: Exercise) -> Bool {
+        guard var active else { return false }
+        let planned = ExerciseSwap.plan(replacement,
+                                        history: history,
+                                        unit: active.plan.unit,
+                                        bodyweightKg: settings?.bodyweightKg,
+                                        experience: settings?.experience ?? .novice)
+        guard active.swapCurrentExercise(for: planned) else { return false }
+        self.active = active
+        clearRestTimerForNewExercise()
+        return true
+    }
+
     func skipExercise() {
         active?.skipExercise()
     }
