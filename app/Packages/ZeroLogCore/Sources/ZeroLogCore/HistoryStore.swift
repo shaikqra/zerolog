@@ -24,6 +24,15 @@ public struct HistoryStore: Sendable {
     public func append(_ session: Session) throws {
         var sessions = try load()
         sessions.append(session)
+        try replace(with: sessions)
+    }
+
+    /// Writes the whole history at once, for restoring a backup.
+    ///
+    /// Atomic on purpose: a restore interrupted halfway through must leave the
+    /// previous file intact rather than a truncated one. Losing the backup is
+    /// recoverable; losing the live history while importing is not.
+    public func replace(with sessions: [Session]) throws {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         try encoder.encode(sessions).write(to: fileURL, options: .atomic)

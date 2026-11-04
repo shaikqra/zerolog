@@ -48,6 +48,35 @@ final class AppModel {
         refresh()
     }
 
+    /// The user's whole record as a file they can keep.
+    ///
+    /// Needed because a sideloaded build expires after seven days and
+    /// re-signing it usually wipes the app's data. Without this, a week of real
+    /// logged workouts is destroyed by the signing process.
+    func backupData() -> Data? {
+        try? Backup.encode(settings: settings, history: history)
+    }
+
+    /// Restores a backup WITHOUT deleting anything logged since it was taken.
+    ///
+    /// Returns how many workouts the history holds afterwards, so the UI can
+    /// tell the truth about what happened instead of claiming success.
+    func restore(from data: Data) throws -> Int {
+        let file = try Backup.decode(data)
+        let merged = Backup.merge(existing: history, imported: file.history)
+        try store?.replace(with: merged)
+        // Settings only fill a gap; they never overwrite a configured device,
+        // because the settings in front of the user are the current intent and
+        // the backup's are historical.
+        if settings == nil, let restored = file.settings {
+            settings = restored
+            try? settingsStore?.save(restored)
+            PhoneSettingsSync.shared.send(restored)
+        }
+        refresh()
+        return merged.count
+    }
+
     func updateSettings(_ new: UserSettings) {
         settings = new
         try? settingsStore?.save(new)

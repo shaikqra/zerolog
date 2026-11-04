@@ -107,6 +107,7 @@ struct SettingsView: View {
                         .foregroundStyle(Color.textTertiary)
                 }
                 .listRowBackground(Color.surface)
+                BackupSection()
             }
             .darkList()
             .navigationTitle("Settings")
