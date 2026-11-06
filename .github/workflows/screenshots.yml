@@ -98,8 +98,13 @@ jobs:
           SHOTS=$!
 
           set +e
+          # Cloning off: xcodebuild otherwise runs UI tests on "Clone of
+          # <device>" while the recorder and the stills loop film the ORIGINAL
+          # sitting at the home screen -- a ten-minute video of wallpaper
+          # while every test passes invisibly.
           xcodebuild test -project ZeroLog.xcodeproj -scheme ZeroLog \
             -destination "id=$UDID" \
+            -parallel-testing-enabled NO \
             -only-testing:ZeroLogUITests/ScreenshotTests \
             -test-timeouts-enabled YES \
             -default-test-execution-time-allowance 300 \

@@ -86,13 +86,49 @@ jobs:
           # Per-test execution cap. The first run of these tests HUNG and ate the
           # job's full 30 minutes, which told us nothing about which test was at
           # fault. A hung UI test must fail as a test, not as a dead job.
+          # No -quiet, no silent failure: this step failed three commits in a
+          # row with its reason readable only behind a GitHub sign-in. The
+          # failing tests' own lines are committed to docs/ci (same contract
+          # as every other diagnostic), and cloning is off so the tests run
+          # on the SAME simulator a human or a recorder would be watching.
+          set +e
           xcodebuild test -project ZeroLog.xcodeproj -scheme ZeroLog \
             -destination "id=$DEST" -derivedDataPath build \
             -only-testing:ZeroLogUITests/BehaviourTests \
+            -parallel-testing-enabled NO \
             -test-timeouts-enabled YES \
             -default-test-execution-time-allowance 150 \
             -maximum-test-execution-time-allowance 240 \
-            CODE_SIGNING_ALLOWED=NO -quiet
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee behaviour-tests.log | tail -5
+          STATUS=${PIPESTATUS[0]}
+          set -e
+          mkdir -p ../docs/ci
+          if [ "$STATUS" -ne 0 ]; then
+            grep -E "Test Case .* (failed|passed)|error:|Assertion Failure|exceeded.*time allowance" behaviour-tests.log \
+              | tail -40 > ../docs/ci/behaviour-test-errors.txt || true
+            [ -s ../docs/ci/behaviour-test-errors.txt ] || tail -40 behaviour-tests.log > ../docs/ci/behaviour-test-errors.txt
+          else
+            : > ../docs/ci/behaviour-test-errors.txt
+          fi
+          exit $STATUS
+
+      # The diagnosis must survive the runner. Same contract as the other
+      # workflows: an empty file is a pass, a non-empty one carries the
+      # failing tests' own lines, readable by anyone without a sign-in.
+      - name: Commit the behaviour-test diagnosis
+        if: always()
+        run: |
+          set -euo pipefail
+          git config user.name "zerolog-ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add -A docs/ci 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "nothing changed"
+          else
+            git commit -q -m "behaviour test log for ${GITHUB_SHA::7} [skip ci]"
+            git pull --rebase -q origin main || true
+            git push
+          fi
 
       # A privacy manifest that exists in the repo but not in the BUNDLE is
       # worth nothing: App Store Connect refuses the upload, and the only
