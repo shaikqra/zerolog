@@ -33,10 +33,6 @@ targets:
       - path: Shared
       - path: ZeroLog/PrivacyInfo.xcprivacy
         buildPhase: resources
-      # The 3D body (60k tris, 13 muscle-group nodes). Derived from Z-Anatomy
-      # (CC BY-SA 4.0) / BodyParts3D (CC BY 4.0); see docs/design/body3d/.
-      - path: ZeroLog/Resources/body.obj
-        buildPhase: resources
     dependencies:
       - package: ZeroLogCore
     settings:

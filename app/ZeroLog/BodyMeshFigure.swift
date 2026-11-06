@@ -1,7 +1,6 @@
 import SwiftUI
 import SceneKit
-import SceneKit.ModelIO
-import ModelIO
+import ZeroLogCore
 
 /// The live 3D body on the Today screen.
 ///
@@ -116,29 +115,41 @@ enum BodyScene {
         let bodyRoot = SCNNode()
         bodyRoot.name = "bodyRoot"
 
-        if let url = Bundle.main.url(forResource: "body", withExtension: "obj") {
-            let asset = MDLAsset(url: url)
+        // No ModelIO. Two CI round-trips showed its OBJ import shipping a
+        // floating pair of legs with no way to ask why from this side. The
+        // parser lives in ZeroLogCore and is tested ON LINUX against this
+        // exact file: 13 groups, every index valid, life-sized. What renders
+        // here is what those tests proved.
+        if let mesh = try? BodyMesh.bundled() {
             let lit = litGroups(for: sessionType)
-            // Walk the WHOLE hierarchy: ModelIO is free to nest the OBJ's
-            // objects inside containers, and a top-level-only loop quietly
-            // shipped a body consisting of two legs.
-            func visit(_ object: MDLObject) {
-                if let mesh = object as? MDLMesh {
-                    let node = SCNNode(mdlObject: mesh)
-                    node.name = object.name
-                    let group = object.name.components(separatedBy: ".").first ?? ""
-                    let material = lit.contains(group) ? litMaterial : baseMaterial
-                    // Every element: a geometry with more elements than
-                    // materials renders the spares in default WHITE.
-                    if let geometry = node.geometry {
-                        geometry.materials = Array(repeating: material,
-                                                   count: max(1, geometry.elements.count))
-                    }
-                    bodyRoot.addChildNode(node)
-                }
-                for child in object.children.objects { visit(child) }
+            for group in mesh.groups {
+                let vertexData = group.vertices.withUnsafeBufferPointer { Data(buffer: $0) }
+                let normalData = group.normals.withUnsafeBufferPointer { Data(buffer: $0) }
+                let indexData = group.indices.withUnsafeBufferPointer { Data(buffer: $0) }
+                let vertices = SCNGeometrySource(data: vertexData, semantic: .vertex,
+                                                 vectorCount: group.vertexCount,
+                                                 usesFloatComponents: true,
+                                                 componentsPerVector: 3,
+                                                 bytesPerComponent: MemoryLayout<Float>.size,
+                                                 dataOffset: 0,
+                                                 dataStride: MemoryLayout<Float>.size * 3)
+                let normals = SCNGeometrySource(data: normalData, semantic: .normal,
+                                                vectorCount: group.vertexCount,
+                                                usesFloatComponents: true,
+                                                componentsPerVector: 3,
+                                                bytesPerComponent: MemoryLayout<Float>.size,
+                                                dataOffset: 0,
+                                                dataStride: MemoryLayout<Float>.size * 3)
+                let element = SCNGeometryElement(data: indexData,
+                                                 primitiveType: .triangles,
+                                                 primitiveCount: group.triangleCount,
+                                                 bytesPerIndex: MemoryLayout<UInt32>.size)
+                let geometry = SCNGeometry(sources: [vertices, normals], elements: [element])
+                geometry.materials = [lit.contains(group.name) ? litMaterial : baseMaterial]
+                let node = SCNNode(geometry: geometry)
+                node.name = group.name
+                bodyRoot.addChildNode(node)
             }
-            for i in 0..<asset.count { visit(asset.object(at: i)) }
         }
         scene.rootNode.addChildNode(bodyRoot)
 
