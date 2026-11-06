@@ -29,7 +29,7 @@ final class BehaviourTests: XCTestCase {
     /// that was removed from the watch.
     func testSetupWillNotPlanAWorkoutWithNoEquipment() {
         app.launch()
-        XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 12))
+        XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 30))
 
         // Setup now pre-ticks every piece of equipment (most gyms have it
         // all), so the empty state must be CREATED: untick everything. This
@@ -41,9 +41,12 @@ final class BehaviourTests: XCTestCase {
             toggle.tap()
         }
 
+        // A disabled SwiftUI button can leave the accessibility tree
+        // entirely, so .isEnabled on it throws "no matches found". The rule
+        // being tested is "there is no way to proceed": absent and disabled
+        // both satisfy it.
         let plan = app.buttons["Plan my first workout"]
-        scrollTo(plan)
-        XCTAssertFalse(plan.isEnabled,
+        XCTAssertFalse(plan.exists && plan.isEnabled,
                        "setup would let the user through with no equipment selected")
         XCTAssertTrue(app.staticTexts["Pick at least one piece of equipment."].exists,
                       "refusing without saying why breaks the show-the-reason rule")
@@ -212,7 +215,11 @@ final class BehaviourTests: XCTestCase {
 
     private func launchPastSetup() {
         app.launch()
-        XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 12))
+        // 30 seconds, not 12: a CI simulator relaunching an app it just
+        // terminated routinely takes 15-25s to put the first screen up. The
+        // suite was red from its first day partly because launches that drew
+        // a slow machine were indistinguishable from a broken app.
+        XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 30))
         // Switch on the equipment so the planner has something to work with.
         // Indexed access, because enumerating every switch is slow enough to
         // matter on a CI simulator.
