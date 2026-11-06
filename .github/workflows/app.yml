@@ -9,6 +9,11 @@
 # a Mac build, because Linux already compiled and tested it.
 name: App build
 
+# Needed by the diagnosis-commit step; without it the default token is
+# read-only and the push fails with the diagnosis still on the runner.
+permissions:
+  contents: write
+
 on:
   push:
     branches: [main]
