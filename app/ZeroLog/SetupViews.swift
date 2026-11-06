@@ -108,6 +108,17 @@ struct SettingsView: View {
                 }
                 .listRowBackground(Color.surface)
                 BackupSection()
+                // Licence condition, not decoration: the 3D body derives from
+                // Z-Anatomy (CC BY-SA 4.0) and BodyParts3D (CC BY 4.0), and
+                // attribution is the price of the asset. It stays visible.
+                Section {
+                    Text("3D body model derived from Z-Anatomy (CC BY-SA 4.0) and BodyParts3D, © The Database Center for Life Science (CC BY 4.0).")
+                        .font(.ui(13))
+                        .foregroundStyle(Color.textTertiary)
+                } header: {
+                    SectionTitle("Credits")
+                }
+                .listRowBackground(Color.surface)
             }
             .darkList()
             .navigationTitle("Settings")

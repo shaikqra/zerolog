@@ -23,9 +23,9 @@ struct TodayView: View {
                         // fact as the title ("Legs day") in a form you can read
                         // from across a gym bag, so the two are one statement,
                         // not two competing ones.
-                        BodyFigure(sessionType: plan.sessionType)
+                        BodyMeshFigure(sessionType: plan.sessionType)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 230)
+                            .frame(height: 260)
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                         // Hidden until there is something true to say; a fresh
