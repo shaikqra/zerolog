@@ -42,14 +42,14 @@ private struct BodySceneView: UIViewRepresentable {
         let view = SCNView()
         view.backgroundColor = .black
         view.antialiasingMode = .multisampling2X
-        // Continuous rendering, deliberately: with it off and the spin
-        // skipped (Reduce Motion, UI tests), SceneKit may never draw a single
-        // frame, and the view sits pure black -- which is exactly what CI
-        // photographed. 30 fps of a static 260pt scene is the cheap kind of
-        // wasteful; a hero that sometimes renders nothing is the expensive
-        // kind. Pausing when idle is a later refinement.
-        view.rendersContinuously = true
-        view.preferredFramesPerSecond = 30
+        // On-demand rendering, and this is load-bearing in BOTH directions:
+        // SceneKit DOES draw static scenes on demand (the early CI frames
+        // prove it -- the mis-imported legs were visible), and continuous
+        // rendering BREAKS XCUITest, which waits for an idle app before every
+        // tap -- a view redrawing 30 times a second is never idle, so every
+        // test interaction crawled and launches timed out. It also burns the
+        // phone's battery on a screen whose whole job is to sit still.
+        view.rendersContinuously = false
         view.scene = BodyScene.build(sessionType: sessionType)
 
         if let body = view.scene?.rootNode.childNode(withName: "spinPivot", recursively: false) {

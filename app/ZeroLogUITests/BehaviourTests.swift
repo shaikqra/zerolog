@@ -31,15 +31,23 @@ final class BehaviourTests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 12))
 
+        // Setup now pre-ticks every piece of equipment (most gyms have it
+        // all), so the empty state must be CREATED: untick everything. This
+        // test spent a week red for asserting the pre-change world.
+        for index in 0..<min(app.switches.count, 12) {
+            let toggle = app.switches.element(boundBy: index)
+            guard toggle.exists, toggle.isHittable,
+                  (toggle.value as? String) == "1" else { continue }
+            toggle.tap()
+        }
+
         let plan = app.buttons["Plan my first workout"]
         scrollTo(plan)
-        plan.tap()
-
-        // Still on setup, with a reason shown rather than a silent no-op.
-        XCTAssertTrue(app.navigationBars["Your gym"].exists,
-                      "setup let the user through with no equipment selected")
+        XCTAssertFalse(plan.isEnabled,
+                       "setup would let the user through with no equipment selected")
         XCTAssertTrue(app.staticTexts["Pick at least one piece of equipment."].exists,
                       "refusing without saying why breaks the show-the-reason rule")
+        XCTAssertTrue(app.navigationBars["Your gym"].exists, "still on setup")
     }
 
     // MARK: - Logging
