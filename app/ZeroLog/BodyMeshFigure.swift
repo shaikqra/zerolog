@@ -42,7 +42,7 @@ private struct BodySceneView: UIViewRepresentable {
         view.rendersContinuously = false
         view.scene = BodyScene.build(sessionType: sessionType)
 
-        if let body = view.scene?.rootNode.childNode(withName: "bodyRoot", recursively: false) {
+        if let body = view.scene?.rootNode.childNode(withName: "spinPivot", recursively: false) {
             let resting = BodyScene.restingAngle(for: sessionType)
             if skipAnimation {
                 body.eulerAngles.y = resting
@@ -67,7 +67,7 @@ private struct BodySceneView: UIViewRepresentable {
         if context.coordinator.sessionType != sessionType {
             context.coordinator.sessionType = sessionType
             view.scene = BodyScene.build(sessionType: sessionType)
-            view.scene?.rootNode.childNode(withName: "bodyRoot", recursively: false)?
+            view.scene?.rootNode.childNode(withName: "spinPivot", recursively: false)?
                 .eulerAngles.y = BodyScene.restingAngle(for: sessionType)
         }
     }
@@ -84,7 +84,7 @@ private struct BodySceneView: UIViewRepresentable {
 
         @objc func pan(_ g: UIPanGestureRecognizer) {
             guard let view,
-                  let body = view.scene?.rootNode.childNode(withName: "bodyRoot",
+                  let body = view.scene?.rootNode.childNode(withName: "spinPivot",
                                                             recursively: false) else { return }
             let dx = Float(g.translation(in: view).x)
             g.setTranslation(.zero, in: view)
@@ -119,23 +119,62 @@ enum BodyScene {
         if let url = Bundle.main.url(forResource: "body", withExtension: "obj") {
             let asset = MDLAsset(url: url)
             let lit = litGroups(for: sessionType)
-            for i in 0..<asset.count {
-                guard let mesh = asset.object(at: i) as? MDLMesh else { continue }
-                let node = SCNNode(mdlObject: mesh)
-                let group = (node.name ?? "").components(separatedBy: ".").first ?? ""
-                node.geometry?.materials = [lit.contains(group) ? litMaterial : baseMaterial]
-                bodyRoot.addChildNode(node)
+            // Walk the WHOLE hierarchy: ModelIO is free to nest the OBJ's
+            // objects inside containers, and a top-level-only loop quietly
+            // shipped a body consisting of two legs.
+            func visit(_ object: MDLObject) {
+                if let mesh = object as? MDLMesh {
+                    let node = SCNNode(mdlObject: mesh)
+                    node.name = object.name
+                    let group = object.name.components(separatedBy: ".").first ?? ""
+                    let material = lit.contains(group) ? litMaterial : baseMaterial
+                    // Every element: a geometry with more elements than
+                    // materials renders the spares in default WHITE.
+                    if let geometry = node.geometry {
+                        geometry.materials = Array(repeating: material,
+                                                   count: max(1, geometry.elements.count))
+                    }
+                    bodyRoot.addChildNode(node)
+                }
+                for child in object.children.objects { visit(child) }
             }
+            for i in 0..<asset.count { visit(asset.object(at: i)) }
         }
         scene.rootNode.addChildNode(bodyRoot)
 
-        // Camera: fitted to the 1.65-unit body with headroom.
+        // Normalise: whatever scale and offset the file arrived with, the body
+        // on screen is HEIGHT units tall and centred on the origin. This makes
+        // the camera maths true by construction instead of true by luck --
+        // the first CI screenshot showed a centimetre-tall figure, and every
+        // guess at why costs a twenty-minute Mac round trip.
+        let (bbMin, bbMax) = bodyRoot.boundingBox
+        let rawHeight = bbMax.y - bbMin.y
+        if rawHeight > 0 {
+            let targetHeight: Float = 1.6
+            let s = targetHeight / rawHeight
+            bodyRoot.scale = SCNVector3(s, s, s)
+            bodyRoot.position = SCNVector3(-(bbMin.x + bbMax.x) / 2 * s,
+                                           -(bbMin.y + bbMax.y) / 2 * s,
+                                           -(bbMin.z + bbMax.z) / 2 * s)
+        }
+        // The spin must happen about the body's own axis, so the pivot moves
+        // to the body rather than the body moving to the pivot.
+        let spinPivot = SCNNode()
+        spinPivot.name = "spinPivot"
+        scene.rootNode.addChildNode(spinPivot)
+        bodyRoot.removeFromParentNode()
+        spinPivot.addChildNode(bodyRoot)
+
+        // Camera: distance derived from the (now known) height and FOV.
         let camera = SCNCamera()
+        camera.projectionDirection = .vertical
         camera.fieldOfView = 18
         camera.zNear = 0.1; camera.zFar = 30
+        let fovRadians = 18.0 * .pi / 180.0
+        let distance = Double(1.6) * 1.12 / (2 * tan(fovRadians / 2))
         let camNode = SCNNode()
         camNode.camera = camera
-        camNode.position = SCNVector3(0, 0, 6.2)
+        camNode.position = SCNVector3(0, 0, Float(distance))
         scene.rootNode.addChildNode(camNode)
 
         // The preview renders' three-light rig: two rims for silhouette, one
