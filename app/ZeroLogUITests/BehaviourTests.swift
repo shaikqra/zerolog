@@ -187,6 +187,21 @@ final class BehaviourTests: XCTestCase {
     // MARK: - Helpers
 
     /// Launches and completes gym setup, leaving the app on Today.
+    /// SceneKit fails to BLACK: a scene that loads nothing photographs as a
+    /// stylish empty rectangle and three CI round-trips went by before anyone
+    /// could say whether the model was even loading. The figure publishes
+    /// what it loaded through its accessibility label; this makes a silent
+    /// black hero a NAMED failure with the loader's own words in it.
+    func testTheThreeDBodyReportsItsMeshLoaded() {
+        launchPastSetup()
+        let figure = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS '3D body'")).firstMatch
+        XCTAssertTrue(figure.waitForExistence(timeout: 10),
+                      "the Today screen must carry the body figure")
+        XCTAssertTrue(figure.label.contains("3D body: 13 groups"),
+                      "the mesh did not load as 13 groups — label says: \(figure.label)")
+    }
+
     private func launchPastSetup() {
         app.launch()
         XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 12))

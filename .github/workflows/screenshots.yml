@@ -116,6 +116,16 @@ jobs:
           echo "xcodebuild test exited $TEST_STATUS"
           ls -la ../media/ || true
           echo "stills captured: $(ls ../docs/screens/phone/*.png 2>/dev/null | wc -l)"
+          # The exit status used to live only in this log, which needs a
+          # sign-in to read -- so a failing phone tour looked identical to a
+          # passing one from outside. Non-empty file = failure, same contract
+          # as every other docs/ci diagnostic.
+          mkdir -p ../docs/ci
+          if [ "$TEST_STATUS" -ne 0 ]; then
+            echo "phone UI tests exited $TEST_STATUS on $(date -u +%Y-%m-%dT%H:%M)" > ../docs/ci/phone-test-errors.txt
+          else
+            : > ../docs/ci/phone-test-errors.txt
+          fi
 
       # Identical consecutive frames are worthless and would bloat the repo.
       - name: Drop duplicate frames

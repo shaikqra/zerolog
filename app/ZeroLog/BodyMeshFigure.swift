@@ -21,7 +21,11 @@ struct BodyMeshFigure: View {
     var body: some View {
         BodySceneView(sessionType: sessionType)
             .aspectRatio(0.62, contentMode: .fit)
-            .accessibilityLabel("Today trains \(BodyFigure.spoken(for: sessionType))")
+            // The label carries a diagnostic suffix because SceneKit can fail
+            // to BLACK, silently, and a screenshot of black-on-black proves
+            // nothing. The UI tests assert on this label, so "the model did
+            // not load" is a named failure instead of an invisible one.
+            .accessibilityLabel("Today trains \(BodyFigure.spoken(for: sessionType)). \(BodyScene.diagnostic)")
             .accessibilityAddTraits(.allowsDirectInteraction)
     }
 }
@@ -38,7 +42,14 @@ private struct BodySceneView: UIViewRepresentable {
         let view = SCNView()
         view.backgroundColor = .black
         view.antialiasingMode = .multisampling2X
-        view.rendersContinuously = false
+        // Continuous rendering, deliberately: with it off and the spin
+        // skipped (Reduce Motion, UI tests), SceneKit may never draw a single
+        // frame, and the view sits pure black -- which is exactly what CI
+        // photographed. 30 fps of a static 260pt scene is the cheap kind of
+        // wasteful; a hero that sometimes renders nothing is the expensive
+        // kind. Pausing when idle is a later refinement.
+        view.rendersContinuously = true
+        view.preferredFramesPerSecond = 30
         view.scene = BodyScene.build(sessionType: sessionType)
 
         if let body = view.scene?.rootNode.childNode(withName: "spinPivot", recursively: false) {
@@ -108,6 +119,10 @@ enum BodyScene {
         }
     }
 
+    /// What actually loaded, for the accessibility label and the UI tests.
+    /// Set during build; a build that loads nothing says so in words.
+    static var diagnostic: String = "3D body not built yet"
+
     static func build(sessionType: String) -> SCNScene {
         let scene = SCNScene()
         scene.background.contents = UIColor.black
@@ -120,7 +135,11 @@ enum BodyScene {
         // parser lives in ZeroLogCore and is tested ON LINUX against this
         // exact file: 13 groups, every index valid, life-sized. What renders
         // here is what those tests proved.
-        if let mesh = try? BodyMesh.bundled() {
+        switch Result(catching: { try BodyMesh.bundled() }) {
+        case .failure(let error):
+            diagnostic = "3D body failed: \(error)"
+        case .success(let mesh):
+            diagnostic = "3D body: \(mesh.groups.count) groups, \(mesh.totalTriangles) triangles"
             let lit = litGroups(for: sessionType)
             for group in mesh.groups {
                 let vertexData = group.vertices.withUnsafeBufferPointer { Data(buffer: $0) }
