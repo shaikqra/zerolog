@@ -1,10 +1,10 @@
-Test Case '-[ZeroLogUITests.BehaviourTests testALoggedSetReachesHistoryWithTheNumbersItWasLoggedWith]' passed (88.708 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:222: error: -[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone] : XCTAssertTrue failed
-Test Case '-[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone]' failed (56.977 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testHistorySurvivesRelaunch]' passed (65.411 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:222: error: -[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser] : XCTAssertTrue failed
-Test Case '-[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser]' failed (36.475 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:51: error: -[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment] : XCTAssertTrue failed - refusing without saying why breaks the show-the-reason rule
-Test Case '-[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment]' failed (12.393 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:222: error: -[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded] : XCTAssertTrue failed
-Test Case '-[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded]' failed (36.095 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testALoggedSetReachesHistoryWithTheNumbersItWasLoggedWith]' passed (44.017 seconds).
+/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:227: error: -[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone] : XCTAssertTrue failed
+Test Case '-[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone]' failed (36.483 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testHistorySurvivesRelaunch]' passed (31.433 seconds).
+/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:227: error: -[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser] : XCTAssertTrue failed
+Test Case '-[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser]' failed (35.280 seconds).
+/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:56: error: -[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment] : XCTAssertTrue failed - refusing without saying why breaks the show-the-reason rule
+Test Case '-[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment]' failed (15.252 seconds).
+/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:227: error: -[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded] : XCTAssertTrue failed
+Test Case '-[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded]' failed (35.212 seconds).
