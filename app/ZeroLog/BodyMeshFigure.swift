@@ -21,6 +21,9 @@ struct BodyMeshFigure: View {
     var body: some View {
         BodySceneView(sessionType: sessionType)
             .aspectRatio(0.62, contentMode: .fit)
+            // The CI video caught the figure painting over the plan list:
+            // an SCNView does not respect SwiftUI bounds on its own.
+            .clipped()
             // The label carries a diagnostic suffix because SceneKit can fail
             // to BLACK, silently, and a screenshot of black-on-black proves
             // nothing. The UI tests assert on this label, so "the model did

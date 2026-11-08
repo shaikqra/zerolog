@@ -115,6 +115,14 @@ jobs:
           else
             : > ../docs/ci/behaviour-test-errors.txt
           fi
+          # The video showed the HOME SCREEN during failing launches: the app
+          # crashes on alternate boots. A crash names itself in its report;
+          # commit the reports instead of guessing at the stack.
+          rm -rf ../docs/ci/crashes && mkdir -p ../docs/ci/crashes
+          find ~/Library/Logs/DiagnosticReports -name "ZeroLog*" -newermt "-30 minutes" 2>/dev/null | head -4 | while read -r f; do
+            head -c 20000 "$f" > "../docs/ci/crashes/$(basename "$f").txt"
+          done
+          ls ../docs/ci/crashes/ || true
           exit $STATUS
 
       # The diagnosis must survive the runner. Same contract as the other
