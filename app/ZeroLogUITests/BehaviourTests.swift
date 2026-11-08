@@ -32,13 +32,21 @@ final class BehaviourTests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 30))
 
         // Setup now pre-ticks every piece of equipment (most gyms have it
-        // all), so the empty state must be CREATED: untick everything. This
-        // test spent a week red for asserting the pre-change world.
-        for index in 0..<min(app.switches.count, 12) {
-            let toggle = app.switches.element(boundBy: index)
-            guard toggle.exists, toggle.isHittable,
-                  (toggle.value as? String) == "1" else { continue }
-            toggle.tap()
+        // all), so the empty state must be CREATED: untick everything.
+        // Sweep-and-scroll, because a lazy list only exposes the switches on
+        // screen: untick what is visible, scroll, repeat until none are on.
+        for _ in 0..<5 {
+            var tapped = false
+            for index in 0..<min(app.switches.count, 16) {
+                let toggle = app.switches.element(boundBy: index)
+                guard toggle.exists, toggle.isHittable,
+                      (toggle.value as? String) == "1" else { continue }
+                toggle.tap()
+                tapped = true
+            }
+            app.swipeUp()
+            if !tapped && !app.switches.allElementsBoundByIndex
+                .contains(where: { ($0.value as? String) == "1" }) { break }
         }
 
         // A disabled SwiftUI button can leave the accessibility tree
@@ -160,7 +168,8 @@ final class BehaviourTests: XCTestCase {
             return
         }
 
-        let undo = app.buttons["Undo"].firstMatch
+        let undo = app.descendants(matching: .any)
+            .matching(identifier: "UndoChange").firstMatch
         XCTAssertTrue(undo.waitForExistence(timeout: 12),
                       "an automatic change was shown with no way to undo it")
         undo.tap()

@@ -122,9 +122,22 @@ enum BodyScene {
         }
     }
 
+    /// The mesh, loaded exactly once. `static let` makes the first ACCESS do
+    /// the work, so the accessibility label and the scene builder read the
+    /// same result in any order -- the previous mutable diagnostic was set
+    /// during build and read before it, reporting "not built yet" about a
+    /// body that rendered fine.
+    static let loaded: Result<BodyMesh, Error> = Result { try BodyMesh.bundled() }
+
     /// What actually loaded, for the accessibility label and the UI tests.
-    /// Set during build; a build that loads nothing says so in words.
-    static var diagnostic: String = "3D body not built yet"
+    static var diagnostic: String {
+        switch loaded {
+        case .success(let mesh):
+            return "3D body: \(mesh.groups.count) groups, \(mesh.totalTriangles) triangles"
+        case .failure(let error):
+            return "3D body failed: \(error)"
+        }
+    }
 
     static func build(sessionType: String) -> SCNScene {
         let scene = SCNScene()
@@ -138,11 +151,10 @@ enum BodyScene {
         // parser lives in ZeroLogCore and is tested ON LINUX against this
         // exact file: 13 groups, every index valid, life-sized. What renders
         // here is what those tests proved.
-        switch Result(catching: { try BodyMesh.bundled() }) {
-        case .failure(let error):
-            diagnostic = "3D body failed: \(error)"
+        switch loaded {
+        case .failure:
+            break   // the label carries the error; the scene stays empty
         case .success(let mesh):
-            diagnostic = "3D body: \(mesh.groups.count) groups, \(mesh.totalTriangles) triangles"
             let lit = litGroups(for: sessionType)
             for group in mesh.groups {
                 let vertexData = group.vertices.withUnsafeBufferPointer { Data(buffer: $0) }

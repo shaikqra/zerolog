@@ -202,6 +202,10 @@ struct ChangeRow: View {
                 .foregroundStyle(Color.textSecondary)
             Button("Undo", action: undo)
                 .buttonStyle(OutlineButtonStyle())
+                // SwiftUI exposes List-row children unpredictably to the
+                // accessibility tree; a fixed identifier makes "is Undo
+                // reachable" a fact rather than a layout accident.
+                .accessibilityIdentifier("UndoChange")
         }
         .padding(.vertical, 6)
     }
