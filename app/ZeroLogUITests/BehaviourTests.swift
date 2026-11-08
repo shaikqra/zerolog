@@ -48,7 +48,12 @@ final class BehaviourTests: XCTestCase {
         let plan = app.buttons["Plan my first workout"]
         XCTAssertFalse(plan.exists && plan.isEnabled,
                        "setup would let the user through with no equipment selected")
-        XCTAssertTrue(app.staticTexts["Pick at least one piece of equipment."].exists,
+        // The reason text is a List FOOTER: lazy lists do not materialise
+        // off-screen rows, so the message genuinely is not in the tree until
+        // the list is scrolled to its end.
+        let reason = app.staticTexts["Pick at least one piece of equipment."]
+        for _ in 0..<4 where !reason.exists { app.swipeUp() }
+        XCTAssertTrue(reason.exists,
                       "refusing without saying why breaks the show-the-reason rule")
         XCTAssertTrue(app.navigationBars["Your gym"].exists, "still on setup")
     }

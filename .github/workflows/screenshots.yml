@@ -118,6 +118,26 @@ jobs:
           kill -INT "$REC" 2>/dev/null || true
           wait "$REC" 2>/dev/null || true
 
+          # TEMPORARY DIAGNOSTIC: film the behaviour suite too. Its launches
+          # fail in perfect alternation (1 ok, 2 fail, 3 ok...) and the only
+          # remaining question is WHAT SCREEN the failing launches land on --
+          # a question a video answers in one viewing. Remove once green.
+          xcrun simctl io "$UDID" recordVideo --codec h264 --force ../media/behaviour.mp4 &
+          REC2=$!
+          set +e
+          xcodebuild test -project ZeroLog.xcodeproj -scheme ZeroLog \
+            -destination "id=$UDID" \
+            -parallel-testing-enabled NO \
+            -only-testing:ZeroLogUITests/BehaviourTests \
+            -test-timeouts-enabled YES \
+            -default-test-execution-time-allowance 300 \
+            CODE_SIGNING_ALLOWED=NO -quiet
+          BEHAVIOUR_STATUS=$?
+          set -e
+          kill -INT "$REC2" 2>/dev/null || true
+          wait "$REC2" 2>/dev/null || true
+          echo "behaviour tests exited $BEHAVIOUR_STATUS"
+
           echo "xcodebuild test exited $TEST_STATUS"
           ls -la ../media/ || true
           echo "stills captured: $(ls ../docs/screens/phone/*.png 2>/dev/null | wc -l)"
@@ -313,12 +333,13 @@ jobs:
           ls -lh media/phone-tour.mp4
           WORK=$(mktemp -d)
           cp media/phone-tour.mp4 "$WORK/"
+          cp media/behaviour.mp4 "$WORK/" 2>/dev/null || true
           cd "$WORK"
           git init -q
           git config user.name "zerolog-ci"
           git config user.email "ci@users.noreply.github.com"
           git checkout -q -b media
-          git add phone-tour.mp4
+          git add -A
           git commit -q -m "Phone tour video from ${GITHUB_SHA::7}"
           git push -q --force \
             "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" \
