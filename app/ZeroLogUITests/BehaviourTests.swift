@@ -56,11 +56,12 @@ final class BehaviourTests: XCTestCase {
         let plan = app.buttons["Plan my first workout"]
         XCTAssertFalse(plan.exists && plan.isEnabled,
                        "setup would let the user through with no equipment selected")
-        // The reason text is a List FOOTER: lazy lists do not materialise
-        // off-screen rows, so the message genuinely is not in the tree until
-        // the list is scrolled to its end.
+        // The reason text is the EQUIPMENT section's footer, which sits near
+        // the TOP of the list -- and the untick sweep ends at the bottom.
+        // Scroll back up towards it; swiping further down was searching the
+        // wrong half of the screen.
         let reason = app.staticTexts["Pick at least one piece of equipment."]
-        for _ in 0..<4 where !reason.exists { app.swipeUp() }
+        for _ in 0..<5 where !reason.exists { app.swipeDown() }
         XCTAssertTrue(reason.exists,
                       "refusing without saying why breaks the show-the-reason rule")
         XCTAssertTrue(app.navigationBars["Your gym"].exists, "still on setup")
@@ -168,8 +169,12 @@ final class BehaviourTests: XCTestCase {
             return
         }
 
+        // The change section sits below the body figure; bring it fully on
+        // screen before expecting its row's button to be materialised.
+        scrollTo(changed)
         let undo = app.descendants(matching: .any)
             .matching(identifier: "UndoChange").firstMatch
+        for _ in 0..<3 where !undo.exists { app.swipeUp() }
         XCTAssertTrue(undo.waitForExistence(timeout: 12),
                       "an automatic change was shown with no way to undo it")
         undo.tap()

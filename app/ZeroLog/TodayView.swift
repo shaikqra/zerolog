@@ -208,6 +208,11 @@ struct ChangeRow: View {
                 .accessibilityIdentifier("UndoChange")
         }
         .padding(.vertical, 6)
+        // .contain, explicitly: the default row behaviour may fold these
+        // children into one opaque element, hiding the Undo button from both
+        // UI tests and VoiceOver users. Undoing an automatic change is a
+        // first-class action; it must be individually reachable.
+        .accessibilityElement(children: .contain)
     }
 
     /// "Added 5 lb to Barbell bench press" or "Lightened Barbell bench press to 120 lb".
