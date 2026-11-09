@@ -349,4 +349,3 @@ final class BehaviourTests: XCTestCase {
     }
 }
 
-// CI retrigger: GitHub infra cancelled the d45cb53 runs with zero steps executed.

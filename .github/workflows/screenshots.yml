@@ -80,16 +80,40 @@ jobs:
           rm -rf ../docs/screens/phone
           mkdir -p ../docs/screens/phone ../media
 
-          # Video of the whole run, for a human to watch.
+          # xcodebuild may run the tests on a CLONE of the destination no
+          # matter what flags say (a runner-image update re-enabled it after
+          # -parallel-testing-enabled NO had suppressed it, and a full run of
+          # stills photographed the ORIGINAL device's wallpaper). So the
+          # camera re-aims instead of trusting flags: whenever a booted clone
+          # exists, shoot the clone.
+          live_udid() {
+            xcrun simctl list devices | grep -E "Clone.*\(Booted\)" \
+              | grep -oE "[0-9A-F-]{36}" | head -1 | grep . || echo "$UDID"
+          }
+
+          # Video of the whole run, for a human to watch. Starts on the
+          # original; if a clone boots, a second recorder takes over below.
           xcrun simctl io "$UDID" recordVideo --codec h264 --force ../media/phone-tour.mp4 &
           REC=$!
+          ( # Clone watcher: the moment a clone boots, film IT as well.
+            for _ in $(seq 1 60); do
+              CLONE=$(xcrun simctl list devices | grep -E "Clone.*\(Booted\)" \
+                | grep -oE "[0-9A-F-]{36}" | head -1)
+              if [ -n "$CLONE" ]; then
+                xcrun simctl io "$CLONE" recordVideo --codec h264 --force ../media/phone-tour-clone.mp4 &
+                echo $! > /tmp/rec_clone.pid
+                break
+              fi
+              sleep 3
+            done
+          ) &
 
-          # Stills every 2s, so there is something to look at without a video
-          # player, and something an agent can read as images.
+          # Stills every 2s, re-resolving the device EACH time so the camera
+          # follows the tests onto the clone.
           (
             i=0
             while [ $i -lt 90 ]; do
-              xcrun simctl io "$UDID" screenshot \
+              xcrun simctl io "$(live_udid)" screenshot \
                 "$(printf '../docs/screens/phone/frame-%02d.png' $i)" >/dev/null 2>&1 || true
               i=$((i + 1))
               sleep 2
@@ -117,6 +141,14 @@ jobs:
           # mp4 is unplayable.
           kill -INT "$REC" 2>/dev/null || true
           wait "$REC" 2>/dev/null || true
+          if [ -f /tmp/rec_clone.pid ]; then
+            kill -INT "$(cat /tmp/rec_clone.pid)" 2>/dev/null || true
+            wait "$(cat /tmp/rec_clone.pid)" 2>/dev/null || true
+            # The clone's film is the one with the app on it; ship it as THE
+            # tour when it exists.
+            [ -s ../media/phone-tour-clone.mp4 ] && mv ../media/phone-tour-clone.mp4 ../media/phone-tour.mp4
+            rm -f /tmp/rec_clone.pid
+          fi
 
           # TEMPORARY DIAGNOSTIC: film the behaviour suite too. Its launches
           # fail in perfect alternation (1 ok, 2 fail, 3 ok...) and the only
