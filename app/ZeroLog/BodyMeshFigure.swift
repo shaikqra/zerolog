@@ -149,6 +149,13 @@ private struct BodySceneView: UIViewRepresentable {
             ["lats", "traps", "hams", "glutes", "calves", "triceps"]
 
         /// Fly the camera to one muscle and flex it, or home to the whole body.
+        ///
+        /// Driven by SCNActions, not SCNTransaction, deliberately: the opening
+        /// spin is an action and it renders silk-smooth under on-demand
+        /// drawing WITHOUT making XCUITest consider the app busy -- the launch
+        /// tests tap through it. The camera flight rides the proven mechanism:
+        /// position and turn as eased actions, the orthographic zoom as a
+        /// custom action interpolating with the same smoothstep curve.
         func focus(on group: String?, animated: Bool) {
             guard let view, let scene = view.scene,
                   let pivot = scene.rootNode.childNode(withName: "spinPivot", recursively: false),
@@ -157,9 +164,12 @@ private struct BodySceneView: UIViewRepresentable {
                   let camera = camNode.camera else { return }
 
             pivot.removeAllActions()
-            SCNTransaction.begin()
-            SCNTransaction.animationDuration = animated ? 0.9 : 0
-            SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            camNode.removeAllActions()
+
+            let target: SCNVector3
+            let endScale: Double
+            let endAngle: Float
+            var flexNode: SCNNode?
 
             if let group,
                let node = bodyRoot.childNode(withName: group, recursively: false),
@@ -170,18 +180,44 @@ private struct BodySceneView: UIViewRepresentable {
                 let showBack = Self.backMuscles.contains(group)
                 let localX = bounds.center.x * s + bodyRoot.position.x
                 let worldY = bounds.center.y * s + bodyRoot.position.y
-                pivot.eulerAngles.y = showBack ? .pi : 0
+                endAngle = showBack ? .pi : 0
                 // A pi turn about y negates x for everything the pivot holds.
-                camNode.position = SCNVector3(showBack ? -localX : localX, worldY, 6)
-                camera.orthographicScale = Double(max(bounds.radius * s * 1.5, 0.22))
-                SCNTransaction.commit()
-                if animated { flex(node) }
+                target = SCNVector3(showBack ? -localX : localX, worldY, 6)
+                endScale = Double(max(bounds.radius * s * 1.5, 0.22))
+                flexNode = node
             } else {
-                pivot.eulerAngles.y = BodyScene.restingAngle(for: sessionType)
-                camNode.position = SCNVector3(0, 0, 6)
-                camera.orthographicScale = 0.9
-                SCNTransaction.commit()
+                endAngle = BodyScene.restingAngle(for: sessionType)
+                target = SCNVector3(0, 0, 6)
+                endScale = 0.9
             }
+
+            guard animated else {
+                pivot.eulerAngles.y = endAngle
+                camNode.position = target
+                camera.orthographicScale = endScale
+                return
+            }
+
+            // Zooming out is quicker than zooming in: leaving should feel
+            // lighter than arriving.
+            let duration = flexNode == nil ? 0.65 : 0.95
+
+            let turn = SCNAction.rotateTo(x: 0, y: CGFloat(endAngle), z: 0,
+                                          duration: duration, usesShortestUnitArc: true)
+            turn.timingMode = .easeInEaseOut
+            pivot.runAction(turn)
+
+            let move = SCNAction.move(to: target, duration: duration)
+            move.timingMode = .easeInEaseOut
+            let startScale = camera.orthographicScale
+            let zoom = SCNAction.customAction(duration: duration) { _, elapsed in
+                let p = Double(elapsed) / duration
+                let eased = p * p * (3 - 2 * p)   // smoothstep, same feel as the move
+                camera.orthographicScale = startScale + (endScale - startScale) * eased
+            }
+            camNode.runAction(.group([move, zoom]))
+
+            if let flexNode { flex(flexNode) }
         }
 
         /// The flex: the muscle throbs brighter twice under the skin. The
@@ -195,7 +231,8 @@ private struct BodySceneView: UIViewRepresentable {
             let down = SCNAction.customAction(duration: 0.45) { _, t in
                 material.emission.intensity = 3.4 - 2.4 * (t / 0.45)
             }
-            node.runAction(.sequence([.wait(duration: 0.6), up, down, up, down]))
+            // Starts as the camera flight ends: arrive, THEN flex.
+            node.runAction(.sequence([.wait(duration: 1.0), up, down, up, down]))
         }
     }
 }

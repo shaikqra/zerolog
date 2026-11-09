@@ -30,10 +30,12 @@ struct TodayView: View {
                         BodyMeshFigure(sessionType: plan.sessionType,
                                        focus: focusedMuscle)
                             .frame(maxWidth: .infinity)
-                            .frame(height: muscleMode ? 300 : 380)
+                            // One motion at a time: the camera flies INSIDE
+                            // this box, so the box itself holds still. A view
+                            // resizing while the camera moves reads as jank.
+                            .frame(height: 360)
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
-                            .animation(.easeInOut(duration: 0.4), value: muscleMode)
                         // The day tab. Tapping it opens the body up: the camera
                         // flies to today's first muscle and a chip per muscle
                         // appears -- pick one and that muscle flexes while the
