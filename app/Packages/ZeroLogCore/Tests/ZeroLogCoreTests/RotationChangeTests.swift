@@ -56,4 +56,36 @@ final class RotationChangeTests: XCTestCase {
         XCTAssertEqual(bench.change, .increased,
                        "every set hit the top of the range on W1; the next push plan must mark the raise. reason: \(bench.reason)")
     }
+
+    func testPhoneLoggedDataExactly() throws {
+        // What the phone's History detail showed after the behaviour walk:
+        // bench 10x45lb, 14x45, 18x45, 22x45 -- reps carry over between sets
+        // and the test's taps stacked. fewest(10) >= high(10), so the raise
+        // is still due. In POUNDS, as the UI logs.
+        let kg45lb = 45.0 * 0.45359237
+        let history = [Session(date: "2026-11-09", sessionType: "push", exercises: [
+            LoggedExercise(exerciseId: "bench_press", sets: [
+                LoggedSet(weightKg: kg45lb, reps: 10),
+                LoggedSet(weightKg: kg45lb, reps: 14),
+                LoggedSet(weightKg: kg45lb, reps: 18),
+                LoggedSet(weightKg: kg45lb, reps: 22),
+            ]),
+        ])]
+        let gym = Set(catalog.exercises.flatMap(\.equipment))
+        let pull = Engine.generateWorkout(catalog: catalog, gymEquipment: gym, minutes: 60,
+                                          history: history, unit: .lb)
+        var h2 = history; h2.append(Session(date: "2026-11-09", sessionType: pull.sessionType,
+            exercises: [LoggedExercise(exerciseId: pull.exercises[0].exerciseId,
+                        sets: [LoggedSet(weightKg: pull.exercises[0].weight.map { $0 * 0.45359237 } ?? 20, reps: pull.exercises[0].targetReps)])]))
+        let legs = Engine.generateWorkout(catalog: catalog, gymEquipment: gym, minutes: 60,
+                                          history: h2, unit: .lb)
+        h2.append(Session(date: "2026-11-09", sessionType: legs.sessionType,
+            exercises: [LoggedExercise(exerciseId: legs.exercises[0].exerciseId,
+                        sets: [LoggedSet(weightKg: legs.exercises[0].weight.map { $0 * 0.45359237 } ?? 20, reps: legs.exercises[0].targetReps)])]))
+        let push2 = Engine.generateWorkout(catalog: catalog, gymEquipment: gym, minutes: 60,
+                                           history: h2, unit: .lb)
+        let bench = try XCTUnwrap(push2.exercises.first { $0.exerciseId == "bench_press" })
+        XCTAssertEqual(bench.change, .increased,
+                       "phone-identical data must earn the raise. reason: \(bench.reason), weight: \(String(describing: bench.weight))")
+    }
 }
