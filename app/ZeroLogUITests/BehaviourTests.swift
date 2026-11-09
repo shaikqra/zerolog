@@ -46,8 +46,14 @@ final class BehaviourTests: XCTestCase {
         for _ in 0..<40 {
             let planButton = app.buttons["Plan my first workout"]
             let danger = planButton.exists ? planButton.frame : .null
+            // Each Toggle appears TWICE in the tree: a row-wide wrapper
+            // carrying the label, and the 51pt switch control inside it.
+            // Tapping the wrapper taps the LABEL, which flips nothing -- a
+            // committed tree dump showed all 8 toggles still on after 40
+            // such taps. Only the small control is worth tapping.
             if let safe = app.switches.allElementsBoundByIndex.first(where: {
-                ($0.value as? String) == "1" && $0.isHittable && !$0.frame.intersects(danger)
+                ($0.value as? String) == "1" && $0.isHittable
+                    && $0.frame.width < 100 && !$0.frame.intersects(danger)
             }) {
                 safe.tap()
             } else if anyToggleOn() {
@@ -209,11 +215,24 @@ final class BehaviourTests: XCTestCase {
         let changed = app.staticTexts["What I changed"]
         for _ in 0..<5 where !changed.exists { app.swipeUp() }
         guard changed.waitForExistence(timeout: 8) else {
-            // Progression depends on the engine's rules; if no change was due,
-            // say so plainly rather than asserting something false.
-            print("=== TREE DUMP BEGIN (no change section) ===")
+            // The engine passes this exact walk on Linux, so when the phone
+            // disagrees the evidence must name the difference. Every plan row
+            // carries the engine's own reason sentence -- scroll them all into
+            // existence, then open the push workout in History to see what
+            // was actually logged. The dumps carry both.
+            for _ in 0..<4 { app.swipeUp() }
+            print("=== TREE DUMP BEGIN (no change: full Today) ===")
             print(app.debugDescription)
             print("=== TREE DUMP END ===")
+            app.tabBars.buttons["History"].tap()
+            let pushEntry = app.collectionViews.staticTexts["Push day"].firstMatch
+            if pushEntry.waitForExistence(timeout: 5) {
+                pushEntry.tap()
+                sleep(1)
+                print("=== TREE DUMP BEGIN (no change: push history detail) ===")
+                print(app.debugDescription)
+                print("=== TREE DUMP END ===")
+            }
             XCTFail("no automatic change appeared after hitting the top of the rep range")
             return
         }
