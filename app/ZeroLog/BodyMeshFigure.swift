@@ -35,7 +35,13 @@ struct BodyMeshFigure: View {
             // twice -- so whether pixels landed is asserted by a test, not
             // judged from film.
             .accessibilityLabel("Today trains \(BodyFigure.spoken(for: sessionType)). \(BodyScene.diagnostic), \(drawReport)")
-            .accessibilityAddTraits(.allowsDirectInteraction)
+            // No .allowsDirectInteraction: that trait hands RAW touches to
+            // the SceneKit view, bypassing the normal routing the gesture
+            // delegate participates in -- with it set, synthesized swipes
+            // died in the 3D view and the page would not scroll (two element
+            // trees in a row showed the list unmoved after nine swipes).
+            // VoiceOver's experience IS the spoken sentence; rotation is
+            // decoration, not information.
     }
 }
 

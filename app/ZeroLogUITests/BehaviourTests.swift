@@ -54,10 +54,15 @@ final class BehaviourTests: XCTestCase {
             // press machine" as the lone survivor). A coordinate tap in the
             // switch's top third works whenever the row is clear of the
             // button by a few points.
+            // The floating button sits in a padded safe-area container that
+            // eats touches ~20pt above the visible button; a tap that cleared
+            // the button by 10pt still died in the padding (the dump showed
+            // the leg press switch taking 30+ taps and staying on). Demand
+            // clearance from the whole container: 90pt above the button top.
             let buttonTop = danger.isNull ? CGFloat.greatestFiniteMagnitude : danger.minY
             if let sw = app.switches.allElementsBoundByIndex.first(where: {
                 ($0.value as? String) == "1" && $0.frame.width < 100
-                    && $0.frame.minY > 240 && $0.frame.minY < buttonTop - 10
+                    && $0.frame.minY > 240 && $0.frame.maxY < buttonTop - 60
             }) {
                 sw.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
             } else if anyToggleOn() {
@@ -220,14 +225,14 @@ final class BehaviourTests: XCTestCase {
         // lazy list does not materialise what has never been on screen:
         // scroll as a human would before concluding it is not there.
         let changed = app.staticTexts["What I changed"]
-        for _ in 0..<5 where !changed.exists { app.swipeUp() }
+        for _ in 0..<5 where !changed.exists { dragUp() }
         guard changed.waitForExistence(timeout: 8) else {
             // The engine passes this exact walk on Linux, so when the phone
             // disagrees the evidence must name the difference. Every plan row
             // carries the engine's own reason sentence -- scroll them all into
             // existence, then open the push workout in History to see what
             // was actually logged. The dumps carry both.
-            for _ in 0..<4 { app.swipeUp() }
+            for _ in 0..<4 { dragUp() }
             print("=== TREE DUMP BEGIN (no change: full Today) ===")
             print(app.debugDescription)
             print("=== TREE DUMP END ===")
@@ -252,7 +257,7 @@ final class BehaviourTests: XCTestCase {
         let byId = app.descendants(matching: .any)
             .matching(identifier: "UndoChange").firstMatch
         let byLabel = app.descendants(matching: .any)["Undo"].firstMatch
-        for _ in 0..<3 where !(byId.exists || byLabel.exists) { app.swipeUp() }
+        for _ in 0..<3 where !(byId.exists || byLabel.exists) { dragUp() }
         let undo = byId.exists ? byId : byLabel
         if !undo.waitForExistence(timeout: 12) {
             // Stop deducing; print what is actually there. The committed CI
@@ -397,8 +402,18 @@ final class BehaviourTests: XCTestCase {
 
     private func scrollTo(_ element: XCUIElement) {
         for _ in 0..<6 where !(element.exists && element.isHittable) {
-            app.swipeUp()
+            dragUp()
         }
+    }
+
+    /// Scrolls by dragging the BOTTOM strip of the screen upward. app.swipeUp
+    /// starts mid-screen, which on Today lands on the 3D body -- and whatever
+    /// view sits mid-screen can swallow the gesture. The bottom strip is
+    /// always list.
+    private func dragUp() {
+        let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.80))
+        let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
+        from.press(forDuration: 0.05, thenDragTo: to)
     }
 }
 
