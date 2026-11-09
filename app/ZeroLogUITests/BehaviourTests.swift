@@ -37,10 +37,20 @@ final class BehaviourTests: XCTestCase {
         // screen: untick what is visible, scroll, repeat until none are on.
         for _ in 0..<5 {
             var tapped = false
+            // The floating "Plan my first workout" button hovers over the
+            // list's bottom edge, and XCUITest taps an element's CENTRE: a
+            // toggle half-hidden beneath the button takes the tap FOR the
+            // button, setup completes, and every later assert runs on the
+            // wrong screen. The committed tree dump caught the app on
+            // "Push day" in a setup test. Skip anything under the button;
+            // the next scroll pass brings it clear.
+            let planButton = app.buttons["Plan my first workout"]
+            let danger = planButton.exists ? planButton.frame : .null
             for index in 0..<min(app.switches.count, 16) {
                 let toggle = app.switches.element(boundBy: index)
                 guard toggle.exists, toggle.isHittable,
-                      (toggle.value as? String) == "1" else { continue }
+                      (toggle.value as? String) == "1",
+                      !toggle.frame.intersects(danger) else { continue }
                 toggle.tap()
                 tapped = true
             }
@@ -53,6 +63,11 @@ final class BehaviourTests: XCTestCase {
         // entirely, so .isEnabled on it throws "no matches found". The rule
         // being tested is "there is no way to proceed": absent and disabled
         // both satisfy it.
+        // If the sweep accidentally left setup, say so HERE -- the footer
+        // assert below would otherwise report a missing message on a screen
+        // that never carries one.
+        XCTAssertTrue(app.navigationBars["Your gym"].exists,
+                      "the untick sweep navigated away from the setup screen")
         let plan = app.buttons["Plan my first workout"]
         XCTAssertFalse(plan.exists && plan.isEnabled,
                        "setup would let the user through with no equipment selected")
@@ -170,10 +185,17 @@ final class BehaviourTests: XCTestCase {
         logOneSetAndSave()
         logOneSetAndSave()
 
+        // The body-first layout puts the change section below the fold, and a
+        // lazy list does not materialise what has never been on screen:
+        // scroll as a human would before concluding it is not there.
         let changed = app.staticTexts["What I changed"]
-        guard changed.waitForExistence(timeout: 12) else {
+        for _ in 0..<5 where !changed.exists { app.swipeUp() }
+        guard changed.waitForExistence(timeout: 8) else {
             // Progression depends on the engine's rules; if no change was due,
             // say so plainly rather than asserting something false.
+            print("=== TREE DUMP BEGIN (no change section) ===")
+            print(app.debugDescription)
+            print("=== TREE DUMP END ===")
             XCTFail("no automatic change appeared after hitting the top of the rep range")
             return
         }
