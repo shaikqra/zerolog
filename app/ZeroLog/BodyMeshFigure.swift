@@ -77,6 +77,13 @@ private struct BodySceneView: UIViewRepresentable {
 
         let pan = UIPanGestureRecognizer(target: context.coordinator,
                                          action: #selector(Coordinator.pan(_:)))
+        // The body only claims HORIZONTAL drags. Without this the recognizer
+        // swallowed vertical swipes too, and with the body covering half the
+        // Today screen the page simply could not be scrolled from where a
+        // thumb naturally lands -- a committed element tree showed the list
+        // unmoved after nine swipes. Turning is left-right; up-down belongs
+        // to the page.
+        pan.delegate = context.coordinator
         view.addGestureRecognizer(pan)
         context.coordinator.view = view
 
@@ -126,11 +133,19 @@ private struct BodySceneView: UIViewRepresentable {
     /// Drag turns the body about its vertical axis. Just that one axis:
     /// free-orbiting a camera ends with the figure upside-down and nobody
     /// knowing which way is forward.
-    final class Coordinator: NSObject {
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
         var sessionType: String
         var focusedGroup: String?
         weak var view: SCNView?
         init(sessionType: String) { self.sessionType = sessionType }
+
+        /// Horizontal drags turn the body; vertical drags scroll the page.
+        func gestureRecognizerShouldBegin(_ gesture: UIGestureRecognizer) -> Bool {
+            guard let pan = gesture as? UIPanGestureRecognizer,
+                  let view = pan.view else { return true }
+            let velocity = pan.velocity(in: view)
+            return abs(velocity.x) > abs(velocity.y)
+        }
 
         @objc func pan(_ g: UIPanGestureRecognizer) {
             guard let view, focusedGroup == nil,   // zoomed in, the camera owns the view

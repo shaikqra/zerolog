@@ -47,24 +47,31 @@ final class BehaviourTests: XCTestCase {
             let planButton = app.buttons["Plan my first workout"]
             let danger = planButton.exists ? planButton.frame : .null
             // Each Toggle appears TWICE in the tree: a row-wide wrapper
-            // carrying the label, and the 51pt switch control inside it.
-            // Tapping the wrapper taps the LABEL, which flips nothing -- a
-            // committed tree dump showed all 8 toggles still on after 40
-            // such taps. Only the small control is worth tapping.
-            if let safe = app.switches.allElementsBoundByIndex.first(where: {
-                ($0.value as? String) == "1" && $0.isHittable
-                    && $0.frame.width < 100 && !$0.frame.intersects(danger)
+            // carrying the label (tapping it flips nothing) and the 51pt
+            // switch control. And the LAST row's switch sits half-under the
+            // floating button, so its CENTRE is covered: isHittable says no
+            // and a centre tap would hit the button (the dump showed "Leg
+            // press machine" as the lone survivor). A coordinate tap in the
+            // switch's top third works whenever the row is clear of the
+            // button by a few points.
+            let buttonTop = danger.isNull ? CGFloat.greatestFiniteMagnitude : danger.minY
+            if let sw = app.switches.allElementsBoundByIndex.first(where: {
+                ($0.value as? String) == "1" && $0.frame.width < 100
+                    && $0.frame.minY > 240 && $0.frame.minY < buttonTop - 10
             }) {
-                safe.tap()
+                sw.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
             } else if anyToggleOn() {
                 app.swipeUp()   // bring covered or off-screen toggles clear
             } else {
-                // Nothing on among materialised rows; sweep once more to
-                // materialise any stragglers, then stop when truly clean.
-                app.swipeUp()
+                // No ON toggle among materialised rows -- but a scrolled-away
+                // one de-materialises and reads as off. Look back up before
+                // believing the list is clean.
+                app.swipeDown(); app.swipeDown()
                 if !anyToggleOn() { break }
             }
         }
+        // Final verification from the top, where early rows re-materialise.
+        app.swipeDown(); app.swipeDown()
         if anyToggleOn() {
             // Name the survivor: which switch is still on, and where.
             print("=== TREE DUMP BEGIN (equipment stuck on) ===")
