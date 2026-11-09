@@ -1,6 +1,6 @@
 # ZeroLog, as it actually looks
 
-Generated from commit `dfe1f4c` on 2026-11-09 by `.github/workflows/screenshots.yml`.
+Generated from commit `3fa1098` on 2026-11-09 by `.github/workflows/screenshots.yml`.
 
 Phone frames are captured from the host every 2 seconds while the UI tests drive the real app, with identical consecutive frames removed. Watch screens are each launched directly, because watchOS cannot be UI-tested; the plans shown come from the real engine, not mock-ups.
 
@@ -50,13 +50,29 @@ Video of the phone run (force-pushed to the `media` branch, newest only): [phone
 
 ![frame-00](phone/frame-00.png)
 
-### frame-02
+### frame-01
 
-![frame-02](phone/frame-02.png)
+![frame-01](phone/frame-01.png)
+
+### frame-05
+
+![frame-05](phone/frame-05.png)
+
+### frame-15
+
+![frame-15](phone/frame-15.png)
+
+### frame-17
+
+![frame-17](phone/frame-17.png)
 
 ### frame-18
 
 ![frame-18](phone/frame-18.png)
+
+### frame-19
+
+![frame-19](phone/frame-19.png)
 
 ### frame-20
 
@@ -105,7 +121,3 @@ Video of the phone run (force-pushed to the `media` branch, newest only): [phone
 ### frame-31
 
 ![frame-31](phone/frame-31.png)
-
-### frame-32
-
-![frame-32](phone/frame-32.png)
