@@ -238,6 +238,13 @@ final class BehaviourTests: XCTestCase {
                       "the Today screen must carry the body figure")
         XCTAssertTrue(figure.label.contains("3D body: 13 groups"),
                       "the mesh did not load as 13 groups — label says: \(figure.label)")
+        // And it must have DRAWN. The view measures its own first frame;
+        // "BLANK" means SceneKit produced a black rectangle, which no
+        // screenshot can distinguish from the background.
+        let drawn = NSPredicate(format: "label CONTAINS 'drawn'")
+        let rendered = app.descendants(matching: .any).matching(drawn).firstMatch
+        XCTAssertTrue(rendered.waitForExistence(timeout: 10),
+                      "the 3D body never drew pixels — label says: \(figure.label)")
     }
 
     private func launchPastSetup() {

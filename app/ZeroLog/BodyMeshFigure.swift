@@ -17,24 +17,28 @@ import ZeroLogCore
 /// - Reduce Motion: no spin, straight to the resting pose.
 struct BodyMeshFigure: View {
     let sessionType: String
+    @State private var drawReport = "rendering"
 
     var body: some View {
-        BodySceneView(sessionType: sessionType)
+        BodySceneView(sessionType: sessionType, drawReport: $drawReport)
             .aspectRatio(0.62, contentMode: .fit)
             // The CI video caught the figure painting over the plan list:
             // an SCNView does not respect SwiftUI bounds on its own.
             .clipped()
-            // The label carries a diagnostic suffix because SceneKit can fail
-            // to BLACK, silently, and a screenshot of black-on-black proves
-            // nothing. The UI tests assert on this label, so "the model did
-            // not load" is a named failure instead of an invisible one.
-            .accessibilityLabel("Today trains \(BodyFigure.spoken(for: sessionType)). \(BodyScene.diagnostic)")
+            // The label carries the loader's verdict AND the renderer's. The
+            // view snapshots itself after the first frame and reports "drawn"
+            // or "BLANK": SceneKit fails to black, black-on-black photographs
+            // as nothing, and the camera pointed at CI has now been wrong
+            // twice -- so whether pixels landed is asserted by a test, not
+            // judged from film.
+            .accessibilityLabel("Today trains \(BodyFigure.spoken(for: sessionType)). \(BodyScene.diagnostic), \(drawReport)")
             .accessibilityAddTraits(.allowsDirectInteraction)
     }
 }
 
 private struct BodySceneView: UIViewRepresentable {
     let sessionType: String
+    @Binding var drawReport: String
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var skipAnimation: Bool {
@@ -71,6 +75,14 @@ private struct BodySceneView: UIViewRepresentable {
                                          action: #selector(Coordinator.pan(_:)))
         view.addGestureRecognizer(pan)
         context.coordinator.view = view
+
+        // Self-audit: measure the first frame instead of trusting it.
+        let report = $drawReport
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak view] in
+            guard let view else { return }
+            let image = view.snapshot()
+            report.wrappedValue = Self.meanLuminance(of: image) > 0.015 ? "drawn" : "BLANK"
+        }
         return view
     }
 
@@ -86,6 +98,21 @@ private struct BodySceneView: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator { Coordinator(sessionType: sessionType) }
+
+    /// Average brightness of the rendered frame, 0...1. The body occupies
+    /// most of the view; anything above a sliver of grey means real pixels.
+    static func meanLuminance(of image: UIImage) -> Double {
+        guard let cg = image.cgImage else { return 0 }
+        let w = 32, h = 48
+        var pixels = [UInt8](repeating: 0, count: w * h)
+        guard let ctx = CGContext(data: &pixels, width: w, height: h,
+                                  bitsPerComponent: 8, bytesPerRow: w,
+                                  space: CGColorSpaceCreateDeviceGray(),
+                                  bitmapInfo: CGImageAlphaInfo.none.rawValue) else { return 0 }
+        ctx.draw(cg, in: CGRect(x: 0, y: 0, width: w, height: h))
+        let total = pixels.reduce(0) { $0 + Int($1) }
+        return Double(total) / Double(w * h * 255)
+    }
 
     /// Drag turns the body about its vertical axis. Just that one axis:
     /// free-orbiting a camera ends with the figure upside-down and nobody
