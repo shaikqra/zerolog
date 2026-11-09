@@ -414,7 +414,11 @@ final class BehaviourTests: XCTestCase {
     private func dragUp() {
         let hook = app.buttons["test-scroll-bottom"].firstMatch
         if hook.exists {
-            hook.tap()
+            // Coordinate tap, NOT .tap(): XCUITest deems the tiny hook "not
+            // visible", tries to auto-scroll it into view with an AX action,
+            // and that scroll is exactly the machinery that is broken here.
+            // A coordinate tap synthesizes the touch directly.
+            hook.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         } else {
             let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.80))
             let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
@@ -424,7 +428,9 @@ final class BehaviourTests: XCTestCase {
 
     private func scrollToTop() {
         let hook = app.buttons["test-scroll-top"].firstMatch
-        if hook.exists { hook.tap() }
+        if hook.exists {
+            hook.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        }
     }
 }
 

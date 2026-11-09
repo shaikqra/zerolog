@@ -24,8 +24,12 @@ struct TestScrollHooks: View {
             }
             .font(.system(size: 1))
             .tint(.clear)
-            .frame(width: 2, height: 2)
-            .opacity(0.02)
+            // Big enough that a synthesized touch cannot miss; still pure
+            // black on the black page, and flag-gated out of real builds'
+            // launches anyway.
+            .frame(width: 20, height: 20)
+            .background(Color.black)
+            .opacity(0.9)
         }
     }
 }
