@@ -200,19 +200,23 @@ struct ChangeRow: View {
             Text(item.reason)
                 .font(.ui(15))
                 .foregroundStyle(Color.textSecondary)
-            Button("Undo", action: undo)
-                .buttonStyle(OutlineButtonStyle())
-                // SwiftUI exposes List-row children unpredictably to the
-                // accessibility tree; a fixed identifier makes "is Undo
-                // reachable" a fact rather than a layout accident.
+            // Not a Button, deliberately: a SwiftUI List folds custom-styled
+            // buttons into the row's single accessibility element, which made
+            // Undo unreachable to both UI tests and VoiceOver no matter what
+            // identifiers were attached. A tap gesture with an explicit
+            // button trait is exposed as its own element, always.
+            Text("Undo")
+                .font(.ui(16, bold: true))
+                .foregroundStyle(Color.textPrimary)
+                .padding(.horizontal, 16)
+                .frame(minHeight: 44)
+                .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.lineStrong))
+                .contentShape(Rectangle())
+                .onTapGesture(perform: undo)
+                .accessibilityAddTraits(.isButton)
                 .accessibilityIdentifier("UndoChange")
         }
         .padding(.vertical, 6)
-        // .contain, explicitly: the default row behaviour may fold these
-        // children into one opaque element, hiding the Undo button from both
-        // UI tests and VoiceOver users. Undoing an automatic change is a
-        // first-class action; it must be individually reachable.
-        .accessibilityElement(children: .contain)
     }
 
     /// "Added 5 lb to Barbell bench press" or "Lightened Barbell bench press to 120 lb".

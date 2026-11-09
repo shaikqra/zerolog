@@ -60,7 +60,11 @@ final class BehaviourTests: XCTestCase {
         // the TOP of the list -- and the untick sweep ends at the bottom.
         // Scroll back up towards it; swiping further down was searching the
         // wrong half of the screen.
-        let reason = app.staticTexts["Pick at least one piece of equipment."]
+        // Any element type, substring match: a List footer may surface as
+        // staticText, otherElement, or part of a combined element depending
+        // on iOS version.
+        let reason = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS 'Pick at least one piece'")).firstMatch
         for _ in 0..<5 where !reason.exists { app.swipeDown() }
         XCTAssertTrue(reason.exists,
                       "refusing without saying why breaks the show-the-reason rule")
@@ -172,9 +176,13 @@ final class BehaviourTests: XCTestCase {
         // The change section sits below the body figure; bring it fully on
         // screen before expecting its row's button to be materialised.
         scrollTo(changed)
-        let undo = app.descendants(matching: .any)
+        // Identifier first, label anywhere second: element folding has eaten
+        // two runs, so the query gives SwiftUI no way to hide it.
+        let byId = app.descendants(matching: .any)
             .matching(identifier: "UndoChange").firstMatch
-        for _ in 0..<3 where !undo.exists { app.swipeUp() }
+        let byLabel = app.descendants(matching: .any)["Undo"].firstMatch
+        for _ in 0..<3 where !(byId.exists || byLabel.exists) { app.swipeUp() }
+        let undo = byId.exists ? byId : byLabel
         XCTAssertTrue(undo.waitForExistence(timeout: 12),
                       "an automatic change was shown with no way to undo it")
         undo.tap()

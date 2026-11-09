@@ -33,12 +33,17 @@ targets:
       - path: Shared
       - path: ZeroLog/PrivacyInfo.xcprivacy
         buildPhase: resources
+      # The icon: the ecorche torso, chest lit, rendered from the same mesh
+      # the Today screen shows. A blank icon reads as a failed install.
+      - path: ZeroLog/Assets.xcassets
+        buildPhase: resources
     dependencies:
       - package: ZeroLogCore
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.getzerolog.app
         INFOPLIST_KEY_CFBundleDisplayName: ZeroLog
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
         TARGETED_DEVICE_FAMILY: "1"
         # The phone app reads workouts and bodyweight; it does not capture motion.
