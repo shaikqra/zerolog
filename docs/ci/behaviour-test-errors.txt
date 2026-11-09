@@ -1,8 +1,8 @@
-Test Case '-[ZeroLogUITests.BehaviourTests testALoggedSetReachesHistoryWithTheNumbersItWasLoggedWith]' passed (69.118 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:236: error: -[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone] : failed - no automatic change appeared after hitting the top of the rep range
-Test Case '-[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone]' failed (78.285 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testHistorySurvivesRelaunch]' passed (37.993 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser]' passed (25.445 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:74: error: -[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment] : XCTAssertFalse failed - the sweep could not untick every piece of equipment
-Test Case '-[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment]' failed (87.264 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded]' passed (25.584 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testALoggedSetReachesHistoryWithTheNumbersItWasLoggedWith]' passed (54.790 seconds).
+/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:243: error: -[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone] : failed - no automatic change appeared after hitting the top of the rep range
+Test Case '-[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone]' failed (87.694 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testHistorySurvivesRelaunch]' passed (39.053 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser]' passed (29.046 seconds).
+/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:81: error: -[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment] : XCTAssertFalse failed - the sweep could not untick every piece of equipment
+Test Case '-[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment]' failed (63.606 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded]' passed (13.836 seconds).

@@ -1,361 +1,361 @@
 === TREE DUMP BEGIN (no change: full Today) ===
-    t =    73.00s Requesting snapshot of accessibility hierarchy for app with pid 6014
-    t =    73.20s Requesting snapshot of accessibility hierarchy for app with pid 6014
-Optional(Attributes: Application, 0x103b66580, pid: 6014, label: 'ZeroLog'
+    t =    80.99s Requesting snapshot of accessibility hierarchy for app with pid 7124
+    t =    81.32s Requesting snapshot of accessibility hierarchy for app with pid 7124
+Optional(Attributes: Application, 0x10313f6c0, pid: 7124, label: 'ZeroLog'
 Element subtree:
- →Application, 0x103b66580, pid: 6014, label: 'ZeroLog'
-    Window (Main), 0x103b717b0, {{222.5, 256.5}, {375.0, 667.0}}
-      Other, 0x103b4fe20, {{222.5, 256.5}, {375.0, 667.0}}
-        Other, 0x103b70690, {{222.5, 256.5}, {375.0, 667.0}}
-          Other, 0x103b50f50, {{222.5, 256.5}, {375.0, 667.0}}
-            Other, 0x103b501a0, {{222.5, 256.5}, {375.0, 667.0}}
-              Other, 0x103b50520, {{222.5, 256.5}, {375.0, 667.0}}
-                Other, 0x103b59210, {{222.5, 256.5}, {375.0, 667.0}}
-                  Other, 0x103b6c540, {{222.5, 256.5}, {375.0, 667.0}}
-                    Other, 0x103b70a10, {{222.5, 256.5}, {375.0, 667.0}}
-                      Other, 0x103b63f70, {{222.5, 256.5}, {375.0, 667.0}}
-                        Other, 0x103b70d70, {{222.5, 256.5}, {375.0, 667.0}}
-                          Other, 0x103b710e0, {{222.5, 256.5}, {375.0, 667.0}}
-                            NavigationBar, 0x103b71440, {{222.5, 276.5}, {375.0, 107.0}}, identifier: 'Push day'
-                              StaticText, 0x103b4e9a0, {{238.5, 320.5}, {159.0, 57.5}}, label: 'Push day'
-                            Other, 0x103b66220, {{222.5, 256.5}, {375.0, 667.0}}
-                              Other, 0x103b5b4d0, {{222.5, 256.5}, {375.0, 667.0}}
-                                Other, 0x103b70310, {{222.5, 256.5}, {375.0, 667.0}}
-                                  Other, 0x103b6aa10, {{222.5, 256.5}, {375.0, 667.0}}
-                                    CollectionView, 0x103b58790, {{222.5, 256.5}, {375.0, 667.0}}
-                                      Other, 0x103b6d9c0, {{-16.0, -1207.0}, {407.0, 1810.5}}
-                                      Cell, 0x103b67d80, {{238.5, 383.5}, {343.0, 382.0}}
-                                        Other, 0x103b5fea0, {{238.5, 383.5}, {343.0, 382.0}}
-                                          Other, 0x103b62b40, {{238.5, 383.5}, {343.0, 382.0}}
-                                            Other, 0x103b657b0, {{238.5, 383.5}, {343.0, 382.0}}
-                                        Other, 0x103b58ea0, {{238.5, 383.5}, {343.0, 382.0}}
-                                          Other, 0x103b68450, {{238.5, 383.5}, {343.0, 382.0}}
-                                            Other, 0x103b62e90, {{238.5, 383.5}, {343.0, 382.0}}
-                                              Other, 0x103b631e0, {{238.5, 383.5}, {343.0, 382.0}}, label: 'Today trains your chest, shoulders and triceps. 3D body: 13 groups, 59988 triangles, drawn'
-                                                Other, 0x103b4fad0, {{238.5, 383.5}, {343.0, 382.0}}
-                                                  Other, 0x103b62130, {{348.9, 414.5}, {122.3, 320.0}}
-                                                    Other, 0x103b57950, {{348.9, 414.5}, {122.3, 320.0}}, identifier: 'spinPivot'
-                                                      Other, 0x103b53570, {{348.9, 414.5}, {122.3, 320.0}}, identifier: 'bodyRoot'
-                                                        Other, 0x103b65ed0, {{394.4, 414.5}, {31.2, 34.8}}, identifier: 'body'
-                                                        Other, 0x103b6e080, {{377.6, 434.5}, {64.8, 88.2}}, identifier: 'traps'
-                                                        Other, 0x103b72990, {{374.1, 479.7}, {71.7, 79.7}}, identifier: 'lats'
-                                                        Other, 0x103b71eb0, {{371.3, 466.8}, {77.5, 37.8}}, identifier: 'chest'
-                                                        Other, 0x103b72d10, {{382.7, 491.7}, {54.7, 81.2}}, identifier: 'abs'
-                                                        Other, 0x103b4f400, {{364.4, 463.9}, {91.1, 33.5}}, identifier: 'delts'
-                                                        Other, 0x103b64660, {{363.9, 466.8}, {92.1, 69.3}}, identifier: 'biceps'
-                                                        Other, 0x103b65460, {{364.1, 475.1}, {91.8, 52.9}}, identifier: 'triceps'
-                                                        Other, 0x103b531f0, {{348.9, 505.5}, {122.3, 94.0}}, identifier: 'forearm'
-                                                        Other, 0x103b58090, {{379.2, 556.2}, {61.6, 116.2}}, identifier: 'quads'
-                                                        Other, 0x103b65b50, {{385.1, 581.0}, {49.8, 90.7}}, identifier: 'hams'
-                                                        Other, 0x103b64300, {{383.8, 641.9}, {52.4, 92.6}}, identifier: 'calves'
-                                                        Other, 0x103b64a00, {{381.5, 550.0}, {57.0, 52.4}}, identifier: 'glutes'
-                                                    Other, 0x103b558f0, {{348.9, 414.5}, {122.3, 320.0}}
-                                                    Other, 0x103b5e510, {{348.9, 414.5}, {122.3, 320.0}}
-                                                    Other, 0x103b63530, {{348.9, 414.5}, {122.3, 320.0}}
-                                                    Other, 0x103b627d0, {{348.9, 414.5}, {122.3, 320.0}}
-                                                    Other, 0x103b733e0, {{348.9, 414.5}, {122.3, 320.0}}
-                                      Cell, 0x103b73060, {{238.5, 765.5}, {343.0, 77.0}}
-                                        Other, 0x103b73730, {{238.5, 765.5}, {343.0, 77.0}}
-                                          Other, 0x103b73a90, {{238.5, 765.5}, {343.0, 77.0}}
-                                            Other, 0x103b73e10, {{238.5, 765.5}, {343.0, 77.0}}
-                                        Other, 0x103b74170, {{238.5, 765.5}, {343.0, 77.0}}
-                                          Other, 0x103b744c0, {{238.5, 765.5}, {343.0, 77.0}}
-                                            Other, 0x103b74820, {{238.5, 765.5}, {343.0, 77.0}}
-                                              Button, 0x103b74b90, {{238.5, 765.5}, {343.0, 77.0}}, identifier: 'DayTab', label: '4 moves, about 38 minutes. Show today's muscles'
-                                                StaticText, 0x103b74f10, {{254.5, 782.5}, {195.5, 20.0}}, label: '4 moves, about 38 minutes.'
-                                                StaticText, 0x103b75270, {{254.5, 806.5}, {188.0, 19.0}}, label: 'Next: Pull day, then Legs day'
-                                                StaticText, 0x103b755e0, {{493.0, 795.2}, {54.5, 17.5}}, label: 'Muscles'
-                                                Image, 0x103b75930, {{554.0, 801.0}, {10.0, 6.0}}, identifier: 'chevron.down', label: 'Go Down'
-                                      Other, 0x103b75ca0, {{-16.0, 603.5}, {407.0, 132.0}}
-                                      Cell, 0x103b76000, {{238.5, 860.0}, {343.0, 44.5}}
-                                        Other, 0x103b76370, {{238.5, 860.0}, {343.0, 44.5}}
-                                        Other, 0x103b766d0, {{238.5, 860.0}, {343.0, 44.5}}
-                                          Other, 0x103b76a70, {{238.5, 860.0}, {343.0, 44.5}}
-                                            Other, 0x103b76de0, {{238.5, 860.0}, {343.0, 44.5}}
-                                              StaticText, 0x103b77160, {{238.5, 860.0}, {343.0, 44.5}}, label: 'This week'
-                                      Cell, 0x103b774d0, {{238.5, 904.5}, {343.0, 70.0}}
-                                        Other, 0x103b77840, {{238.5, 904.5}, {343.0, 70.0}}
-                                          Other, 0x103b77bc0, {{238.5, 904.5}, {343.0, 70.0}}
-                                            Other, 0x103b77f30, {{238.5, 904.5}, {343.0, 70.0}}
-                                        Other, 0x103b782a0, {{238.5, 904.5}, {343.0, 70.0}}
-                                          Other, 0x103b78600, {{238.5, 904.5}, {343.0, 70.0}}
-                                            Other, 0x103b78970, {{238.5, 904.5}, {343.0, 70.0}}
-                                              StaticText, 0x103b78ce0, {{254.5, 915.5}, {12.5, 31.5}}, label: '3'
-                                              StaticText, 0x103b79040, {{254.5, 947.0}, {51.0, 16.5}}, label: 'workouts'
-                                              StaticText, 0x103b79390, {{323.5, 915.5}, {12.5, 31.5}}, label: '6'
-                                              StaticText, 0x103b79710, {{323.5, 947.0}, {23.5, 16.5}}, label: 'sets'
-                                              StaticText, 0x103b79a70, {{365.0, 915.5}, {42.0, 31.5}}, label: '3.8k'
-                                              StaticText, 0x103b79e10, {{365.0, 947.0}, {29.5, 16.5}}, label: 'lifted'
-                                      Other, 0x103b7a1a0, {{564.5, 383.5}, {30.0, 387.0}}, label: 'Vertical scroll bar, 3 pages', value: 0%
-                                        Other, 0x103b7a510, {{591.5, 760.5}, {3.0, 7.0}}
-                                      Other, 0x103b7a880, {{564.5, 383.5}, {30.0, 387.0}}, label: 'Vertical scroll bar, 3 pages', value: 0%
-                                        Other, 0x103b7abd0, {{591.5, 760.5}, {3.0, 7.0}}
-                                    Button, 0x103b7af50, {{242.5, 798.5}, {335.0, 56.0}}, label: 'Start workout'
-                TabBar, 0x103b7b290, {{222.5, 874.5}, {375.0, 49.0}}, label: 'Tab Bar'
-                  Button, 0x103b7b600, {{224.5, 875.5}, {90.0, 48.0}}, identifier: 'figure.strengthtraining.traditional', label: 'Today', Selected
-                    Image, 0x103b7b950, {{252.5, 877.0}, {33.0, 32.0}}, identifier: 'figure.strengthtraining.traditional', label: 'figure.strengthtraining.traditional'
-                  Button, 0x103b7bcb0, {{318.5, 875.5}, {90.0, 48.0}}, identifier: 'chart.line.uptrend.xyaxis', label: 'Progress'
-                    Image, 0x103b7c040, {{348.0, 880.5}, {31.0, 25.5}}, identifier: 'chart.line.uptrend.xyaxis', label: 'chart line'
-                  Button, 0x103b7c390, {{412.5, 875.5}, {89.0, 48.0}}, identifier: 'clock', label: 'History'
-                    Image, 0x103b7c710, {{443.0, 879.0}, {27.5, 27.5}}, identifier: 'clock.fill', label: 'clock'
-                  Button, 0x103b7ca60, {{505.5, 875.5}, {90.0, 48.0}}, identifier: 'gearshape', label: 'Settings'
-                    Image, 0x103b7cdc0, {{536.0, 879.0}, {28.0, 28.0}}, identifier: 'gearshape.fill', label: 'gearshape.fill'
+ →Application, 0x10313f6c0, pid: 7124, label: 'ZeroLog'
+    Window (Main), 0x103157da0, {{222.5, 256.5}, {375.0, 667.0}}
+      Other, 0x103151720, {{222.5, 256.5}, {375.0, 667.0}}
+        Other, 0x1031513a0, {{222.5, 256.5}, {375.0, 667.0}}
+          Other, 0x103159600, {{222.5, 256.5}, {375.0, 667.0}}
+            Other, 0x1031434e0, {{222.5, 256.5}, {375.0, 667.0}}
+              Other, 0x103152f30, {{222.5, 256.5}, {375.0, 667.0}}
+                Other, 0x103143ef0, {{222.5, 256.5}, {375.0, 667.0}}
+                  Other, 0x103151040, {{222.5, 256.5}, {375.0, 667.0}}
+                    Other, 0x103148ad0, {{222.5, 256.5}, {375.0, 667.0}}
+                      Other, 0x103152880, {{222.5, 256.5}, {375.0, 667.0}}
+                        Other, 0x103157a50, {{222.5, 256.5}, {375.0, 667.0}}
+                          Other, 0x10313cd60, {{222.5, 256.5}, {375.0, 667.0}}
+                            NavigationBar, 0x103141cb0, {{222.5, 276.5}, {375.0, 107.0}}, identifier: 'Push day'
+                              StaticText, 0x1031483b0, {{238.5, 320.5}, {159.0, 57.5}}, label: 'Push day'
+                            Other, 0x10314fba0, {{222.5, 256.5}, {375.0, 667.0}}
+                              Other, 0x10315d0b0, {{222.5, 256.5}, {375.0, 667.0}}
+                                Other, 0x103157360, {{222.5, 256.5}, {375.0, 667.0}}
+                                  Other, 0x103154030, {{222.5, 256.5}, {375.0, 667.0}}
+                                    CollectionView, 0x103155150, {{222.5, 256.5}, {375.0, 667.0}}
+                                      Other, 0x103154a80, {{-16.0, -1207.0}, {407.0, 1810.5}}
+                                      Cell, 0x103140eb0, {{238.5, 383.5}, {343.0, 382.0}}
+                                        Other, 0x10314f840, {{238.5, 383.5}, {343.0, 382.0}}
+                                          Other, 0x10314d5e0, {{238.5, 383.5}, {343.0, 382.0}}
+                                            Other, 0x103140110, {{238.5, 383.5}, {343.0, 382.0}}
+                                        Other, 0x1031445d0, {{238.5, 383.5}, {343.0, 382.0}}
+                                          Other, 0x103154390, {{238.5, 383.5}, {343.0, 382.0}}
+                                            Other, 0x103146bf0, {{238.5, 383.5}, {343.0, 382.0}}
+                                              Other, 0x1031532a0, {{238.5, 383.5}, {343.0, 382.0}}, label: 'Today trains your chest, shoulders and triceps. 3D body: 13 groups, 59988 triangles, drawn'
+                                                Other, 0x10314c480, {{238.5, 383.5}, {343.0, 382.0}}
+                                                  Other, 0x103151aa0, {{348.9, 414.5}, {122.3, 320.0}}
+                                                    Other, 0x1031423a0, {{348.9, 414.5}, {122.3, 320.0}}, identifier: 'spinPivot'
+                                                      Other, 0x103142a90, {{348.9, 414.5}, {122.3, 320.0}}, identifier: 'bodyRoot'
+                                                        Other, 0x10315f9f0, {{394.4, 414.5}, {31.2, 34.8}}, identifier: 'body'
+                                                        Other, 0x10315ef60, {{377.6, 434.5}, {64.8, 88.2}}, identifier: 'traps'
+                                                        Other, 0x10315f300, {{374.1, 479.7}, {71.7, 79.7}}, identifier: 'lats'
+                                                        Other, 0x10315f670, {{371.3, 466.8}, {77.5, 37.8}}, identifier: 'chest'
+                                                        Other, 0x10315fd60, {{382.7, 491.7}, {54.7, 81.2}}, identifier: 'abs'
+                                                        Other, 0x1031600d0, {{364.4, 463.9}, {91.1, 33.5}}, identifier: 'delts'
+                                                        Other, 0x103160450, {{363.9, 466.8}, {92.1, 69.3}}, identifier: 'biceps'
+                                                        Other, 0x1031607c0, {{364.1, 475.1}, {91.8, 52.9}}, identifier: 'triceps'
+                                                        Other, 0x103160b30, {{348.9, 505.5}, {122.3, 94.0}}, identifier: 'forearm'
+                                                        Other, 0x103160e90, {{379.2, 556.2}, {61.6, 116.2}}, identifier: 'quads'
+                                                        Other, 0x103161200, {{385.1, 581.0}, {49.8, 90.7}}, identifier: 'hams'
+                                                        Other, 0x103161570, {{383.8, 641.9}, {52.4, 92.6}}, identifier: 'calves'
+                                                        Other, 0x1031618d0, {{381.5, 550.0}, {57.0, 52.4}}, identifier: 'glutes'
+                                                    Other, 0x103161c20, {{348.9, 414.5}, {122.3, 320.0}}
+                                                    Other, 0x103161fa0, {{348.9, 414.5}, {122.3, 320.0}}
+                                                    Other, 0x103162300, {{348.9, 414.5}, {122.3, 320.0}}
+                                                    Other, 0x1031626a0, {{348.9, 414.5}, {122.3, 320.0}}
+                                                    Other, 0x103162a30, {{348.9, 414.5}, {122.3, 320.0}}
+                                      Cell, 0x103162da0, {{238.5, 765.5}, {343.0, 77.0}}
+                                        Other, 0x103163110, {{238.5, 765.5}, {343.0, 77.0}}
+                                          Other, 0x103163460, {{238.5, 765.5}, {343.0, 77.0}}
+                                            Other, 0x1031637e0, {{238.5, 765.5}, {343.0, 77.0}}
+                                        Other, 0x103163b20, {{238.5, 765.5}, {343.0, 77.0}}
+                                          Other, 0x103163e90, {{238.5, 765.5}, {343.0, 77.0}}
+                                            Other, 0x1031641e0, {{238.5, 765.5}, {343.0, 77.0}}
+                                              Button, 0x103164540, {{238.5, 765.5}, {343.0, 77.0}}, identifier: 'DayTab', label: '4 moves, about 38 minutes. Show today's muscles'
+                                                StaticText, 0x1031648d0, {{254.5, 782.5}, {195.5, 20.0}}, label: '4 moves, about 38 minutes.'
+                                                StaticText, 0x103164c20, {{254.5, 806.5}, {188.0, 19.0}}, label: 'Next: Pull day, then Legs day'
+                                                StaticText, 0x103164fa0, {{493.0, 795.2}, {54.5, 17.5}}, label: 'Muscles'
+                                                Image, 0x1031652f0, {{554.0, 801.0}, {10.0, 6.0}}, identifier: 'chevron.down', label: 'Go Down'
+                                      Other, 0x103165650, {{-16.0, 603.5}, {407.0, 132.0}}
+                                      Cell, 0x1031659a0, {{238.5, 860.0}, {343.0, 44.5}}
+                                        Other, 0x103165ce0, {{238.5, 860.0}, {343.0, 44.5}}
+                                        Other, 0x103166050, {{238.5, 860.0}, {343.0, 44.5}}
+                                          Other, 0x1031663c0, {{238.5, 860.0}, {343.0, 44.5}}
+                                            Other, 0x103166710, {{238.5, 860.0}, {343.0, 44.5}}
+                                              StaticText, 0x103166a70, {{238.5, 860.0}, {343.0, 44.5}}, label: 'This week'
+                                      Cell, 0x103166dc0, {{238.5, 904.5}, {343.0, 70.0}}
+                                        Other, 0x103167120, {{238.5, 904.5}, {343.0, 70.0}}
+                                          Other, 0x103167470, {{238.5, 904.5}, {343.0, 70.0}}
+                                            Other, 0x1031677f0, {{238.5, 904.5}, {343.0, 70.0}}
+                                        Other, 0x103167b50, {{238.5, 904.5}, {343.0, 70.0}}
+                                          Other, 0x103167ec0, {{238.5, 904.5}, {343.0, 70.0}}
+                                            Other, 0x103168220, {{238.5, 904.5}, {343.0, 70.0}}
+                                              StaticText, 0x103168590, {{254.5, 915.5}, {12.5, 31.5}}, label: '3'
+                                              StaticText, 0x1031688f0, {{254.5, 947.0}, {51.0, 16.5}}, label: 'workouts'
+                                              StaticText, 0x103168c80, {{323.5, 915.5}, {12.5, 31.5}}, label: '6'
+                                              StaticText, 0x103169010, {{323.5, 947.0}, {23.5, 16.5}}, label: 'sets'
+                                              StaticText, 0x103169380, {{365.0, 915.5}, {42.0, 31.5}}, label: '3.8k'
+                                              StaticText, 0x1031696d0, {{365.0, 947.0}, {29.5, 16.5}}, label: 'lifted'
+                                      Other, 0x103169a70, {{564.5, 383.5}, {30.0, 387.0}}, label: 'Vertical scroll bar, 3 pages', value: 0%
+                                        Other, 0x103169dd0, {{591.5, 760.5}, {3.0, 7.0}}
+                                      Other, 0x10316a150, {{564.5, 383.5}, {30.0, 387.0}}, label: 'Vertical scroll bar, 3 pages', value: 0%
+                                        Other, 0x10316a4c0, {{591.5, 760.5}, {3.0, 7.0}}
+                                    Button, 0x10316a820, {{242.5, 798.5}, {335.0, 56.0}}, label: 'Start workout'
+                TabBar, 0x10316aba0, {{222.5, 874.5}, {375.0, 49.0}}, label: 'Tab Bar'
+                  Button, 0x10316aef0, {{224.5, 875.5}, {90.0, 48.0}}, identifier: 'figure.strengthtraining.traditional', label: 'Today', Selected
+                    Image, 0x10316b250, {{252.5, 877.0}, {33.0, 32.0}}, identifier: 'figure.strengthtraining.traditional', label: 'figure.strengthtraining.traditional'
+                  Button, 0x10316b5b0, {{318.5, 875.5}, {90.0, 48.0}}, identifier: 'chart.line.uptrend.xyaxis', label: 'Progress'
+                    Image, 0x10316b920, {{348.0, 880.5}, {31.0, 25.5}}, identifier: 'chart.line.uptrend.xyaxis', label: 'chart line'
+                  Button, 0x10316bc90, {{412.5, 875.5}, {89.0, 48.0}}, identifier: 'clock', label: 'History'
+                    Image, 0x10316bff0, {{443.0, 879.0}, {27.5, 27.5}}, identifier: 'clock.fill', label: 'clock'
+                  Button, 0x10316c360, {{505.5, 875.5}, {90.0, 48.0}}, identifier: 'gearshape', label: 'Settings'
+                    Image, 0x10316c6f0, {{536.0, 879.0}, {28.0, 28.0}}, identifier: 'gearshape.fill', label: 'gearshape.fill'
 Path to element:
- →Application, 0x103b66580, pid: 6014, label: 'ZeroLog'
+ →Application, 0x10313f6c0, pid: 7124, label: 'ZeroLog'
 Query chain:
  →Find: Target Application 'com.getzerolog.app'
   Output: {
-    Application, 0x103487a80, pid: 6014, label: 'ZeroLog'
+    Application, 0x1032a68a0, pid: 7124, label: 'ZeroLog'
   }
 )
 === TREE DUMP END ===
 === TREE DUMP BEGIN (no change: push history detail) ===
-    t =    77.31s Requesting snapshot of accessibility hierarchy for app with pid 6014
-    t =    77.49s Requesting snapshot of accessibility hierarchy for app with pid 6014
-Optional(Attributes: Application, 0x103b7d150, pid: 6014, label: 'ZeroLog'
+    t =    85.41s Requesting snapshot of accessibility hierarchy for app with pid 7124
+    t =    85.66s Requesting snapshot of accessibility hierarchy for app with pid 7124
+Optional(Attributes: Application, 0x1032afd30, pid: 7124, label: 'ZeroLog'
 Element subtree:
- →Application, 0x103b7d150, pid: 6014, label: 'ZeroLog'
-    Window (Main), 0x103b7db30, {{222.5, 256.5}, {375.0, 667.0}}
-      Other, 0x103b7e530, {{222.5, 256.5}, {375.0, 667.0}}
-        Other, 0x103b7e1e0, {{222.5, 256.5}, {375.0, 667.0}}
-          Other, 0x103a90b60, {{222.5, 256.5}, {375.0, 667.0}}
-            Other, 0x103a90da0, {{222.5, 256.5}, {375.0, 667.0}}
-              Other, 0x103a81990, {{222.5, 256.5}, {375.0, 667.0}}
-                Other, 0x103a81ab0, {{222.5, 256.5}, {375.0, 667.0}}
-                  Other, 0x103a918a0, {{222.5, 256.5}, {375.0, 667.0}}
-                    Other, 0x103a919c0, {{222.5, 256.5}, {375.0, 667.0}}
-                      Other, 0x103a91ae0, {{222.5, 256.5}, {375.0, 667.0}}
-                        Other, 0x103a91c00, {{222.5, 256.5}, {375.0, 667.0}}
-                          Other, 0x103a91d20, {{222.5, 256.5}, {375.0, 667.0}}
-                            NavigationBar, 0x103489400, {{222.5, 276.5}, {375.0, 107.0}}, identifier: 'Nov 9, 2026'
-                              Button, 0x103495260, {{222.5, 276.5}, {85.0, 44.0}}, label: 'History'
-                              StaticText, 0x1034949c0, {{238.5, 320.5}, {208.5, 57.5}}, label: 'Nov 9, 2026'
-                            Other, 0x1034928c0, {{222.5, 256.5}, {375.0, 667.0}}
-                              Other, 0x10348bb80, {{222.5, 256.5}, {375.0, 667.0}}
-                                Other, 0x10348bca0, {{222.5, 256.5}, {375.0, 667.0}}
-                                  Other, 0x10348bdc0, {{222.5, 256.5}, {375.0, 667.0}}
-                                    CollectionView, 0x10348bee0, {{222.5, 256.5}, {375.0, 667.0}}
-                                      Other, 0x10348c000, {{-16.0, -1207.0}, {407.0, 1572.0}}
-                                      Cell, 0x10348c120, {{238.5, 383.5}, {343.0, 44.5}}
-                                        Other, 0x10348c240, {{238.5, 383.5}, {343.0, 44.5}}
-                                        Other, 0x10348c360, {{238.5, 383.5}, {343.0, 44.5}}
-                                          Other, 0x10348c480, {{238.5, 383.5}, {343.0, 44.5}}
-                                            Other, 0x10348c5a0, {{238.5, 383.5}, {343.0, 44.5}}
-                                              StaticText, 0x10348c6c0, {{238.5, 383.5}, {343.0, 44.5}}, label: 'Barbell bench press'
-                                      Cell, 0x10348c7e0, {{238.5, 428.0}, {343.0, 44.0}}
-                                        Other, 0x10348c900, {{238.5, 428.0}, {343.0, 44.0}}
-                                          Other, 0x10348ca20, {{238.5, 428.0}, {343.0, 44.0}}
-                                            Other, 0x10348cb40, {{238.5, 428.0}, {343.0, 44.0}}
-                                        Other, 0x10348cc60, {{238.5, 428.0}, {343.0, 44.0}}
-                                          Other, 0x10348cd80, {{238.5, 428.0}, {343.0, 44.0}}
-                                            Other, 0x10348cea0, {{238.5, 428.0}, {343.0, 44.0}}
-                                              Button, 0x103a91e40, {{238.5, 428.0}, {343.0, 44.0}}, label: 'Set 1, 10 × 45 lb'
-                                                StaticText, 0x103a91f60, {{254.5, 443.8}, {36.5, 21.5}}, label: 'Set 1'
-                                                StaticText, 0x10348cfc0, {{475.0, 434.2}, {90.5, 31.5}}, label: '10 × 45 lb'
-                                      Cell, 0x103a92080, {{238.5, 472.0}, {343.0, 44.0}}
-                                        Other, 0x103a921a0, {{238.5, 472.0}, {343.0, 44.0}}
-                                          Other, 0x103a922c0, {{238.5, 472.0}, {343.0, 44.0}}
-                                            Other, 0x103a923e0, {{238.5, 472.0}, {343.0, 44.0}}
-                                        Other, 0x103a92500, {{238.5, 472.0}, {343.0, 44.0}}
-                                          Other, 0x103a92620, {{238.5, 472.0}, {343.0, 44.0}}
-                                            Other, 0x103a92740, {{238.5, 472.0}, {343.0, 44.0}}
-                                              Button, 0x103a92860, {{238.5, 472.0}, {343.0, 44.0}}, label: 'Set 2, 14 × 45 lb'
-                                                StaticText, 0x103a92980, {{254.5, 487.8}, {39.0, 21.5}}, label: 'Set 2'
-                                                StaticText, 0x103a92aa0, {{474.5, 478.2}, {91.0, 31.5}}, label: '14 × 45 lb'
-                                      Other, 0x103a92bc0, {{254.5, 471.5}, {327.0, 0.5}}
-                                      Cell, 0x103b7de80, {{238.5, 516.0}, {343.0, 44.0}}
-                                        Other, 0x103b7e890, {{238.5, 516.0}, {343.0, 44.0}}
-                                          Other, 0x103b7ebe0, {{238.5, 516.0}, {343.0, 44.0}}
-                                            Other, 0x103b7f2c0, {{238.5, 516.0}, {343.0, 44.0}}
-                                        Other, 0x103b7ef60, {{238.5, 516.0}, {343.0, 44.0}}
-                                          Other, 0x103a92ce0, {{238.5, 516.0}, {343.0, 44.0}}
-                                            Other, 0x103a92e00, {{238.5, 516.0}, {343.0, 44.0}}
-                                              Button, 0x103a92f20, {{238.5, 516.0}, {343.0, 44.0}}, label: 'Set 3, 18 × 45 lb'
-                                                StaticText, 0x103a93040, {{254.5, 531.8}, {39.5, 21.5}}, label: 'Set 3'
-                                                StaticText, 0x103a93160, {{475.0, 522.2}, {90.5, 31.5}}, label: '18 × 45 lb'
-                                      Other, 0x103a93280, {{254.5, 515.5}, {327.0, 0.5}}
-                                      Cell, 0x103a933a0, {{238.5, 560.0}, {343.0, 44.0}}
-                                        Other, 0x103a934c0, {{238.5, 560.0}, {343.0, 44.0}}
-                                          Other, 0x103a935e0, {{238.5, 560.0}, {343.0, 44.0}}
-                                            Other, 0x103a93700, {{238.5, 560.0}, {343.0, 44.0}}
-                                        Other, 0x103a93820, {{238.5, 560.0}, {343.0, 44.0}}
-                                          Other, 0x103a93940, {{238.5, 560.0}, {343.0, 44.0}}
-                                            Other, 0x103a93a60, {{238.5, 560.0}, {343.0, 44.0}}
-                                              Button, 0x103a93b80, {{238.5, 560.0}, {343.0, 44.0}}, label: 'Set 4, 22 × 45 lb'
-                                                StaticText, 0x103a93ca0, {{254.5, 575.8}, {40.5, 21.5}}, label: 'Set 4'
-                                                StaticText, 0x103a93dc0, {{470.0, 566.2}, {95.5, 31.5}}, label: '22 × 45 lb'
-                                      Other, 0x103a93ee0, {{254.5, 559.5}, {327.0, 0.5}}
-                                      Other, 0x103a94000, {{-16.0, 365.0}, {407.0, 1415.5}}
-                                      Cell, 0x103a94120, {{238.5, 639.0}, {343.0, 44.0}}
-                                        Other, 0x103a94240, {{238.5, 639.0}, {343.0, 44.0}}
-                                          Other, 0x103a94360, {{238.5, 639.0}, {343.0, 44.0}}
-                                            Other, 0x103a94480, {{238.5, 639.0}, {343.0, 44.0}}
-                                        Other, 0x103a945a0, {{238.5, 639.0}, {343.0, 44.0}}
-                                          Other, 0x103a946c0, {{238.5, 639.0}, {343.0, 44.0}}
-                                            Other, 0x103a947e0, {{238.5, 639.0}, {343.0, 44.0}}
-                                              StaticText, 0x103a94900, {{238.5, 639.0}, {343.0, 44.0}}, label: 'Tap a set to change it, or swipe left to delete it.'
-                                      Other, 0x103a94a20, {{564.5, 383.5}, {30.0, 491.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
-                                        Other, 0x103a94b40, {{591.5, 864.5}, {3.0, 7.0}}
-                                      Other, 0x103a94c60, {{564.5, 383.5}, {30.0, 491.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
-                                        Other, 0x103a94d80, {{591.5, 864.5}, {3.0, 7.0}}
-                TabBar, 0x103a94ea0, {{222.5, 874.5}, {375.0, 49.0}}, label: 'Tab Bar'
-                  Button, 0x103a94fc0, {{224.5, 875.5}, {90.0, 48.0}}, identifier: 'figure.strengthtraining.traditional', label: 'Today'
-                    Image, 0x103a950e0, {{252.5, 877.0}, {33.0, 32.0}}, identifier: 'figure.strengthtraining.traditional', label: 'figure.strengthtraining.traditional'
-                  Button, 0x103a95200, {{318.5, 875.5}, {90.0, 48.0}}, identifier: 'chart.line.uptrend.xyaxis', label: 'Progress'
-                    Image, 0x103a95320, {{348.0, 880.5}, {31.0, 25.5}}, identifier: 'chart.line.uptrend.xyaxis', label: 'chart line'
-                  Button, 0x103a95440, {{412.5, 875.5}, {89.0, 48.0}}, identifier: 'clock', label: 'History', Selected
-                    Image, 0x103a95560, {{443.0, 879.0}, {27.5, 27.5}}, identifier: 'clock.fill', label: 'clock'
-                  Button, 0x103a95680, {{505.5, 875.5}, {90.0, 48.0}}, identifier: 'gearshape', label: 'Settings'
-                    Image, 0x103a957a0, {{536.0, 879.0}, {28.0, 28.0}}, identifier: 'gearshape.fill', label: 'gearshape.fill'
+ →Application, 0x1032afd30, pid: 7124, label: 'ZeroLog'
+    Window (Main), 0x1032ae5f0, {{222.5, 256.5}, {375.0, 667.0}}
+      Other, 0x1032b1da0, {{222.5, 256.5}, {375.0, 667.0}}
+        Other, 0x1032b1ec0, {{222.5, 256.5}, {375.0, 667.0}}
+          Other, 0x1032b1c50, {{222.5, 256.5}, {375.0, 667.0}}
+            Other, 0x1032afeb0, {{222.5, 256.5}, {375.0, 667.0}}
+              Other, 0x1032b1fe0, {{222.5, 256.5}, {375.0, 667.0}}
+                Other, 0x1032b2100, {{222.5, 256.5}, {375.0, 667.0}}
+                  Other, 0x1032b2220, {{222.5, 256.5}, {375.0, 667.0}}
+                    Other, 0x1032b2340, {{222.5, 256.5}, {375.0, 667.0}}
+                      Other, 0x1032b2460, {{222.5, 256.5}, {375.0, 667.0}}
+                        Other, 0x1032b2580, {{222.5, 256.5}, {375.0, 667.0}}
+                          Other, 0x1032b26a0, {{222.5, 256.5}, {375.0, 667.0}}
+                            NavigationBar, 0x1032b27c0, {{222.5, 276.5}, {375.0, 107.0}}, identifier: 'Nov 9, 2026'
+                              Button, 0x1032b28e0, {{222.5, 276.5}, {85.0, 44.0}}, label: 'History'
+                              StaticText, 0x1032b2a00, {{238.5, 320.5}, {208.5, 57.5}}, label: 'Nov 9, 2026'
+                            Other, 0x1032b2b20, {{222.5, 256.5}, {375.0, 667.0}}
+                              Other, 0x1032b2c40, {{222.5, 256.5}, {375.0, 667.0}}
+                                Other, 0x1032b2d60, {{222.5, 256.5}, {375.0, 667.0}}
+                                  Other, 0x1032b2e80, {{222.5, 256.5}, {375.0, 667.0}}
+                                    CollectionView, 0x1032b2fa0, {{222.5, 256.5}, {375.0, 667.0}}
+                                      Other, 0x1032b30c0, {{-16.0, -1207.0}, {407.0, 1572.0}}
+                                      Cell, 0x1032b31e0, {{238.5, 383.5}, {343.0, 44.5}}
+                                        Other, 0x1032b3300, {{238.5, 383.5}, {343.0, 44.5}}
+                                        Other, 0x1032b3420, {{238.5, 383.5}, {343.0, 44.5}}
+                                          Other, 0x1032b3540, {{238.5, 383.5}, {343.0, 44.5}}
+                                            Other, 0x1032b3660, {{238.5, 383.5}, {343.0, 44.5}}
+                                              StaticText, 0x1032b3780, {{238.5, 383.5}, {343.0, 44.5}}, label: 'Barbell bench press'
+                                      Cell, 0x1032b38a0, {{238.5, 428.0}, {343.0, 44.0}}
+                                        Other, 0x1032b39c0, {{238.5, 428.0}, {343.0, 44.0}}
+                                          Other, 0x1032b3ae0, {{238.5, 428.0}, {343.0, 44.0}}
+                                            Other, 0x1032b3c00, {{238.5, 428.0}, {343.0, 44.0}}
+                                        Other, 0x1032b3d20, {{238.5, 428.0}, {343.0, 44.0}}
+                                          Other, 0x1032b3e40, {{238.5, 428.0}, {343.0, 44.0}}
+                                            Other, 0x1032b3f60, {{238.5, 428.0}, {343.0, 44.0}}
+                                              Button, 0x1032b4080, {{238.5, 428.0}, {343.0, 44.0}}, label: 'Set 1, 10 × 45 lb'
+                                                StaticText, 0x1032b41a0, {{254.5, 443.8}, {36.5, 21.5}}, label: 'Set 1'
+                                                StaticText, 0x1032b42c0, {{475.0, 434.2}, {90.5, 31.5}}, label: '10 × 45 lb'
+                                      Cell, 0x1032b43e0, {{238.5, 472.0}, {343.0, 44.0}}
+                                        Other, 0x1032b4500, {{238.5, 472.0}, {343.0, 44.0}}
+                                          Other, 0x1032b4620, {{238.5, 472.0}, {343.0, 44.0}}
+                                            Other, 0x1032b4740, {{238.5, 472.0}, {343.0, 44.0}}
+                                        Other, 0x1032b4860, {{238.5, 472.0}, {343.0, 44.0}}
+                                          Other, 0x1032b4980, {{238.5, 472.0}, {343.0, 44.0}}
+                                            Other, 0x1032b4aa0, {{238.5, 472.0}, {343.0, 44.0}}
+                                              Button, 0x1032b4bc0, {{238.5, 472.0}, {343.0, 44.0}}, label: 'Set 2, 14 × 45 lb'
+                                                StaticText, 0x1032b4ce0, {{254.5, 487.8}, {39.0, 21.5}}, label: 'Set 2'
+                                                StaticText, 0x1032b4e00, {{474.5, 478.2}, {91.0, 31.5}}, label: '14 × 45 lb'
+                                      Other, 0x1032b4f20, {{254.5, 471.5}, {327.0, 0.5}}
+                                      Cell, 0x1032b5040, {{238.5, 516.0}, {343.0, 44.0}}
+                                        Other, 0x1032b5160, {{238.5, 516.0}, {343.0, 44.0}}
+                                          Other, 0x1032b5280, {{238.5, 516.0}, {343.0, 44.0}}
+                                            Other, 0x1032b53a0, {{238.5, 516.0}, {343.0, 44.0}}
+                                        Other, 0x1032b54c0, {{238.5, 516.0}, {343.0, 44.0}}
+                                          Other, 0x1032b55e0, {{238.5, 516.0}, {343.0, 44.0}}
+                                            Other, 0x1032b5700, {{238.5, 516.0}, {343.0, 44.0}}
+                                              Button, 0x1032b5820, {{238.5, 516.0}, {343.0, 44.0}}, label: 'Set 3, 18 × 45 lb'
+                                                StaticText, 0x1032b5940, {{254.5, 531.8}, {39.5, 21.5}}, label: 'Set 3'
+                                                StaticText, 0x1032b5a60, {{475.0, 522.2}, {90.5, 31.5}}, label: '18 × 45 lb'
+                                      Other, 0x1032b5b80, {{254.5, 515.5}, {327.0, 0.5}}
+                                      Cell, 0x1032b5ca0, {{238.5, 560.0}, {343.0, 44.0}}
+                                        Other, 0x10317eee0, {{238.5, 560.0}, {343.0, 44.0}}
+                                          Other, 0x103178670, {{238.5, 560.0}, {343.0, 44.0}}
+                                            Other, 0x10317eb60, {{238.5, 560.0}, {343.0, 44.0}}
+                                        Other, 0x10317e070, {{238.5, 560.0}, {343.0, 44.0}}
+                                          Other, 0x10317f230, {{238.5, 560.0}, {343.0, 44.0}}
+                                            Other, 0x10317f580, {{238.5, 560.0}, {343.0, 44.0}}
+                                              Button, 0x10317f8e0, {{238.5, 560.0}, {343.0, 44.0}}, label: 'Set 4, 22 × 45 lb'
+                                                StaticText, 0x10317fc60, {{254.5, 575.8}, {40.5, 21.5}}, label: 'Set 4'
+                                                StaticText, 0x10317ffd0, {{470.0, 566.2}, {95.5, 31.5}}, label: '22 × 45 lb'
+                                      Other, 0x103180330, {{254.5, 559.5}, {327.0, 0.5}}
+                                      Other, 0x1031806c0, {{-16.0, 365.0}, {407.0, 1415.5}}
+                                      Cell, 0x103180a30, {{238.5, 639.0}, {343.0, 44.0}}
+                                        Other, 0x103180d90, {{238.5, 639.0}, {343.0, 44.0}}
+                                          Other, 0x1031810e0, {{238.5, 639.0}, {343.0, 44.0}}
+                                            Other, 0x103181bf0, {{238.5, 639.0}, {343.0, 44.0}}
+                                        Other, 0x1031824d0, {{238.5, 639.0}, {343.0, 44.0}}
+                                          Other, 0x103182860, {{238.5, 639.0}, {343.0, 44.0}}
+                                            Other, 0x103182be0, {{238.5, 639.0}, {343.0, 44.0}}
+                                              StaticText, 0x103182f60, {{238.5, 639.0}, {343.0, 44.0}}, label: 'Tap a set to change it, or swipe left to delete it.'
+                                      Other, 0x1031832e0, {{564.5, 383.5}, {30.0, 491.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
+                                        Other, 0x103183e10, {{591.5, 864.5}, {3.0, 7.0}}
+                                      Other, 0x1031849a0, {{564.5, 383.5}, {30.0, 491.0}}, label: 'Vertical scroll bar, 1 page', value: 0%
+                                        Other, 0x103184d30, {{591.5, 864.5}, {3.0, 7.0}}
+                TabBar, 0x1031850b0, {{222.5, 874.5}, {375.0, 49.0}}, label: 'Tab Bar'
+                  Button, 0x103185420, {{224.5, 875.5}, {90.0, 48.0}}, identifier: 'figure.strengthtraining.traditional', label: 'Today'
+                    Image, 0x1031857b0, {{252.5, 877.0}, {33.0, 32.0}}, identifier: 'figure.strengthtraining.traditional', label: 'figure.strengthtraining.traditional'
+                  Button, 0x103185b40, {{318.5, 875.5}, {90.0, 48.0}}, identifier: 'chart.line.uptrend.xyaxis', label: 'Progress'
+                    Image, 0x103185ec0, {{348.0, 880.5}, {31.0, 25.5}}, identifier: 'chart.line.uptrend.xyaxis', label: 'chart line'
+                  Button, 0x103186240, {{412.5, 875.5}, {89.0, 48.0}}, identifier: 'clock', label: 'History', Selected
+                    Image, 0x1031865d0, {{443.0, 879.0}, {27.5, 27.5}}, identifier: 'clock.fill', label: 'clock'
+                  Button, 0x103186b60, {{505.5, 875.5}, {90.0, 48.0}}, identifier: 'gearshape', label: 'Settings'
+                    Image, 0x103186ee0, {{536.0, 879.0}, {28.0, 28.0}}, identifier: 'gearshape.fill', label: 'gearshape.fill'
 Path to element:
- →Application, 0x103b7d150, pid: 6014, label: 'ZeroLog'
+ →Application, 0x1032afd30, pid: 7124, label: 'ZeroLog'
 Query chain:
  →Find: Target Application 'com.getzerolog.app'
   Output: {
-    Application, 0x103b717b0, pid: 6014, label: 'ZeroLog'
+    Application, 0x1032a6860, pid: 7124, label: 'ZeroLog'
   }
 )
 === TREE DUMP END ===
 === TREE DUMP BEGIN (equipment stuck on) ===
-    t =    86.23s Requesting snapshot of accessibility hierarchy for app with pid 12092
-    t =    86.54s Requesting snapshot of accessibility hierarchy for app with pid 12092
-Optional(Attributes: Application, 0x11468a890, pid: 12092, label: 'ZeroLog'
+    t =    62.69s Requesting snapshot of accessibility hierarchy for app with pid 13961
+    t =    62.92s Requesting snapshot of accessibility hierarchy for app with pid 13961
+Optional(Attributes: Application, 0x1133e3020, pid: 13961, label: 'ZeroLog'
 Element subtree:
- →Application, 0x11468a890, pid: 12092, label: 'ZeroLog'
-    Window (Main), 0x11468a9b0, {{222.5, 256.5}, {375.0, 667.0}}
-      Other, 0x11468ad70, {{222.5, 256.5}, {375.0, 667.0}}
-        Other, 0x11468ae90, {{222.5, 256.5}, {375.0, 667.0}}
-          Other, 0x11468b430, {{222.5, 256.5}, {375.0, 667.0}}
-            Other, 0x11468aad0, {{222.5, 256.5}, {375.0, 667.0}}
-              Other, 0x11468abf0, {{222.5, 256.5}, {375.0, 667.0}}
-                NavigationBar, 0x11468afb0, {{222.5, 276.5}, {375.0, 107.0}}, identifier: 'Your gym'
-                  StaticText, 0x114594b60, {{238.5, 320.5}, {163.0, 57.5}}, label: 'Your gym'
-                Other, 0x11468b0d0, {{222.5, 256.5}, {375.0, 667.0}}
-                  Other, 0x11468b1f0, {{222.5, 256.5}, {375.0, 667.0}}
-                    Other, 0x11468b310, {{222.5, 256.5}, {375.0, 667.0}}
-                      Other, 0x11468e000, {{222.5, 256.5}, {375.0, 667.0}}
-                        CollectionView, 0x11468e120, {{222.5, 256.5}, {375.0, 667.0}}
-                          Other, 0x11468e240, {{-16.0, -1207.0}, {407.0, 1416.0}}
-                          Cell, 0x11468e360, {{238.5, 383.5}, {343.0, 64.5}}
-                            Other, 0x11468e480, {{238.5, 383.5}, {343.0, 64.5}}
-                              Other, 0x11468e5a0, {{238.5, 383.5}, {343.0, 64.5}}
-                                Other, 0x11468e6c0, {{238.5, 383.5}, {343.0, 64.5}}
-                            Other, 0x11468e7e0, {{238.5, 383.5}, {343.0, 64.5}}
-                              Other, 0x11468e900, {{238.5, 383.5}, {343.0, 64.5}}
-                                Other, 0x11468ea20, {{238.5, 383.5}, {343.0, 64.5}}
-                                  StaticText, 0x11468eb40, {{238.5, 383.5}, {343.0, 64.5}}, label: 'Tell ZeroLog what your gym has. It only plans exercises you can actually do there.'
-                          Other, 0x11468ec60, {{-16.0, 209.0}, {407.0, 414.0}}
-                          Cell, 0x11468ee60, {{238.5, 465.5}, {343.0, 44.5}}
-                            Other, 0x11468ef80, {{238.5, 465.5}, {343.0, 44.5}}
-                            Other, 0x11468f0a0, {{238.5, 465.5}, {343.0, 44.5}}
-                              Other, 0x11468f1c0, {{238.5, 465.5}, {343.0, 44.5}}
-                                Other, 0x11468f2e0, {{238.5, 465.5}, {343.0, 44.5}}
-                                  StaticText, 0x11468f400, {{238.5, 465.5}, {343.0, 44.5}}, label: 'Equipment'
-                          Cell, 0x11468f520, {{238.5, 510.0}, {343.0, 44.0}}
-                            Other, 0x11468f640, {{238.5, 510.0}, {343.0, 44.0}}
-                              Other, 0x11468f760, {{238.5, 510.0}, {343.0, 44.0}}
-                                Other, 0x11468f880, {{238.5, 510.0}, {343.0, 44.0}}
-                            Other, 0x11468f9a0, {{238.5, 510.0}, {343.0, 44.0}}
-                              Other, 0x11468fac0, {{238.5, 510.0}, {343.0, 44.0}}
-                                Other, 0x11468fbe0, {{238.5, 510.0}, {343.0, 44.0}}
-                                  Switch, 0x11468fd00, {{238.5, 510.0}, {343.0, 44.0}}, label: 'Barbell', value: 0
-                                    StaticText, 0x11468fe20, {{254.5, 521.2}, {52.0, 21.5}}, label: 'Barbell'
-                                    Switch, 0x11468ff40, {{516.5, 516.5}, {51.0, 31.0}}, value: 0
-                          Cell, 0x114690060, {{238.5, 554.0}, {343.0, 44.0}}
-                            Other, 0x114690180, {{238.5, 554.0}, {343.0, 44.0}}
-                              Other, 0x1146902a0, {{238.5, 554.0}, {343.0, 44.0}}
-                                Other, 0x1146903c0, {{238.5, 554.0}, {343.0, 44.0}}
-                            Other, 0x1146904e0, {{238.5, 554.0}, {343.0, 44.0}}
-                              Other, 0x114690600, {{238.5, 554.0}, {343.0, 44.0}}
-                                Other, 0x114690720, {{238.5, 554.0}, {343.0, 44.0}}
-                                  Switch, 0x114690840, {{238.5, 554.0}, {343.0, 44.0}}, label: 'Squat rack', value: 0
-                                    StaticText, 0x114690960, {{254.5, 565.2}, {80.0, 21.5}}, label: 'Squat rack'
-                                    Switch, 0x114690a80, {{516.5, 560.5}, {51.0, 31.0}}, value: 0
-                          Other, 0x114690ba0, {{254.5, 553.5}, {327.0, 0.5}}
-                          Cell, 0x114690cc0, {{238.5, 598.0}, {343.0, 44.0}}
-                            Other, 0x114690de0, {{238.5, 598.0}, {343.0, 44.0}}
-                              Other, 0x114690f00, {{238.5, 598.0}, {343.0, 44.0}}
-                                Other, 0x114691020, {{238.5, 598.0}, {343.0, 44.0}}
-                            Other, 0x114691140, {{238.5, 598.0}, {343.0, 44.0}}
-                              Other, 0x114691260, {{238.5, 598.0}, {343.0, 44.0}}
-                                Other, 0x114691380, {{238.5, 598.0}, {343.0, 44.0}}
-                                  Switch, 0x1146914a0, {{238.5, 598.0}, {343.0, 44.0}}, label: 'Flat bench', value: 0
-                                    StaticText, 0x1146915c0, {{254.5, 609.2}, {78.5, 21.5}}, label: 'Flat bench'
-                                    Switch, 0x1146916e0, {{516.5, 604.5}, {51.0, 31.0}}, value: 0
-                          Other, 0x114691800, {{254.5, 597.5}, {327.0, 0.5}}
-                          Cell, 0x114691920, {{238.5, 642.0}, {343.0, 44.0}}
-                            Other, 0x114691a40, {{238.5, 642.0}, {343.0, 44.0}}
-                              Other, 0x114691b60, {{238.5, 642.0}, {343.0, 44.0}}
-                                Other, 0x114691c80, {{238.5, 642.0}, {343.0, 44.0}}
-                            Other, 0x114691da0, {{238.5, 642.0}, {343.0, 44.0}}
-                              Other, 0x114691ec0, {{238.5, 642.0}, {343.0, 44.0}}
-                                Other, 0x114691fe0, {{238.5, 642.0}, {343.0, 44.0}}
-                                  Switch, 0x114692100, {{238.5, 642.0}, {343.0, 44.0}}, label: 'Dumbbells', value: 0
-                                    StaticText, 0x114692220, {{254.5, 653.2}, {79.5, 21.5}}, label: 'Dumbbells'
-                                    Switch, 0x114692340, {{516.5, 648.5}, {51.0, 31.0}}, value: 0
-                          Other, 0x114692460, {{254.5, 641.5}, {327.0, 0.5}}
-                          Cell, 0x114692580, {{238.5, 686.0}, {343.0, 44.0}}
-                            Other, 0x1146926a0, {{238.5, 686.0}, {343.0, 44.0}}
-                              Other, 0x1146927c0, {{238.5, 686.0}, {343.0, 44.0}}
-                                Other, 0x1146928e0, {{238.5, 686.0}, {343.0, 44.0}}
-                            Other, 0x114692a00, {{238.5, 686.0}, {343.0, 44.0}}
-                              Other, 0x114692b20, {{238.5, 686.0}, {343.0, 44.0}}
-                                Other, 0x114692c40, {{238.5, 686.0}, {343.0, 44.0}}
-                                  Switch, 0x114692d60, {{238.5, 686.0}, {343.0, 44.0}}, label: 'Cable machine', value: 0
-                                    StaticText, 0x114692e80, {{254.5, 697.2}, {112.0, 21.5}}, label: 'Cable machine'
-                                    Switch, 0x114692fa0, {{516.5, 692.5}, {51.0, 31.0}}, value: 0
-                          Other, 0x1146930c0, {{254.5, 685.5}, {327.0, 0.5}}
-                          Cell, 0x1146931e0, {{238.5, 730.0}, {343.0, 44.0}}
-                            Other, 0x114693300, {{238.5, 730.0}, {343.0, 44.0}}
-                              Other, 0x114693420, {{238.5, 730.0}, {343.0, 44.0}}
-                                Other, 0x114693540, {{238.5, 730.0}, {343.0, 44.0}}
-                            Other, 0x114693660, {{238.5, 730.0}, {343.0, 44.0}}
-                              Other, 0x114693780, {{238.5, 730.0}, {343.0, 44.0}}
-                                Other, 0x1146938a0, {{238.5, 730.0}, {343.0, 44.0}}
-                                  Switch, 0x1146939c0, {{238.5, 730.0}, {343.0, 44.0}}, label: 'Lat pulldown machine', value: 0
-                                    StaticText, 0x114693ae0, {{254.5, 741.2}, {163.5, 21.5}}, label: 'Lat pulldown machine'
-                                    Switch, 0x114693c00, {{516.5, 736.5}, {51.0, 31.0}}, value: 0
-                          Other, 0x114693d20, {{254.5, 729.5}, {327.0, 0.5}}
-                          Cell, 0x114693e40, {{238.5, 774.0}, {343.0, 44.0}}
-                            Other, 0x114693f60, {{238.5, 774.0}, {343.0, 44.0}}
-                              Other, 0x114694080, {{238.5, 774.0}, {343.0, 44.0}}
-                                Other, 0x1146941a0, {{238.5, 774.0}, {343.0, 44.0}}
-                            Other, 0x1146942c0, {{238.5, 774.0}, {343.0, 44.0}}
-                              Other, 0x1146943e0, {{238.5, 774.0}, {343.0, 44.0}}
-                                Other, 0x114694500, {{238.5, 774.0}, {343.0, 44.0}}
-                                  Switch, 0x114694620, {{238.5, 774.0}, {343.0, 44.0}}, label: 'Pull-up bar', value: 0
-                                    StaticText, 0x114694740, {{254.5, 785.2}, {82.0, 21.5}}, label: 'Pull-up bar'
-                                    Switch, 0x114694860, {{516.5, 780.5}, {51.0, 31.0}}, value: 0
-                          Other, 0x114694980, {{254.5, 773.5}, {327.0, 0.5}}
-                          Cell, 0x114694aa0, {{238.5, 818.0}, {343.0, 44.0}}
-                            Other, 0x114694bc0, {{238.5, 818.0}, {343.0, 44.0}}
-                              Other, 0x114694ce0, {{238.5, 818.0}, {343.0, 44.0}}
-                                Other, 0x114694e00, {{238.5, 818.0}, {343.0, 44.0}}
-                            Other, 0x114694f20, {{238.5, 818.0}, {343.0, 44.0}}
-                              Other, 0x114695040, {{238.5, 818.0}, {343.0, 44.0}}
-                                Other, 0x114695160, {{238.5, 818.0}, {343.0, 44.0}}
-                                  Switch, 0x114695280, {{238.5, 818.0}, {343.0, 44.0}}, label: 'Leg press machine', value: 1
-                                    StaticText, 0x1146953a0, {{254.5, 829.2}, {142.0, 21.5}}, label: 'Leg press machine'
-                                    Switch, 0x1146954c0, {{516.5, 824.5}, {51.0, 31.0}}, value: 1
-                          Other, 0x1146955e0, {{254.5, 817.5}, {327.0, 0.5}}
-                          Other, 0x114695700, {{-16.0, 623.0}, {407.0, 106.0}}
-                          Cell, 0x114695820, {{238.5, 879.5}, {343.0, 44.5}}
-                            Other, 0x114695940, {{238.5, 879.5}, {343.0, 44.5}}
-                            Other, 0x114695a60, {{238.5, 879.5}, {343.0, 44.5}}
-                              Other, 0x114695b80, {{238.5, 879.5}, {343.0, 44.5}}
-                                Other, 0x114695ca0, {{238.5, 879.5}, {343.0, 44.5}}
-                                  StaticText, 0x114695dc0, {{238.5, 879.5}, {343.0, 44.5}}, label: 'How long do you usually train?'
-                          Other, 0x114695ee0, {{564.5, 383.5}, {30.0, 436.0}}, label: 'Vertical scroll bar, 3 pages', value: 0%
-                            Other, 0x114696000, {{591.5, 386.5}, {3.0, 247.5}}
-                          Other, 0x114696120, {{564.5, 383.5}, {30.0, 436.0}}, label: 'Vertical scroll bar, 3 pages', value: 0%
-                            Other, 0x114696240, {{591.5, 386.5}, {3.0, 247.5}}
-                        Button, 0x114696360, {{242.5, 847.5}, {335.0, 56.0}}, label: 'Plan my first workout'
+ →Application, 0x1133e3020, pid: 13961, label: 'ZeroLog'
+    Window (Main), 0x1133eb1a0, {{222.5, 256.5}, {375.0, 667.0}}
+      Other, 0x1133ebe00, {{222.5, 256.5}, {375.0, 667.0}}
+        Other, 0x1133e72c0, {{222.5, 256.5}, {375.0, 667.0}}
+          Other, 0x1133eb9e0, {{222.5, 256.5}, {375.0, 667.0}}
+            Other, 0x1133eb5c0, {{222.5, 256.5}, {375.0, 667.0}}
+              Other, 0x1133edba0, {{222.5, 256.5}, {375.0, 667.0}}
+                NavigationBar, 0x1133edcc0, {{222.5, 276.5}, {375.0, 107.0}}, identifier: 'Your gym'
+                  StaticText, 0x1133edde0, {{238.5, 320.5}, {163.0, 57.5}}, label: 'Your gym'
+                Other, 0x1133edf00, {{222.5, 256.5}, {375.0, 667.0}}
+                  Other, 0x1133ee020, {{222.5, 256.5}, {375.0, 667.0}}
+                    Other, 0x1133ee140, {{222.5, 256.5}, {375.0, 667.0}}
+                      Other, 0x1133ee260, {{222.5, 256.5}, {375.0, 667.0}}
+                        CollectionView, 0x1133ee430, {{222.5, 256.5}, {375.0, 667.0}}
+                          Other, 0x1133ee550, {{-16.0, -1207.0}, {407.0, 1416.0}}
+                          Cell, 0x1133ee670, {{238.5, 383.5}, {343.0, 64.5}}
+                            Other, 0x1133ee790, {{238.5, 383.5}, {343.0, 64.5}}
+                              Other, 0x1133ee8b0, {{238.5, 383.5}, {343.0, 64.5}}
+                                Other, 0x1133ee9d0, {{238.5, 383.5}, {343.0, 64.5}}
+                            Other, 0x1133eeaf0, {{238.5, 383.5}, {343.0, 64.5}}
+                              Other, 0x1133eec10, {{238.5, 383.5}, {343.0, 64.5}}
+                                Other, 0x1133eed30, {{238.5, 383.5}, {343.0, 64.5}}
+                                  StaticText, 0x1133eee50, {{238.5, 383.5}, {343.0, 64.5}}, label: 'Tell ZeroLog what your gym has. It only plans exercises you can actually do there.'
+                          Other, 0x1133eef70, {{-16.0, 209.0}, {407.0, 414.0}}
+                          Cell, 0x1133ef090, {{238.5, 465.5}, {343.0, 44.5}}
+                            Other, 0x1133ef1b0, {{238.5, 465.5}, {343.0, 44.5}}
+                            Other, 0x1133ef2d0, {{238.5, 465.5}, {343.0, 44.5}}
+                              Other, 0x1133ef3f0, {{238.5, 465.5}, {343.0, 44.5}}
+                                Other, 0x1133ef510, {{238.5, 465.5}, {343.0, 44.5}}
+                                  StaticText, 0x1133ef630, {{238.5, 465.5}, {343.0, 44.5}}, label: 'Equipment'
+                          Cell, 0x1136256f0, {{238.5, 510.0}, {343.0, 44.0}}
+                            Other, 0x113624940, {{238.5, 510.0}, {343.0, 44.0}}
+                              Other, 0x113625bc0, {{238.5, 510.0}, {343.0, 44.0}}
+                                Other, 0x113625ce0, {{238.5, 510.0}, {343.0, 44.0}}
+                            Other, 0x113626130, {{238.5, 510.0}, {343.0, 44.0}}
+                              Other, 0x113626250, {{238.5, 510.0}, {343.0, 44.0}}
+                                Other, 0x113626370, {{238.5, 510.0}, {343.0, 44.0}}
+                                  Switch, 0x113626490, {{238.5, 510.0}, {343.0, 44.0}}, label: 'Barbell', value: 0
+                                    StaticText, 0x1136265b0, {{254.5, 521.2}, {52.0, 21.5}}, label: 'Barbell'
+                                    Switch, 0x1136266d0, {{516.5, 516.5}, {51.0, 31.0}}, value: 0
+                          Cell, 0x1136267f0, {{238.5, 554.0}, {343.0, 44.0}}
+                            Other, 0x113626910, {{238.5, 554.0}, {343.0, 44.0}}
+                              Other, 0x113626a30, {{238.5, 554.0}, {343.0, 44.0}}
+                                Other, 0x113627080, {{238.5, 554.0}, {343.0, 44.0}}
+                            Other, 0x1136271a0, {{238.5, 554.0}, {343.0, 44.0}}
+                              Other, 0x1136272c0, {{238.5, 554.0}, {343.0, 44.0}}
+                                Other, 0x1136273e0, {{238.5, 554.0}, {343.0, 44.0}}
+                                  Switch, 0x113627500, {{238.5, 554.0}, {343.0, 44.0}}, label: 'Squat rack', value: 0
+                                    StaticText, 0x113627620, {{254.5, 565.2}, {80.0, 21.5}}, label: 'Squat rack'
+                                    Switch, 0x113627740, {{516.5, 560.5}, {51.0, 31.0}}, value: 0
+                          Other, 0x113627860, {{254.5, 553.5}, {327.0, 0.5}}
+                          Cell, 0x113627980, {{238.5, 598.0}, {343.0, 44.0}}
+                            Other, 0x113627aa0, {{238.5, 598.0}, {343.0, 44.0}}
+                              Other, 0x113627bc0, {{238.5, 598.0}, {343.0, 44.0}}
+                                Other, 0x113627ce0, {{238.5, 598.0}, {343.0, 44.0}}
+                            Other, 0x113627e00, {{238.5, 598.0}, {343.0, 44.0}}
+                              Other, 0x113627f20, {{238.5, 598.0}, {343.0, 44.0}}
+                                Other, 0x113628040, {{238.5, 598.0}, {343.0, 44.0}}
+                                  Switch, 0x113628160, {{238.5, 598.0}, {343.0, 44.0}}, label: 'Flat bench', value: 0
+                                    StaticText, 0x113628280, {{254.5, 609.2}, {78.5, 21.5}}, label: 'Flat bench'
+                                    Switch, 0x1136283a0, {{516.5, 604.5}, {51.0, 31.0}}, value: 0
+                          Other, 0x11362b070, {{254.5, 597.5}, {327.0, 0.5}}
+                          Cell, 0x11362b190, {{238.5, 642.0}, {343.0, 44.0}}
+                            Other, 0x11362b2b0, {{238.5, 642.0}, {343.0, 44.0}}
+                              Other, 0x11362b3d0, {{238.5, 642.0}, {343.0, 44.0}}
+                                Other, 0x11362b4f0, {{238.5, 642.0}, {343.0, 44.0}}
+                            Other, 0x11362b610, {{238.5, 642.0}, {343.0, 44.0}}
+                              Other, 0x11362b730, {{238.5, 642.0}, {343.0, 44.0}}
+                                Other, 0x11362b850, {{238.5, 642.0}, {343.0, 44.0}}
+                                  Switch, 0x11362b970, {{238.5, 642.0}, {343.0, 44.0}}, label: 'Dumbbells', value: 0
+                                    StaticText, 0x11362ba90, {{254.5, 653.2}, {79.5, 21.5}}, label: 'Dumbbells'
+                                    Switch, 0x11362bbb0, {{516.5, 648.5}, {51.0, 31.0}}, value: 0
+                          Other, 0x11362bcd0, {{254.5, 641.5}, {327.0, 0.5}}
+                          Cell, 0x11362bdf0, {{238.5, 686.0}, {343.0, 44.0}}
+                            Other, 0x11362bf10, {{238.5, 686.0}, {343.0, 44.0}}
+                              Other, 0x11362c030, {{238.5, 686.0}, {343.0, 44.0}}
+                                Other, 0x11362c150, {{238.5, 686.0}, {343.0, 44.0}}
+                            Other, 0x11362c270, {{238.5, 686.0}, {343.0, 44.0}}
+                              Other, 0x11362c390, {{238.5, 686.0}, {343.0, 44.0}}
+                                Other, 0x11362c4b0, {{238.5, 686.0}, {343.0, 44.0}}
+                                  Switch, 0x11362c5d0, {{238.5, 686.0}, {343.0, 44.0}}, label: 'Cable machine', value: 0
+                                    StaticText, 0x11362c6f0, {{254.5, 697.2}, {112.0, 21.5}}, label: 'Cable machine'
+                                    Switch, 0x11362c810, {{516.5, 692.5}, {51.0, 31.0}}, value: 0
+                          Other, 0x11362c930, {{254.5, 685.5}, {327.0, 0.5}}
+                          Cell, 0x11362ca50, {{238.5, 730.0}, {343.0, 44.0}}
+                            Other, 0x11362cb70, {{238.5, 730.0}, {343.0, 44.0}}
+                              Other, 0x11362cc90, {{238.5, 730.0}, {343.0, 44.0}}
+                                Other, 0x11362cdb0, {{238.5, 730.0}, {343.0, 44.0}}
+                            Other, 0x11362ced0, {{238.5, 730.0}, {343.0, 44.0}}
+                              Other, 0x11362cff0, {{238.5, 730.0}, {343.0, 44.0}}
+                                Other, 0x11362d110, {{238.5, 730.0}, {343.0, 44.0}}
+                                  Switch, 0x11362d230, {{238.5, 730.0}, {343.0, 44.0}}, label: 'Lat pulldown machine', value: 0
+                                    StaticText, 0x11362d350, {{254.5, 741.2}, {163.5, 21.5}}, label: 'Lat pulldown machine'
+                                    Switch, 0x11362d470, {{516.5, 736.5}, {51.0, 31.0}}, value: 0
+                          Other, 0x11362d590, {{254.5, 729.5}, {327.0, 0.5}}
+                          Cell, 0x11362d6b0, {{238.5, 774.0}, {343.0, 44.0}}
+                            Other, 0x11362d7d0, {{238.5, 774.0}, {343.0, 44.0}}
+                              Other, 0x11362d8f0, {{238.5, 774.0}, {343.0, 44.0}}
+                                Other, 0x11362da10, {{238.5, 774.0}, {343.0, 44.0}}
+                            Other, 0x11362db30, {{238.5, 774.0}, {343.0, 44.0}}
+                              Other, 0x11362dc50, {{238.5, 774.0}, {343.0, 44.0}}
+                                Other, 0x11362dd70, {{238.5, 774.0}, {343.0, 44.0}}
+                                  Switch, 0x11362de90, {{238.5, 774.0}, {343.0, 44.0}}, label: 'Pull-up bar', value: 0
+                                    StaticText, 0x11362dfe0, {{254.5, 785.2}, {82.0, 21.5}}, label: 'Pull-up bar'
+                                    Switch, 0x11362e100, {{516.5, 780.5}, {51.0, 31.0}}, value: 0
+                          Other, 0x11362e220, {{254.5, 773.5}, {327.0, 0.5}}
+                          Cell, 0x11362e340, {{238.5, 818.0}, {343.0, 44.0}}
+                            Other, 0x11362e460, {{238.5, 818.0}, {343.0, 44.0}}
+                              Other, 0x11362e580, {{238.5, 818.0}, {343.0, 44.0}}
+                                Other, 0x11362e6a0, {{238.5, 818.0}, {343.0, 44.0}}
+                            Other, 0x11362e7c0, {{238.5, 818.0}, {343.0, 44.0}}
+                              Other, 0x11362e8e0, {{238.5, 818.0}, {343.0, 44.0}}
+                                Other, 0x11362ea00, {{238.5, 818.0}, {343.0, 44.0}}
+                                  Switch, 0x11362eb20, {{238.5, 818.0}, {343.0, 44.0}}, label: 'Leg press machine', value: 1
+                                    StaticText, 0x11362ec40, {{254.5, 829.2}, {142.0, 21.5}}, label: 'Leg press machine'
+                                    Switch, 0x11362ed60, {{516.5, 824.5}, {51.0, 31.0}}, value: 1
+                          Other, 0x11362ee80, {{254.5, 817.5}, {327.0, 0.5}}
+                          Other, 0x11362efa0, {{-16.0, 623.0}, {407.0, 106.0}}
+                          Cell, 0x11362f0c0, {{238.5, 879.5}, {343.0, 44.5}}
+                            Other, 0x11362f1e0, {{238.5, 879.5}, {343.0, 44.5}}
+                            Other, 0x11362f300, {{238.5, 879.5}, {343.0, 44.5}}
+                              Other, 0x11362f420, {{238.5, 879.5}, {343.0, 44.5}}
+                                Other, 0x11362f540, {{238.5, 879.5}, {343.0, 44.5}}
+                                  StaticText, 0x11362f660, {{238.5, 879.5}, {343.0, 44.5}}, label: 'How long do you usually train?'
+                          Other, 0x11362f780, {{564.5, 383.5}, {30.0, 436.0}}, label: 'Vertical scroll bar, 3 pages', value: 0%
+                            Other, 0x11362f8a0, {{591.5, 386.5}, {3.0, 247.5}}
+                          Other, 0x11362f9c0, {{564.5, 383.5}, {30.0, 436.0}}, label: 'Vertical scroll bar, 3 pages', value: 0%
+                            Other, 0x11362fae0, {{591.5, 386.5}, {3.0, 247.5}}
+                        Button, 0x11362fc00, {{242.5, 847.5}, {335.0, 56.0}}, label: 'Plan my first workout'
 Path to element:
- →Application, 0x11468a890, pid: 12092, label: 'ZeroLog'
+ →Application, 0x1133e3020, pid: 13961, label: 'ZeroLog'
 Query chain:
  →Find: Target Application 'com.getzerolog.app'
   Output: {
-    Application, 0x11467b430, pid: 12092, label: 'ZeroLog'
+    Application, 0x1133eccc0, pid: 13961, label: 'ZeroLog'
   }
 )
 === TREE DUMP END ===
