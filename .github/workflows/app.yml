@@ -109,8 +109,8 @@ jobs:
           set -e
           mkdir -p ../docs/ci
           if [ "$STATUS" -ne 0 ]; then
-            grep -E "Test Case .* (failed|passed)|error:|Assertion Failure|exceeded.*time allowance" behaviour-tests.log \
-              | tail -40 > ../docs/ci/behaviour-test-errors.txt || true
+            grep -E "Test Case .* (failed|passed)|error:|Assertion Failure|exceeded.*time allowance|is not running|[Cc]rash|Restarting|terminated" behaviour-tests.log \
+              | tail -60 > ../docs/ci/behaviour-test-errors.txt || true
             [ -s ../docs/ci/behaviour-test-errors.txt ] || tail -40 behaviour-tests.log > ../docs/ci/behaviour-test-errors.txt
           else
             : > ../docs/ci/behaviour-test-errors.txt
@@ -119,10 +119,16 @@ jobs:
           # crashes on alternate boots. A crash names itself in its report;
           # commit the reports instead of guessing at the stack.
           rm -rf ../docs/ci/crashes && mkdir -p ../docs/ci/crashes
-          find ~/Library/Logs/DiagnosticReports -name "ZeroLog*" -newermt "-30 minutes" 2>/dev/null | head -4 | while read -r f; do
+          # -mmin, not -newermt "-30 minutes": macOS find is BSD find, which
+          # rejects GNU relative dates SILENTLY under 2>/dev/null -- the first
+          # collection run gathered nothing while the app crash-looped on
+          # camera. Also sweep the simulator-side report directory.
+          for dir in ~/Library/Logs/DiagnosticReports ~/Library/Logs/CoreSimulator; do
+            find "$dir" \( -name "ZeroLog*.ips" -o -name "ZeroLog*.crash" \) -mmin -40 2>/dev/null
+          done | head -4 | while read -r f; do
             head -c 20000 "$f" > "../docs/ci/crashes/$(basename "$f").txt"
           done
-          ls ../docs/ci/crashes/ || true
+          ls -la ../docs/ci/crashes/ || true
           exit $STATUS
 
       # The diagnosis must survive the runner. Same contract as the other

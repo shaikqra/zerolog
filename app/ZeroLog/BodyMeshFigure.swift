@@ -210,16 +210,20 @@ enum BodyScene {
         bodyRoot.removeFromParentNode()
         spinPivot.addChildNode(bodyRoot)
 
-        // Camera: distance derived from the (now known) height and FOV.
+        // ORTHOGRAPHIC camera, and that is the fix for a hero that rendered
+        // on one commit and came up black on the next: with perspective, what
+        // fits depends on distance, field of view, projection direction and
+        // the exact pixel size SwiftUI hands the view -- four quantities that
+        // must all agree, and whose disagreement looks like an empty box.
+        // Orthographic has ONE number: visible height = 2 x orthographicScale,
+        // true at any view size. Body is 1.6 tall; 0.9 shows it with margin.
         let camera = SCNCamera()
-        camera.projectionDirection = .vertical
-        camera.fieldOfView = 18
+        camera.usesOrthographicProjection = true
+        camera.orthographicScale = 0.9
         camera.zNear = 0.1; camera.zFar = 30
-        let fovRadians = 18.0 * .pi / 180.0
-        let distance = Double(1.6) * 1.12 / (2 * tan(fovRadians / 2))
         let camNode = SCNNode()
         camNode.camera = camera
-        camNode.position = SCNVector3(0, 0, Float(distance))
+        camNode.position = SCNVector3(0, 0, 6)
         scene.rootNode.addChildNode(camNode)
 
         // The preview renders' three-light rig: two rims for silhouette, one
