@@ -1,8 +1,8 @@
-Test Case '-[ZeroLogUITests.BehaviourTests testALoggedSetReachesHistoryWithTheNumbersItWasLoggedWith]' passed (54.450 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:186: error: -[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone] : XCTAssertTrue failed - an automatic change was shown with no way to undo it
-Test Case '-[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone]' failed (98.930 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testHistorySurvivesRelaunch]' passed (29.938 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser]' passed (43.377 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:69: error: -[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment] : XCTAssertTrue failed - refusing without saying why breaks the show-the-reason rule
-Test Case '-[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment]' failed (20.801 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded]' passed (14.192 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testALoggedSetReachesHistoryWithTheNumbersItWasLoggedWith]' passed (44.797 seconds).
+/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:197: error: -[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone] : failed - an automatic change was shown with no way to undo it
+Test Case '-[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone]' failed (64.581 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testHistorySurvivesRelaunch]' passed (26.351 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser]' passed (31.084 seconds).
+/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:74: error: -[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment] : XCTAssertTrue failed - refusing without saying why breaks the show-the-reason rule
+Test Case '-[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment]' failed (17.854 seconds).
+Test Case '-[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded]' passed (16.976 seconds).
