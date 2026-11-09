@@ -66,17 +66,17 @@ final class BehaviourTests: XCTestCase {
             }) {
                 sw.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
             } else if anyToggleOn() {
-                app.swipeUp()   // bring covered or off-screen toggles clear
+                dragUp()   // scroll covered toggles clear of the button
             } else {
                 // No ON toggle among materialised rows -- but a scrolled-away
                 // one de-materialises and reads as off. Look back up before
                 // believing the list is clean.
-                app.swipeDown(); app.swipeDown()
+                scrollToTop()
                 if !anyToggleOn() { break }
             }
         }
         // Final verification from the top, where early rows re-materialise.
-        app.swipeDown(); app.swipeDown()
+        scrollToTop()
         if anyToggleOn() {
             // Name the survivor: which switch is still on, and where.
             print("=== TREE DUMP BEGIN (equipment stuck on) ===")
@@ -406,14 +406,25 @@ final class BehaviourTests: XCTestCase {
         }
     }
 
-    /// Scrolls by dragging the BOTTOM strip of the screen upward. app.swipeUp
-    /// starts mid-screen, which on Today lands on the 3D body -- and whatever
-    /// view sits mid-screen can swallow the gesture. The bottom strip is
-    /// always list.
+    /// Scrolls to the bottom of the current list. On the iOS 27 simulator,
+    /// synthesized swipes and drags do not scroll SwiftUI lists AT ALL (a
+    /// filmed run shows 22 seconds of sweeping move nothing while every tap
+    /// lands), so the app exposes flag-gated one-point scroll hooks and the
+    /// tests drive the same scrolling machinery a real finger does.
     private func dragUp() {
-        let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.80))
-        let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
-        from.press(forDuration: 0.05, thenDragTo: to)
+        let hook = app.buttons["test-scroll-bottom"].firstMatch
+        if hook.exists {
+            hook.tap()
+        } else {
+            let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.80))
+            let to = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.25))
+            from.press(forDuration: 0.05, thenDragTo: to)
+        }
+    }
+
+    private func scrollToTop() {
+        let hook = app.buttons["test-scroll-top"].firstMatch
+        if hook.exists { hook.tap() }
     }
 }
 

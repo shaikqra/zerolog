@@ -15,11 +15,13 @@ struct OnboardingView: View {
 
     var body: some View {
         NavigationStack {
+            ScrollViewReader { proxy in
             Form {
                 Text("Tell ZeroLog what your gym has. It only plans exercises you can actually do there.")
                     .font(.ui(17))
                     .foregroundStyle(Color.textSecondary)
                     .listRowBackground(Color.clear)
+                    .testScrollAnchor("list-top")
                 EquipmentSection(types: model.catalog?.equipmentTypes ?? [], selected: $equipment)
                 Section {
                     MinutesPicker(minutes: $minutes)
@@ -48,9 +50,11 @@ struct OnboardingView: View {
                          + "guessing on day one. After that your last session decides.")
                         .font(.ui(13))
                         .foregroundStyle(Color.textSecondary)
+                        .testScrollAnchor("list-bottom")
                 }
                 .listRowBackground(Color.surface)
             }
+            .overlay(alignment: .topTrailing) { TestScrollHooks(proxy: proxy) }
             .darkList()
             .navigationTitle("Your gym")
             .safeAreaInset(edge: .bottom) {
@@ -70,6 +74,7 @@ struct OnboardingView: View {
                     equipment = Set(model.catalog?.equipmentTypes.map(\.id) ?? [])
                 }
             }
+            }   // ScrollViewReader
         }
     }
 }

@@ -16,6 +16,7 @@ struct TodayView: View {
         NavigationStack {
             Group {
                 if let plan = model.plan {
+                    ScrollViewReader { proxy in
                     List {
                         // THE one decisive move. What today is was previously a
                         // navigation title in chrome type, while the scoreboard
@@ -29,6 +30,7 @@ struct TodayView: View {
                         // see the body, the day sits below it.
                         BodyMeshFigure(sessionType: plan.sessionType,
                                        focus: focusedMuscle)
+                            .testScrollAnchor("list-top")
                             .frame(maxWidth: .infinity)
                             // One motion at a time: the camera flies INSIDE
                             // this box, so the box itself holds still. A view
@@ -113,7 +115,13 @@ struct TodayView: View {
                             }
                             .listRowBackground(Color.surface)
                         }
+                        Color.clear
+                            .frame(height: 1)
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                            .testScrollAnchor("list-bottom")
                     }
+                    .overlay(alignment: .topTrailing) { TestScrollHooks(proxy: proxy) }
                     .darkList()
                     // The large title already renders in the scoreboard face,
                     // so it IS the focal point -- my first attempt added a hero
@@ -127,6 +135,7 @@ struct TodayView: View {
                             .padding(20)
                             .disabled(plan.exercises.isEmpty)
                     }
+                    }   // ScrollViewReader
                 } else {
                     ContentUnavailableView(
                         "Today's workout isn't ready",
