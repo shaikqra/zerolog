@@ -65,6 +65,10 @@ final class BehaviourTests: XCTestCase {
                     && $0.frame.minY > 240 && $0.frame.maxY < buttonTop - 60
             }) {
                 sw.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
+                // Let the toggle's animation settle: re-querying too fast
+                // reads the old "on" value and the loop taps AGAIN, flipping
+                // the switch straight back.
+                usleep(400_000)
             } else if anyToggleOn() {
                 dragUp()   // scroll covered toggles clear of the button
             } else {
@@ -221,11 +225,12 @@ final class BehaviourTests: XCTestCase {
         logOneSetAndSave(atTopOfRange: true)
         logOneSetAndSave(atTopOfRange: true)
 
-        // The body-first layout puts the change section below the fold, and a
-        // lazy list does not materialise what has never been on screen:
-        // scroll as a human would before concluding it is not there.
+        // The change section now sits directly under the day tab, where news
+        // that important belongs. From the top of the list it materialises
+        // without any scrolling.
+        scrollToTop()
         let changed = app.staticTexts["What I changed"]
-        for _ in 0..<5 where !changed.exists { dragUp() }
+        for _ in 0..<3 where !changed.exists { dragUp() }
         guard changed.waitForExistence(timeout: 8) else {
             // The engine passes this exact walk on Linux, so when the phone
             // disagrees the evidence must name the difference. Every plan row
@@ -268,7 +273,9 @@ final class BehaviourTests: XCTestCase {
             XCTFail("an automatic change was shown with no way to undo it")
             return
         }
-        undo.tap()
+        // Coordinate tap: a partially-below-the-fold element makes .tap()
+        // attempt the AX auto-scroll that is broken on this simulator.
+        undo.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         XCTAssertTrue(waitForDisappearance(of: changed, timeout: 15),
                       "Undo left the change in place")
     }

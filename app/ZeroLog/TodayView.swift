@@ -62,6 +62,23 @@ struct TodayView: View {
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                         }
+                        // The engine's changes come FIRST after the day tab:
+                        // red means "the engine changed something", and news
+                        // that important must not live three pages deep -- a
+                        // committed element tree showed the raise rendering
+                        // correctly on a row nobody could reach. What changed,
+                        // why, and the undo, at the top where the eye lands.
+                        let changes = plan.exercises.filter { $0.change != nil }
+                        if !changes.isEmpty {
+                            Section {
+                                ForEach(changes, id: \.exerciseId) { item in
+                                    ChangeRow(item: item, unit: plan.unit) { model.undoChange(item.exerciseId) }
+                                }
+                            } header: {
+                                SectionTitle("What I changed")
+                            }
+                            .listRowBackground(Color.surface)
+                        }
                         // Hidden until there is something true to say; a fresh
                         // install must not greet anyone with zeros.
                         if model.progress.hasAnything {
@@ -77,17 +94,6 @@ struct TodayView: View {
                                 Label(problem, systemImage: "exclamationmark.triangle")
                                     .font(.ui(16))
                                     .foregroundStyle(Color.textPrimary)
-                            }
-                            .listRowBackground(Color.surface)
-                        }
-                        let changes = plan.exercises.filter { $0.change != nil }
-                        if !changes.isEmpty {
-                            Section {
-                                ForEach(changes, id: \.exerciseId) { item in
-                                    ChangeRow(item: item, unit: plan.unit) { model.undoChange(item.exerciseId) }
-                                }
-                            } header: {
-                                SectionTitle("What I changed")
                             }
                             .listRowBackground(Color.surface)
                         }
