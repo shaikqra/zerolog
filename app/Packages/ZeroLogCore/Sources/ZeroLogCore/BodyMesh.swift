@@ -21,6 +21,28 @@ public struct BodyMesh: Sendable {
 
         public var vertexCount: Int { vertices.count / 3 }
         public var triangleCount: Int { indices.count / 3 }
+
+        /// Where this muscle sits in space: centre of its bounding box and
+        /// the radius that encloses it. This is what the camera flies to
+        /// when the user asks to see one muscle, so it is computed in Core
+        /// where a Linux test can assert every group lands INSIDE the body
+        /// instead of discovering a camera pointed at empty air on a Mac.
+        public var bounds: (center: (x: Float, y: Float, z: Float), radius: Float) {
+            var lo = (Float.greatestFiniteMagnitude, Float.greatestFiniteMagnitude, Float.greatestFiniteMagnitude)
+            var hi = (-Float.greatestFiniteMagnitude, -Float.greatestFiniteMagnitude, -Float.greatestFiniteMagnitude)
+            var i = 0
+            while i + 2 < vertices.count {
+                lo.0 = min(lo.0, vertices[i]);   hi.0 = max(hi.0, vertices[i])
+                lo.1 = min(lo.1, vertices[i+1]); hi.1 = max(hi.1, vertices[i+1])
+                lo.2 = min(lo.2, vertices[i+2]); hi.2 = max(hi.2, vertices[i+2])
+                i += 3
+            }
+            guard !vertices.isEmpty else { return ((0, 0, 0), 0) }
+            let c = ((lo.0 + hi.0) / 2, (lo.1 + hi.1) / 2, (lo.2 + hi.2) / 2)
+            let ext = (hi.0 - lo.0, hi.1 - lo.1, hi.2 - lo.2)
+            let radius = max(ext.0, max(ext.1, ext.2)) / 2
+            return ((c.0, c.1, c.2), radius)
+        }
     }
 
     public let groups: [Group]

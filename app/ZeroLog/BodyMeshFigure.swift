@@ -17,10 +17,13 @@ import ZeroLogCore
 /// - Reduce Motion: no spin, straight to the resting pose.
 struct BodyMeshFigure: View {
     let sessionType: String
+    /// Mesh group id to zoom to and flex, nil = whole body. Owned by the
+    /// Today screen: tapping a muscle chip flies the camera here.
+    var focus: String? = nil
     @State private var drawReport = "rendering"
 
     var body: some View {
-        BodySceneView(sessionType: sessionType, drawReport: $drawReport)
+        BodySceneView(sessionType: sessionType, focus: focus, drawReport: $drawReport)
             .aspectRatio(0.62, contentMode: .fit)
             // The CI video caught the figure painting over the plan list:
             // an SCNView does not respect SwiftUI bounds on its own.
@@ -38,6 +41,7 @@ struct BodyMeshFigure: View {
 
 private struct BodySceneView: UIViewRepresentable {
     let sessionType: String
+    var focus: String?
     @Binding var drawReport: String
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -94,6 +98,11 @@ private struct BodySceneView: UIViewRepresentable {
             view.scene = BodyScene.build(sessionType: sessionType)
             view.scene?.rootNode.childNode(withName: "spinPivot", recursively: false)?
                 .eulerAngles.y = BodyScene.restingAngle(for: sessionType)
+            context.coordinator.focusedGroup = nil
+        }
+        if context.coordinator.focusedGroup != focus {
+            context.coordinator.focusedGroup = focus
+            context.coordinator.focus(on: focus, animated: !skipAnimation)
         }
     }
 
@@ -119,17 +128,74 @@ private struct BodySceneView: UIViewRepresentable {
     /// knowing which way is forward.
     final class Coordinator: NSObject {
         var sessionType: String
+        var focusedGroup: String?
         weak var view: SCNView?
         init(sessionType: String) { self.sessionType = sessionType }
 
         @objc func pan(_ g: UIPanGestureRecognizer) {
-            guard let view,
+            guard let view, focusedGroup == nil,   // zoomed in, the camera owns the view
                   let body = view.scene?.rootNode.childNode(withName: "spinPivot",
                                                             recursively: false) else { return }
             let dx = Float(g.translation(in: view).x)
             g.setTranslation(.zero, in: view)
             body.removeAllActions()
             body.eulerAngles.y += dx * 0.012
+        }
+
+        /// These live on the body's back, so the figure turns around before
+        /// the camera closes in — zooming to lats while facing the chest
+        /// would frame the right place on the wrong side.
+        private static let backMuscles: Set<String> =
+            ["lats", "traps", "hams", "glutes", "calves", "triceps"]
+
+        /// Fly the camera to one muscle and flex it, or home to the whole body.
+        func focus(on group: String?, animated: Bool) {
+            guard let view, let scene = view.scene,
+                  let pivot = scene.rootNode.childNode(withName: "spinPivot", recursively: false),
+                  let bodyRoot = pivot.childNode(withName: "bodyRoot", recursively: false),
+                  let camNode = scene.rootNode.childNodes.first(where: { $0.camera != nil }),
+                  let camera = camNode.camera else { return }
+
+            pivot.removeAllActions()
+            SCNTransaction.begin()
+            SCNTransaction.animationDuration = animated ? 0.9 : 0
+            SCNTransaction.animationTimingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+
+            if let group,
+               let node = bodyRoot.childNode(withName: group, recursively: false),
+               let bounds = BodyScene.bounds(of: group) {
+                // The mesh was normalised at build time (scaled to 1.6 tall,
+                // centred); the camera target needs the same transform.
+                let s = bodyRoot.scale.x
+                let showBack = Self.backMuscles.contains(group)
+                let localX = bounds.center.x * s + bodyRoot.position.x
+                let worldY = bounds.center.y * s + bodyRoot.position.y
+                pivot.eulerAngles.y = showBack ? .pi : 0
+                // A pi turn about y negates x for everything the pivot holds.
+                camNode.position = SCNVector3(showBack ? -localX : localX, worldY, 6)
+                camera.orthographicScale = Double(max(bounds.radius * s * 1.5, 0.22))
+                SCNTransaction.commit()
+                if animated { flex(node) }
+            } else {
+                pivot.eulerAngles.y = BodyScene.restingAngle(for: sessionType)
+                camNode.position = SCNVector3(0, 0, 6)
+                camera.orthographicScale = 0.9
+                SCNTransaction.commit()
+            }
+        }
+
+        /// The flex: the muscle throbs brighter twice under the skin. The
+        /// mesh is a statue, not a puppet — no joints to bend — so the flex
+        /// is light, not movement, and Reduce Motion skips it entirely.
+        private func flex(_ node: SCNNode) {
+            guard let material = node.geometry?.firstMaterial else { return }
+            let up = SCNAction.customAction(duration: 0.45) { _, t in
+                material.emission.intensity = 1 + 2.4 * (t / 0.45)
+            }
+            let down = SCNAction.customAction(duration: 0.45) { _, t in
+                material.emission.intensity = 3.4 - 2.4 * (t / 0.45)
+            }
+            node.runAction(.sequence([.wait(duration: 0.6), up, down, up, down]))
         }
     }
 }
@@ -144,7 +210,7 @@ enum BodyScene {
     static func litGroups(for sessionType: String) -> Set<String> {
         switch sessionType {
         case "pull": return ["traps", "lats", "biceps", "forearm"]
-        case "legs": return ["quads", "hams", "glutes", "adds", "calves"]
+        case "legs": return ["quads", "hams", "glutes", "calves"]
         default:     return ["chest", "delts", "triceps"]
         }
     }
@@ -155,6 +221,13 @@ enum BodyScene {
     /// during build and read before it, reporting "not built yet" about a
     /// body that rendered fine.
     static let loaded: Result<BodyMesh, Error> = Result { try BodyMesh.bundled() }
+
+    /// Per-group camera targets, from the Core mesh the tests proved.
+    static func bounds(of group: String) -> (center: (x: Float, y: Float, z: Float), radius: Float)? {
+        guard case .success(let mesh) = loaded,
+              let g = mesh.groups.first(where: { $0.name == group }) else { return nil }
+        return g.bounds
+    }
 
     /// What actually loaded, for the accessibility label and the UI tests.
     static var diagnostic: String {

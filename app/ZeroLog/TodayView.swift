@@ -4,6 +4,13 @@ import ZeroLogCore
 /// Today's workout, straight from the engine, with a button to start it.
 struct TodayView: View {
     @Environment(AppModel.self) private var model
+    /// The muscle the camera is parked on, nil = whole body. The founder's
+    /// spec, verbatim: press the day, zoom to the body part being trained;
+    /// pick triceps, the triceps flex. The body IS the navigation.
+    @State private var focusedMuscle: String? = nil
+    @State private var muscleMode = false
+
+    private static let catalog = try? Catalog.bundled()
 
     var body: some View {
         NavigationStack {
@@ -16,18 +23,41 @@ struct TodayView: View {
                         // every exercise row equally. A screen reads flat when
                         // it opts out of its own best move for the thing that
                         // matters most, which is exactly what this did.
-                        SessionHero(summary: summary(plan),
-                                    upcoming: model.upcoming)
-                            .listRowBackground(Color.clear)
-                        // The figure: today's muscles, lit. It carries the same
-                        // fact as the title ("Legs day") in a form you can read
-                        // from across a gym bag, so the two are one statement,
-                        // not two competing ones.
-                        BodyMeshFigure(sessionType: plan.sessionType)
+                        // The body comes FIRST and takes the screen: it is not
+                        // an illustration above a list, it is the way in. The
+                        // founder asked for exactly this order -- open the app,
+                        // see the body, the day sits below it.
+                        BodyMeshFigure(sessionType: plan.sessionType,
+                                       focus: focusedMuscle)
                             .frame(maxWidth: .infinity)
-                            .frame(height: 260)
+                            .frame(height: muscleMode ? 300 : 380)
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
+                            .animation(.easeInOut(duration: 0.4), value: muscleMode)
+                        // The day tab. Tapping it opens the body up: the camera
+                        // flies to today's first muscle and a chip per muscle
+                        // appears -- pick one and that muscle flexes while the
+                        // plan below narrows to its exercises.
+                        DayTab(summary: summary(plan),
+                               upcoming: model.upcoming,
+                               isOpen: muscleMode) {
+                            withAnimation(.easeInOut(duration: 0.4)) {
+                                muscleMode.toggle()
+                                focusedMuscle = muscleMode ? todayGroups(plan).first : nil
+                            }
+                        }
+                        .listRowBackground(Color.surface)
+                        .listRowSeparator(.hidden)
+                        if muscleMode {
+                            MuscleChips(groups: todayGroups(plan),
+                                        selected: focusedMuscle) { group in
+                                withAnimation(.easeInOut(duration: 0.3)) {
+                                    focusedMuscle = (focusedMuscle == group) ? nil : group
+                                }
+                            }
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                        }
                         // Hidden until there is something true to say; a fresh
                         // install must not greet anyone with zeros.
                         if model.progress.hasAnything {
@@ -58,7 +88,7 @@ struct TodayView: View {
                             .listRowBackground(Color.surface)
                         }
                         Section {
-                            ForEach(plan.exercises, id: \.exerciseId) { item in
+                            ForEach(visibleExercises(plan), id: \.exerciseId) { item in
                                 NavigationLink {
                                     HowToView(exerciseId: item.exerciseId)
                                 } label: {
@@ -66,7 +96,7 @@ struct TodayView: View {
                                 }
                             }
                         } header: {
-                            SectionTitle("Today's plan")
+                            SectionTitle(planHeader)
                         }
                         .listRowBackground(Color.surface)
                         if !plan.skipped.isEmpty {
@@ -113,6 +143,32 @@ struct TodayView: View {
         Binding(get: { model.active != nil }, set: { _ in })
     }
 
+    /// Today's muscles, in plan order, deduplicated — one chip each.
+    private func todayGroups(_ plan: Workout) -> [String] {
+        var seen = Set<String>(), ordered: [String] = []
+        for item in plan.exercises {
+            guard let pattern = Self.catalog?.exercise(id: item.exerciseId)?.pattern else { continue }
+            for g in MuscleMap.groups(for: pattern) where seen.insert(g).inserted {
+                ordered.append(g)
+            }
+        }
+        return ordered
+    }
+
+    /// The plan, narrowed to the focused muscle when there is one.
+    private func visibleExercises(_ plan: Workout) -> [PlannedExercise] {
+        guard let focusedMuscle else { return plan.exercises }
+        return plan.exercises.filter { item in
+            guard let pattern = Self.catalog?.exercise(id: item.exerciseId)?.pattern else { return true }
+            return MuscleMap.groups(for: pattern).contains(focusedMuscle)
+        }
+    }
+
+    private var planHeader: String {
+        guard let focusedMuscle else { return "Today's plan" }
+        return "\(MuscleMap.spoken(focusedMuscle)) exercises"
+    }
+
     /// "4 moves, about 38 minutes."
     private func summary(_ plan: Workout) -> String {
         let moves = plan.exercises.count == 1 ? "1 move" : "\(plan.exercises.count) moves"
@@ -120,26 +176,70 @@ struct TodayView: View {
     }
 }
 
-/// What supports the title: how long today is, and what follows it.
-///
-/// Deliberately carries NO heading of its own. The navigation large title
-/// already sets the session name in the scoreboard face, and an earlier
-/// version repeated it here -- two large headings, the less important one
-/// bigger. One focal point per screen.
-struct SessionHero: View {
+/// The day tab under the body: what today is, how long, what follows —
+/// and the way into the muscles. Carries no heading of its own; the
+/// navigation large title owns the session name (one focal point).
+struct DayTab: View {
     let summary: String
     let upcoming: [UpcomingSession]
+    let isOpen: Bool
+    let open: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(summary)
-                .font(.ui(16))
-                .foregroundStyle(Color.textSecondary)
-            UpcomingRow(upcoming: upcoming)
-                .padding(.top, 2)
+        Button(action: open) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(summary)
+                        .font(.ui(16))
+                        .foregroundStyle(Color.textSecondary)
+                    UpcomingRow(upcoming: upcoming)
+                        .padding(.top, 2)
+                }
+                Spacer(minLength: 12)
+                HStack(spacing: 5) {
+                    Text(isOpen ? "Close" : "Muscles")
+                        .font(.ui(14, bold: true))
+                    Image(systemName: isOpen ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 11, weight: .bold))
+                }
+                .foregroundStyle(Color.textPrimary)
+            }
+            .padding(.vertical, 6)
+            .contentShape(Rectangle())
         }
-        .padding(.vertical, 4)
-        .accessibilityElement(children: .combine)
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(summary) \(isOpen ? "Close the muscle view" : "Show today's muscles")")
+        .accessibilityIdentifier("DayTab")
+    }
+}
+
+/// One chip per muscle today trains. Tapping a chip flies the camera to it
+/// and the muscle flexes; tapping again returns to the whole body.
+struct MuscleChips: View {
+    let groups: [String]
+    let selected: String?
+    let pick: (String) -> Void
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(groups, id: \.self) { group in
+                    let isOn = group == selected
+                    Text(MuscleMap.spoken(group))
+                        .font(.ui(15, bold: true))
+                        .foregroundStyle(isOn ? Color.black : Color.textPrimary)
+                        .padding(.horizontal, 14)
+                        .frame(minHeight: 36)
+                        .background(isOn ? Color.white : Color.clear, in: Capsule())
+                        .overlay(Capsule().stroke(isOn ? Color.clear : Color.lineStrong))
+                        .contentShape(Capsule())
+                        .onTapGesture { pick(group) }
+                        .accessibilityAddTraits(isOn ? [.isButton, .isSelected] : .isButton)
+                        .accessibilityIdentifier("muscle-\(group)")
+                }
+            }
+            .padding(.vertical, 2)
+        }
     }
 }
 

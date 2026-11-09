@@ -20,6 +20,26 @@ final class ScreenshotTests: XCTestCase {
         XCTAssertTrue(startButton.waitForExistence(timeout: 10))
         snap("02 Today")
 
+        // The body as navigation: open the day tab, the camera flies to
+        // today's first muscle; pick a chip, that muscle flexes and the plan
+        // narrows. A screen nobody photographs is a screen nobody has checked.
+        let dayTab = app.descendants(matching: .any)
+            .matching(identifier: "DayTab").firstMatch
+        if dayTab.waitForExistence(timeout: 5) {
+            dayTab.tap()
+            sleep(2)   // camera flight + flex
+            snap("02b Zoomed to today's muscle")
+            let chip = app.descendants(matching: .any)
+                .matching(NSPredicate(format: "identifier BEGINSWITH 'muscle-'"))
+                .element(boundBy: 1)
+            if chip.exists {
+                chip.tap()
+                sleep(2)
+                snap("02c Another muscle, plan narrowed")
+            }
+            dayTab.tap()   // back to the whole body and the full plan
+        }
+
         // How to do an exercise, opened from the plan.
         app.staticTexts["Barbell bench press"].tap()
         XCTAssertTrue(app.navigationBars["Barbell bench press"].waitForExistence(timeout: 10))
