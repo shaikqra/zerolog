@@ -59,6 +59,12 @@ final class BehaviourTests: XCTestCase {
                 if !anyToggleOn() { break }
             }
         }
+        if anyToggleOn() {
+            // Name the survivor: which switch is still on, and where.
+            print("=== TREE DUMP BEGIN (equipment stuck on) ===")
+            print(app.debugDescription)
+            print("=== TREE DUMP END ===")
+        }
         XCTAssertFalse(anyToggleOn(), "the sweep could not untick every piece of equipment")
 
         // A disabled SwiftUI button can leave the accessibility tree
@@ -166,10 +172,18 @@ final class BehaviourTests: XCTestCase {
         app.buttons["Start workout"].tap()
         let confirm = app.buttons["Log set"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 12))
+        // EVERY set must reach the top of the range: the engine raises on
+        // the FEWEST reps across sets, and the rep stepper resets to the
+        // prescribed bottom after each logged set. Topping only the first
+        // set asks for a raise the rules refuse -- which is exactly what a
+        // run of this test proved (3 workouts, no change, correctly).
         let addRep = app.buttons["Add rep"]
         for _ in 0..<4 { addRep.tap() }
         confirm.tap()
-        for _ in 0..<3 where confirm.exists { confirm.tap() }
+        for _ in 0..<3 where confirm.exists {
+            for _ in 0..<4 where addRep.exists { addRep.tap() }
+            confirm.tap()
+        }
         // Moving on is now explicit. Assert it exists rather than tapping
         // blindly: if this button ever disappears the workout becomes a dead
         // end, and a lifter would be stuck on bench press forever.
