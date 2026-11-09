@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Atkinson+Hyperlegible:wght@400;700&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;800&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#1c1c20; display:flex; gap:28px; padding:28px; font-family:Inter,sans-serif; }
+.phone { width:375px; height:812px; border-radius:40px; overflow:hidden; flex-shrink:0; position:relative; border:2px solid #333; }
+.tag { position:absolute; top:8px; left:0; right:0; text-align:center; color:#888; font:600 11px Inter; letter-spacing:1px; z-index:9;}
+.scr { height:100%; padding:54px 20px 20px; display:flex; flex-direction:column; gap:14px; }
+
+/* ===== A: current ===== */
+.a { background:#000; color:#fff; }
+.a .day { font:800 44px "Big Shoulders Display"; letter-spacing:.5px; }
+.a .sub { font:400 15px "Atkinson Hyperlegible"; color:#9a9a9a; margin-top:2px;}
+.a .hero { height:218px; display:flex; align-items:center; justify-content:center; }
+.a .week { font:400 14px "Atkinson Hyperlegible"; color:#9a9a9a; border-top:1px solid #222; border-bottom:1px solid #222; padding:10px 0; display:flex; justify-content:space-between;}
+.a .week b { color:#fff; font-weight:700;}
+.a .rows { display:flex; flex-direction:column; }
+.a .row { display:flex; justify-content:space-between; align-items:baseline; padding:13px 0; border-bottom:1px solid #1a1a1a;}
+.a .nm { font:400 16px "Atkinson Hyperlegible"; }
+.a .wt { font:700 22px "Big Shoulders Display"; }
+.a .chg .nm, .a .chg .wt { color:#FF5B4F; }
+.a .why { font:400 12px "Atkinson Hyperlegible"; color:#8a4a44; margin-top:-9px; padding-bottom:10px; border-bottom:1px solid #1a1a1a;}
+.a .cta { margin-top:auto; border:2px solid #fff; border-radius:14px; text-align:center; padding:15px; font:700 17px "Atkinson Hyperlegible"; }
+
+/* ===== B: dark cards + accent ===== */
+.b { background:#0a0a0d; color:#f2f2f4; }
+.b .day { font:800 40px "Space Grotesk"; letter-spacing:-1px;}
+.b .sub { font:400 14px Inter; color:#8f8f98; margin-top:2px;}
+.b .card { background:#131318; border-radius:20px; padding:16px; }
+.b .hero { height:196px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#15151b,#101014); border:1px solid #1f1f26;}
+.b .week { display:flex; justify-content:space-between; font:400 13px Inter; color:#8f8f98;}
+.b .week b { display:block; color:#f2f2f4; font:700 20px "Space Grotesk"; margin-top:3px;}
+.b .row { display:flex; justify-content:space-between; align-items:baseline; padding:12px 16px; background:#131318; border-radius:16px; margin-bottom:8px;}
+.b .nm { font:600 15px Inter; }
+.b .last { font:400 12px Inter; color:#6f6f78; display:block; margin-top:2px;}
+.b .wt { font:700 20px "Space Grotesk"; }
+.b .chg { border:1px solid #3FD68A44; }
+.b .chg .wt { color:#3FD68A; }
+.b .why { font:400 12px Inter; color:#3FD68A; opacity:.75; margin-top:3px; display:block;}
+.b .cta { margin-top:auto; background:#3FD68A; color:#04140c; border-radius:16px; text-align:center; padding:16px; font:800 16px Inter; }
+
+/* ===== C: energy ===== */
+.c { background:radial-gradient(120% 60% at 50% -10%, #1a1026 0%, #0b0710 55%, #070509 100%); color:#fff; }
+.c .day { font:800 34px Unbounded; background:linear-gradient(90deg,#ff5b4f,#ff9a3d); -webkit-background-clip:text; background-clip:text; color:transparent;}
+.c .sub { font:400 14px Inter; color:#9a8fa8; margin-top:4px;}
+.c .hero { height:196px; display:flex; align-items:center; justify-content:center; border-radius:24px; background:rgba(255,91,79,.06); border:1px solid rgba(255,91,79,.25); box-shadow:0 0 44px rgba(255,91,79,.12) inset;}
+.c .week { display:flex; gap:10px; }
+.c .pill { flex:1; text-align:center; background:rgba(255,255,255,.05); border-radius:14px; padding:10px 0; font:400 12px Inter; color:#9a8fa8;}
+.c .pill b { display:block; font:800 18px Unbounded; color:#fff; margin-bottom:2px;}
+.c .row { display:flex; justify-content:space-between; align-items:baseline; padding:13px 4px; border-bottom:1px solid rgba(255,255,255,.07);}
+.c .nm { font:600 15px Inter; }
+.c .wt { font:800 19px Unbounded; }
+.c .chg .wt, .c .chg .nm { color:#ff7a5e; text-shadow:0 0 18px rgba(255,91,79,.5);}
+.c .cta { margin-top:auto; background:linear-gradient(90deg,#ff5b4f,#ff9a3d); border-radius:999px; text-align:center; padding:17px; font:800 15px Unbounded; color:#140503; box-shadow:0 6px 30px rgba(255,91,79,.35);}
+
+svg.body { opacity:.92; }
+</style></head><body>
+
+<div class="phone a"><div class="tag">A — CURRENT</div><div class="scr">
+  <div><div class="day">PUSH DAY</div><div class="sub">Monday · 4 exercises</div></div>
+  <div class="hero"><svg class="body" width="120" height="200" viewBox="0 0 120 200"><g fill="none" stroke="#fff" stroke-width="2"><ellipse cx="60" cy="22" rx="13" ry="16"/><path d="M38 48 Q60 40 82 48 L86 95 Q60 104 34 95 Z"/><path d="M38 48 L22 100 M82 48 L98 100"/><path d="M44 104 L40 180 M76 104 L80 180"/></g><ellipse cx="60" cy="62" rx="16" ry="10" fill="#fff" opacity=".9"/></svg></div>
+  <div class="week"><span>This week</span><span><b>3</b> workouts · <b>9,480 kg</b> lifted</span></div>
+  <div class="rows">
+    <div class="row chg"><span class="nm">Bench press</span><span class="wt">62.5 KG · 3×8</span></div>
+    <div class="why">Up 2.5 kg — you finished every set last time</div>
+    <div class="row"><span class="nm">Overhead press</span><span class="wt">40 KG · 3×8</span></div>
+    <div class="row"><span class="nm">Incline dumbbell press</span><span class="wt">22 KG · 3×10</span></div>
+    <div class="row"><span class="nm">Triceps pushdown</span><span class="wt">25 KG · 3×12</span></div>
+  </div>
+  <div class="cta">Start workout</div>
+</div></div>
+
+<div class="phone b"><div class="tag">B — CARDS + ONE ACCENT</div><div class="scr">
+  <div><div class="day">Push day</div><div class="sub">Monday · 4 exercises</div></div>
+  <div class="card hero"><svg class="body" width="112" height="180" viewBox="0 0 120 200"><g fill="none" stroke="#e8e8ec" stroke-width="2"><ellipse cx="60" cy="22" rx="13" ry="16"/><path d="M38 48 Q60 40 82 48 L86 95 Q60 104 34 95 Z"/><path d="M38 48 L22 100 M82 48 L98 100"/><path d="M44 104 L40 180 M76 104 L80 180"/></g><ellipse cx="60" cy="62" rx="16" ry="10" fill="#3FD68A"/></svg></div>
+  <div class="card week"><span>Workouts<b>3</b></span><span>Lifted<b>9,480 kg</b></span><span>Streak<b>—</b></span></div>
+  <div>
+    <div class="row chg"><span><span class="nm">Bench press</span><span class="last">Last time: 60 kg</span><span class="why">Up 2.5 kg — you finished every set</span></span><span class="wt">62.5 kg</span></div>
+    <div class="row"><span><span class="nm">Overhead press</span><span class="last">Last time: 40 kg</span></span><span class="wt">40 kg</span></div>
+    <div class="row"><span><span class="nm">Incline dumbbell press</span><span class="last">Last time: 22 kg</span></span><span class="wt">22 kg</span></div>
+    <div class="row"><span><span class="nm">Triceps pushdown</span><span class="last">Last time: 25 kg</span></span><span class="wt">25 kg</span></div>
+  </div>
+  <div class="cta">Start workout</div>
+</div></div>
+
+<div class="phone c"><div class="tag">C — ENERGY</div><div class="scr">
+  <div><div class="day">PUSH DAY</div><div class="sub">Monday · 4 exercises</div></div>
+  <div class="hero"><svg class="body" width="112" height="180" viewBox="0 0 120 200"><g fill="none" stroke="#ffb49f" stroke-width="2"><ellipse cx="60" cy="22" rx="13" ry="16"/><path d="M38 48 Q60 40 82 48 L86 95 Q60 104 34 95 Z"/><path d="M38 48 L22 100 M82 48 L98 100"/><path d="M44 104 L40 180 M76 104 L80 180"/></g><ellipse cx="60" cy="62" rx="16" ry="10" fill="#ff5b4f"/></svg></div>
+  <div class="week"><div class="pill"><b>3</b>workouts</div><div class="pill"><b>9.5t</b>lifted</div><div class="pill"><b>4</b>exercises</div></div>
+  <div>
+    <div class="row chg"><span class="nm">Bench press</span><span class="wt">62.5 KG</span></div>
+    <div class="row"><span class="nm">Overhead press</span><span class="wt">40 KG</span></div>
+    <div class="row"><span class="nm">Incline dumbbell press</span><span class="wt">22 KG</span></div>
+    <div class="row"><span class="nm">Triceps pushdown</span><span class="wt">25 KG</span></div>
+  </div>
+  <div class="cta">START WORKOUT</div>
+</div></div>
+
+</body></html>
