@@ -31,33 +31,35 @@ final class BehaviourTests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.navigationBars["Your gym"].waitForExistence(timeout: 30))
 
-        // Setup now pre-ticks every piece of equipment (most gyms have it
-        // all), so the empty state must be CREATED: untick everything.
-        // Sweep-and-scroll, because a lazy list only exposes the switches on
-        // screen: untick what is visible, scroll, repeat until none are on.
-        for _ in 0..<5 {
-            var tapped = false
-            // The floating "Plan my first workout" button hovers over the
-            // list's bottom edge, and XCUITest taps an element's CENTRE: a
-            // toggle half-hidden beneath the button takes the tap FOR the
-            // button, setup completes, and every later assert runs on the
-            // wrong screen. The committed tree dump caught the app on
-            // "Push day" in a setup test. Skip anything under the button;
-            // the next scroll pass brings it clear.
+        // Setup pre-ticks every piece of equipment, so the empty state must
+        // be CREATED: untick everything. One stateless loop: find an ON
+        // toggle that is safely tappable, tap it; if the only ON toggles are
+        // covered by the floating "Plan my first workout" button (which
+        // otherwise EATS the tap -- a committed tree dump caught this test on
+        // "Push day") or are off screen, scroll and look again. The previous
+        // sweep skipped covered toggles and could end its passes with one
+        // still on, which made the gate assert fail honestly: the user COULD
+        // proceed, because equipment genuinely remained selected.
+        func anyToggleOn() -> Bool {
+            app.switches.allElementsBoundByIndex.contains { ($0.value as? String) == "1" }
+        }
+        for _ in 0..<40 {
             let planButton = app.buttons["Plan my first workout"]
             let danger = planButton.exists ? planButton.frame : .null
-            for index in 0..<min(app.switches.count, 16) {
-                let toggle = app.switches.element(boundBy: index)
-                guard toggle.exists, toggle.isHittable,
-                      (toggle.value as? String) == "1",
-                      !toggle.frame.intersects(danger) else { continue }
-                toggle.tap()
-                tapped = true
+            if let safe = app.switches.allElementsBoundByIndex.first(where: {
+                ($0.value as? String) == "1" && $0.isHittable && !$0.frame.intersects(danger)
+            }) {
+                safe.tap()
+            } else if anyToggleOn() {
+                app.swipeUp()   // bring covered or off-screen toggles clear
+            } else {
+                // Nothing on among materialised rows; sweep once more to
+                // materialise any stragglers, then stop when truly clean.
+                app.swipeUp()
+                if !anyToggleOn() { break }
             }
-            app.swipeUp()
-            if !tapped && !app.switches.allElementsBoundByIndex
-                .contains(where: { ($0.value as? String) == "1" }) { break }
         }
+        XCTAssertFalse(anyToggleOn(), "the sweep could not untick every piece of equipment")
 
         // A disabled SwiftUI button can leave the accessibility tree
         // entirely, so .isEnabled on it throws "no matches found". The rule
@@ -180,10 +182,12 @@ final class BehaviourTests: XCTestCase {
         XCTAssertTrue(save.waitForExistence(timeout: 12))
         save.tap()
 
-        // Rotate back round to the same day.
+        // Rotate back round to the same day — and EARN the raise: the engine
+        // moves the weight only when every logged set reaches the top of the
+        // rep range, so these sessions log top-of-range sets.
         XCTAssertTrue(app.buttons["Start workout"].waitForExistence(timeout: 12))
-        logOneSetAndSave()
-        logOneSetAndSave()
+        logOneSetAndSave(atTopOfRange: true)
+        logOneSetAndSave(atTopOfRange: true)
 
         // The body-first layout puts the change section below the fold, and a
         // lazy list does not materialise what has never been on screen:
@@ -305,12 +309,21 @@ final class BehaviourTests: XCTestCase {
                       "setup completed but no plan appeared")
     }
 
-    private func logOneSetAndSave() {
+    private func logOneSetAndSave(atTopOfRange: Bool = false) {
         let start = app.buttons["Start workout"]
         XCTAssertTrue(start.waitForExistence(timeout: 12))
         start.tap()
         let confirm = app.buttons["Log set"]
         XCTAssertTrue(confirm.waitForExistence(timeout: 12))
+        if atTopOfRange {
+            // The engine raises weight only when the FEWEST reps across the
+            // logged sets reaches the top of the range (Engine.prescribe:
+            // fewest >= high). The default set is prescribed at the BOTTOM,
+            // so a test expecting a raise must add the reps a lifter would:
+            // bench is 6-10, four taps.
+            let addRep = app.buttons["Add rep"]
+            for _ in 0..<4 where addRep.exists { addRep.tap() }
+        }
         confirm.tap()
         endWorkout()
         let save = app.buttons["Save workout"]
