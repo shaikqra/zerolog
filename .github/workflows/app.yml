@@ -112,6 +112,9 @@ jobs:
             grep -E "Test Case .* (failed|passed)|error:|Assertion Failure|exceeded.*time allowance|is not running|[Cc]rash|Restarting|terminated" behaviour-tests.log \
               | tail -60 > ../docs/ci/behaviour-test-errors.txt || true
             [ -s ../docs/ci/behaviour-test-errors.txt ] || tail -40 behaviour-tests.log > ../docs/ci/behaviour-test-errors.txt
+            # Element-tree dumps from failing tests: the ground truth about
+            # what was on screen, straight from XCUITest's own eyes.
+            awk "/TREE DUMP BEGIN/,/TREE DUMP END/" behaviour-tests.log | head -400 > ../docs/ci/behaviour-tree.txt || true
           else
             : > ../docs/ci/behaviour-test-errors.txt
           fi

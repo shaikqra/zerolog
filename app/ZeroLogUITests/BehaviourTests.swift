@@ -66,6 +66,11 @@ final class BehaviourTests: XCTestCase {
         let reason = app.descendants(matching: .any)
             .matching(NSPredicate(format: "label CONTAINS 'Pick at least one piece'")).firstMatch
         for _ in 0..<5 where !reason.exists { app.swipeDown() }
+        if !reason.exists {
+            print("=== TREE DUMP BEGIN (equipment) ===")
+            print(app.debugDescription)
+            print("=== TREE DUMP END ===")
+        }
         XCTAssertTrue(reason.exists,
                       "refusing without saying why breaks the show-the-reason rule")
         XCTAssertTrue(app.navigationBars["Your gym"].exists, "still on setup")
@@ -183,8 +188,15 @@ final class BehaviourTests: XCTestCase {
         let byLabel = app.descendants(matching: .any)["Undo"].firstMatch
         for _ in 0..<3 where !(byId.exists || byLabel.exists) { app.swipeUp() }
         let undo = byId.exists ? byId : byLabel
-        XCTAssertTrue(undo.waitForExistence(timeout: 12),
-                      "an automatic change was shown with no way to undo it")
+        if !undo.waitForExistence(timeout: 12) {
+            // Stop deducing; print what is actually there. The committed CI
+            // log carries this dump, so the next fix aims at facts.
+            print("=== TREE DUMP BEGIN (undo) ===")
+            print(app.debugDescription)
+            print("=== TREE DUMP END ===")
+            XCTFail("an automatic change was shown with no way to undo it")
+            return
+        }
         undo.tap()
         XCTAssertTrue(waitForDisappearance(of: changed, timeout: 15),
                       "Undo left the change in place")
