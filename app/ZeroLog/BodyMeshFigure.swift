@@ -209,7 +209,7 @@ private struct BodySceneView: UIViewRepresentable {
             } else {
                 endAngle = BodyScene.restingAngle(for: sessionType)
                 target = SCNVector3(0, 0, 6)
-                endScale = 0.9
+                endScale = 0.84
             }
 
             guard animated else {
@@ -247,10 +247,10 @@ private struct BodySceneView: UIViewRepresentable {
         private func flex(_ node: SCNNode) {
             guard let material = node.geometry?.firstMaterial else { return }
             let up = SCNAction.customAction(duration: 0.45) { _, t in
-                material.emission.intensity = 1 + 2.4 * (t / 0.45)
+                material.emission.intensity = 0.9 * (t / 0.45)
             }
             let down = SCNAction.customAction(duration: 0.45) { _, t in
-                material.emission.intensity = 3.4 - 2.4 * (t / 0.45)
+                material.emission.intensity = 0.9 - 0.9 * (t / 0.45)
             }
             // Starts as the camera flight ends: arrive, THEN flex.
             node.runAction(.sequence([.wait(duration: 1.0), up, down, up, down]))
@@ -337,7 +337,8 @@ enum BodyScene {
                                                  primitiveCount: group.triangleCount,
                                                  bytesPerIndex: MemoryLayout<UInt32>.size)
                 let geometry = SCNGeometry(sources: [vertices, normals], elements: [element])
-                geometry.materials = [lit.contains(group.name) ? litMaterial : baseMaterial]
+                geometry.materials = [group.name == "body" ? contextMaterial
+                                      : lit.contains(group.name) ? litMaterial : baseMaterial]
                 let node = SCNNode(geometry: geometry)
                 node.name = group.name
                 bodyRoot.addChildNode(node)
@@ -377,7 +378,7 @@ enum BodyScene {
         // true at any view size. Body is 1.6 tall; 0.9 shows it with margin.
         let camera = SCNCamera()
         camera.usesOrthographicProjection = true
-        camera.orthographicScale = 0.9
+        camera.orthographicScale = 0.84   // body fills ~95% of the frame height
         camera.zNear = 0.1; camera.zFar = 30
         let camNode = SCNNode()
         camNode.camera = camera
@@ -393,36 +394,62 @@ enum BodyScene {
             n.look(at: SCNVector3(0, 0, 0))
             scene.rootNode.addChildNode(n)
         }
-        light(.omni, 350, SCNVector3(-2.2, 0.5, -0.4))
-        light(.omni, 350, SCNVector3(2.2, 0.5, -0.4))
-        light(.omni, 500, SCNVector3(0, 0.9, 4.5))
-        let ambient = SCNLight(); ambient.type = .ambient; ambient.intensity = 60
+        // Cooler than the first pass: the real phone's renderer runs much
+        // hotter than the simulator, and the founder's screenshot showed
+        // blown-white legs on a chrome body. Matte materials + restrained
+        // light let the muscle SHAPE carry the picture.
+        light(.omni, 300, SCNVector3(-2.2, 0.5, -0.4))
+        light(.omni, 300, SCNVector3(2.2, 0.5, -0.4))
+        light(.omni, 380, SCNVector3(0, 0.9, 4.5))
+        let ambient = SCNLight(); ambient.type = .ambient; ambient.intensity = 40
         let ambientNode = SCNNode(); ambientNode.light = ambient
         scene.rootNode.addChildNode(ambientNode)
 
         return scene
     }
 
-    /// Near-black metal: the unlit body. Matches the committed previews.
+    /// Near-black, matte: the unlit body RECEDES. The first on-device
+    /// screenshot showed chrome: metalness 0.65 under three lights reads as
+    /// polished silver on real hardware (the simulator renders far cooler),
+    /// complete with anatomical eyes staring out of a shiny skull. Matte and
+    /// dark, the body becomes the stage and the lit muscles the actors.
     private static var baseMaterial: SCNMaterial {
         let m = SCNMaterial()
         m.lightingModel = .physicallyBased
-        m.diffuse.contents = UIColor(white: 0.07, alpha: 1)
-        m.metalness.contents = 0.65
-        m.roughness.contents = 0.42
+        m.diffuse.contents = UIColor(white: 0.045, alpha: 1)
+        m.metalness.contents = 0.15
+        m.roughness.contents = 0.8
         return m
     }
 
-    /// Today's muscles: pale and faintly emissive, bright against the black
-    /// but still showing their shape. White, never red or green — those
-    /// colours carry meanings this figure must not spend.
+    /// Head, neck and hands: darker still. They are context, not content —
+    /// at full base brightness the face's anatomical eyes dominate the
+    /// figure, and nobody opens a lifting app to be stared at.
+    private static var contextMaterial: SCNMaterial {
+        let m = SCNMaterial()
+        m.lightingModel = .physicallyBased
+        m.diffuse.contents = UIColor(white: 0.025, alpha: 1)
+        m.metalness.contents = 0.05
+        m.roughness.contents = 0.9
+        return m
+    }
+
+    /// Today's muscles: pale grey that still SHADES — the first on-device
+    /// build blew them out to flat white silhouettes with zero muscle
+    /// definition. No emission at all: form comes from the lights, and a
+    /// surface that emits cannot show shadow. White, never red or green —
+    /// those colours carry meanings this figure must not spend.
     private static var litMaterial: SCNMaterial {
         let m = SCNMaterial()
         m.lightingModel = .physicallyBased
-        m.diffuse.contents = UIColor(red: 0.62, green: 0.66, blue: 0.72, alpha: 1)
-        m.metalness.contents = 0.1
-        m.roughness.contents = 0.5
-        m.emission.contents = UIColor(red: 0.20, green: 0.21, blue: 0.23, alpha: 1)
+        m.diffuse.contents = UIColor(red: 0.42, green: 0.45, blue: 0.50, alpha: 1)
+        m.metalness.contents = 0.05
+        m.roughness.contents = 0.65
+        // Emission colour present but intensity ZERO: at rest the muscle
+        // shades like matter. The flex animates intensity up and back —
+        // the glow exists only while the muscle "works".
+        m.emission.contents = UIColor(red: 0.85, green: 0.88, blue: 1.0, alpha: 1)
+        m.emission.intensity = 0
         return m
     }
 }
