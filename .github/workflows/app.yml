@@ -154,6 +154,9 @@ jobs:
           found=0
           for app in build/Build/Products/*/*.app; do
             [ -d "$app" ] || continue
+            # Test-runner bundles are xcodebuild scaffolding and never ship
+            # to any store; they carry no manifest and never need one.
+            case "$app" in *-Runner.app) continue ;; esac
             found=$((found + 1))
             manifest="$app/PrivacyInfo.xcprivacy"
             if [ ! -f "$manifest" ]; then
