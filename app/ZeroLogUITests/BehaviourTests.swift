@@ -59,10 +59,17 @@ final class BehaviourTests: XCTestCase {
             // the button by 10pt still died in the padding (the dump showed
             // the leg press switch taking 30+ taps and staying on). Demand
             // clearance from the whole container: 90pt above the button top.
+            // Clearance is judged where the finger actually lands (30% down
+            // the switch), against the button container's padded top edge
+            // (20pt above the pill) plus margin. A blunt 60pt-from-maxY
+            // buffer rejected the leg press switch at FULL scroll by 5pt --
+            // at this screen's maximum scroll it simply never qualified.
             let buttonTop = danger.isNull ? CGFloat.greatestFiniteMagnitude : danger.minY
             if let sw = app.switches.allElementsBoundByIndex.first(where: {
-                ($0.value as? String) == "1" && $0.frame.width < 100
-                    && $0.frame.minY > 240 && $0.frame.maxY < buttonTop - 60
+                guard ($0.value as? String) == "1" && $0.frame.width < 100
+                        && $0.frame.minY > 240 else { return false }
+                let tapY = $0.frame.minY + $0.frame.height * 0.3
+                return tapY < buttonTop - 25
             }) {
                 sw.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.3)).tap()
                 // Let the toggle's animation settle: re-querying too fast
@@ -272,6 +279,15 @@ final class BehaviourTests: XCTestCase {
             print("=== TREE DUMP END ===")
             XCTFail("an automatic change was shown with no way to undo it")
             return
+        }
+        // Bring the section's rows fully above the fold first: Undo existed
+        // last run but its centre sat below the screen edge, so the
+        // coordinate tap landed on nothing and "Undo left the change in
+        // place". The hook anchors the section header to the top.
+        let surface = app.buttons["test-scroll-changes"].firstMatch
+        if surface.exists {
+            surface.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+            usleep(300_000)
         }
         // Coordinate tap: a partially-below-the-fold element makes .tap()
         // attempt the AX auto-scroll that is broken on this simulator.

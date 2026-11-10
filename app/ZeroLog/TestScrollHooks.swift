@@ -21,6 +21,9 @@ struct TestScrollHooks: View {
                 Button("test-scroll-bottom") {
                     proxy.scrollTo("list-bottom", anchor: .bottom)
                 }
+                Button("test-scroll-changes") {
+                    proxy.scrollTo("list-changes", anchor: .top)
+                }
             }
             .font(.system(size: 1))
             .tint(.clear)

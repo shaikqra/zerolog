@@ -76,6 +76,7 @@ struct TodayView: View {
                                 }
                             } header: {
                                 SectionTitle("What I changed")
+                                    .testScrollAnchor("list-changes")
                             }
                             .listRowBackground(Color.surface)
                         }
