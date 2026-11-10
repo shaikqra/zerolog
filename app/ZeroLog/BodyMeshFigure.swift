@@ -436,15 +436,16 @@ enum BodyScene {
         return m
     }
 
-    /// Head, neck and hands: darker still. They are context, not content —
-    /// at full base brightness the face's anatomical eyes dominate the
-    /// figure, and nobody opens a lifting app to be stared at.
+    /// Head, neck and hands: present but quiet. The first fix for the
+    /// staring chrome face overshot to 0.025 white — invisible against the
+    /// true-black page, and the founder rightly reported a headless body.
+    /// Dark grey matte: clearly a head, never the star.
     private static var contextMaterial: SCNMaterial {
         let m = SCNMaterial()
         m.lightingModel = .physicallyBased
-        m.diffuse.contents = UIColor(white: 0.025, alpha: 1)
-        m.metalness.contents = 0.05
-        m.roughness.contents = 0.9
+        m.diffuse.contents = UIColor(white: 0.18, alpha: 1)
+        m.metalness.contents = 0.0
+        m.roughness.contents = 0.85
         return m
     }
 
