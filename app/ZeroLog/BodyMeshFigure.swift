@@ -67,7 +67,10 @@ private struct BodySceneView: UIViewRepresentable {
         // test interaction crawled and launches timed out. It also burns the
         // phone's battery on a screen whose whole job is to sit still.
         view.rendersContinuously = false
-        view.scene = BodyScene.build(sessionType: sessionType)
+        // The breathing pulse keeps the render loop alive; cap the rate so
+        // a slow glow does not cost 60fps of battery.
+        view.preferredFramesPerSecond = 30
+        view.scene = BodyScene.build(sessionType: sessionType, animated: !skipAnimation)
 
         if let body = view.scene?.rootNode.childNode(withName: "spinPivot", recursively: false) {
             let resting = BodyScene.restingAngle(for: sessionType)
@@ -108,7 +111,7 @@ private struct BodySceneView: UIViewRepresentable {
         // the materials is cheaper than diffing them.
         if context.coordinator.sessionType != sessionType {
             context.coordinator.sessionType = sessionType
-            view.scene = BodyScene.build(sessionType: sessionType)
+            view.scene = BodyScene.build(sessionType: sessionType, animated: !skipAnimation)
             view.scene?.rootNode.childNode(withName: "spinPivot", recursively: false)?
                 .eulerAngles.y = BodyScene.restingAngle(for: sessionType)
             context.coordinator.focusedGroup = nil
@@ -246,14 +249,19 @@ private struct BodySceneView: UIViewRepresentable {
         /// is light, not movement, and Reduce Motion skips it entirely.
         private func flex(_ node: SCNNode) {
             guard let material = node.geometry?.firstMaterial else { return }
+            // The flex borrows the emission channel from the ambient pulse:
+            // pause the breath, throb twice, breathe again.
+            node.removeAction(forKey: "pulse")
             let up = SCNAction.customAction(duration: 0.45) { _, t in
-                material.emission.intensity = 0.9 * (t / 0.45)
+                material.emission.intensity = 0.1 + 1.1 * Double(t) / 0.45
             }
             let down = SCNAction.customAction(duration: 0.45) { _, t in
-                material.emission.intensity = 0.9 - 0.9 * (t / 0.45)
+                material.emission.intensity = 1.2 - 1.1 * Double(t) / 0.45
             }
             // Starts as the camera flight ends: arrive, THEN flex.
-            node.runAction(.sequence([.wait(duration: 1.0), up, down, up, down]))
+            node.runAction(.sequence([.wait(duration: 1.0), up, down, up, down])) {
+                node.runAction(BodyScene.pulse(material), forKey: "pulse")
+            }
         }
     }
 }
@@ -297,7 +305,7 @@ enum BodyScene {
         }
     }
 
-    static func build(sessionType: String) -> SCNScene {
+    static func build(sessionType: String, animated: Bool = true) -> SCNScene {
         let scene = SCNScene()
         scene.background.contents = UIColor.black
 
@@ -337,10 +345,16 @@ enum BodyScene {
                                                  primitiveCount: group.triangleCount,
                                                  bytesPerIndex: MemoryLayout<UInt32>.size)
                 let geometry = SCNGeometry(sources: [vertices, normals], elements: [element])
+                let isLit = lit.contains(group.name) && group.name != "body"
                 geometry.materials = [group.name == "body" ? contextMaterial
-                                      : lit.contains(group.name) ? litMaterial : baseMaterial]
+                                      : isLit ? litMaterial : baseMaterial]
                 let node = SCNNode(geometry: geometry)
                 node.name = group.name
+                // The founder's slow flicker: today's muscles breathe.
+                // Reduce Motion (animated == false) gets steady white.
+                if isLit, animated, let material = geometry.firstMaterial {
+                    node.runAction(pulse(material), forKey: "pulse")
+                }
                 bodyRoot.addChildNode(node)
             }
         }
@@ -434,22 +448,35 @@ enum BodyScene {
         return m
     }
 
-    /// Today's muscles: pale grey that still SHADES — the first on-device
-    /// build blew them out to flat white silhouettes with zero muscle
-    /// definition. No emission at all: form comes from the lights, and a
-    /// surface that emits cannot show shadow. White, never red or green —
-    /// those colours carry meanings this figure must not spend.
+    /// Today's muscles: COMPLETELY WHITE, the founder's call — and they
+    /// breathe. The sculpt reads through the shadow creases BETWEEN the
+    /// muscle bellies (white needs darkness beside it to look carved), and
+    /// a slow emission pulse makes the group flicker gently, alive rather
+    /// than flashing. White, never red or green — those colours carry
+    /// meanings this figure must not spend.
     private static var litMaterial: SCNMaterial {
         let m = SCNMaterial()
         m.lightingModel = .physicallyBased
-        m.diffuse.contents = UIColor(red: 0.42, green: 0.45, blue: 0.50, alpha: 1)
-        m.metalness.contents = 0.05
-        m.roughness.contents = 0.65
-        // Emission colour present but intensity ZERO: at rest the muscle
-        // shades like matter. The flex animates intensity up and back —
-        // the glow exists only while the muscle "works".
-        m.emission.contents = UIColor(red: 0.85, green: 0.88, blue: 1.0, alpha: 1)
-        m.emission.intensity = 0
+        m.diffuse.contents = UIColor(white: 0.95, alpha: 1)
+        m.metalness.contents = 0.0
+        m.roughness.contents = 0.6
+        m.emission.contents = UIColor(white: 1.0, alpha: 1)
+        m.emission.intensity = 0.1
         return m
+    }
+
+    /// The slow flicker: a ~3 second breath, emission swelling and settling
+    /// forever. Skipped entirely under Reduce Motion.
+    static func pulse(_ material: SCNMaterial) -> SCNAction {
+        let half = 1.5
+        let swell = SCNAction.customAction(duration: half) { _, t in
+            let p = Double(t) / half
+            material.emission.intensity = 0.1 + 0.45 * (p * p * (3 - 2 * p))
+        }
+        let settle = SCNAction.customAction(duration: half) { _, t in
+            let p = Double(t) / half
+            material.emission.intensity = 0.55 - 0.45 * (p * p * (3 - 2 * p))
+        }
+        return .repeatForever(.sequence([swell, settle]))
     }
 }
