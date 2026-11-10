@@ -24,8 +24,12 @@ ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/X
 
 ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/actool --version --output-format xml1
 
-Build description signature: 559039c165ea642fd00bd294efca53bf
-Build description path: /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/XCBuildData/559039c165ea642fd00bd294efca53bf.xcbuilddata
+Build description signature: 214d711a71e3d756dee48f76f56a5512
+Build description path: /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/XCBuildData/214d711a71e3d756dee48f76f56a5512.xcbuilddata
+ClangStatCache /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk /Users/runner/work/zerolog/zerolog/app/build/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache
+    cd /Users/runner/work/zerolog/zerolog/app/ZeroLog.xcodeproj
+    /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -o /Users/runner/work/zerolog/zerolog/app/build/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache
+
 CreateBuildDirectory /Users/runner/work/zerolog/zerolog/app/build/Build/Products
     cd /Users/runner/work/zerolog/zerolog/app/ZeroLog.xcodeproj
     builtin-create-build-directory /Users/runner/work/zerolog/zerolog/app/build/Build/Products
@@ -33,10 +37,6 @@ CreateBuildDirectory /Users/runner/work/zerolog/zerolog/app/build/Build/Products
 CreateBuildDirectory /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex
     cd /Users/runner/work/zerolog/zerolog/app/ZeroLog.xcodeproj
     builtin-create-build-directory /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex
-
-ClangStatCache /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk /Users/runner/work/zerolog/zerolog/app/build/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache
-    cd /Users/runner/work/zerolog/zerolog/app/ZeroLog.xcodeproj
-    /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -o /Users/runner/work/zerolog/zerolog/app/build/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache
 
 WriteAuxiliaryFile /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog-f11bcd0affd0b1d73e0e503de33f2134-VFS-iphoneos/all-product-headers.yaml
     cd /Users/runner/work/zerolog/zerolog/app/ZeroLog.xcodeproj
@@ -54,13 +54,13 @@ CreateBuildDirectory /Users/runner/work/zerolog/zerolog/app/build/Build/Products
     cd /Users/runner/work/zerolog/zerolog/app/ZeroLog.xcodeproj
     builtin-create-build-directory /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/PackageFrameworks
 
-WriteAuxiliaryFile /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore_ZeroLogCore.build/ZeroLogCore_ZeroLogCore.DependencyStaticMetadataFileList (in target 'ZeroLogCore_ZeroLogCore' from project 'ZeroLogCore')
-    cd /Users/runner/work/zerolog/zerolog/app/Packages/ZeroLogCore
-    write-file /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore_ZeroLogCore.build/ZeroLogCore_ZeroLogCore.DependencyStaticMetadataFileList
-
 WriteAuxiliaryFile /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore_ZeroLogCore.build/empty-ZeroLogCore_ZeroLogCore.plist (in target 'ZeroLogCore_ZeroLogCore' from project 'ZeroLogCore')
     cd /Users/runner/work/zerolog/zerolog/app/Packages/ZeroLogCore
     write-file /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore_ZeroLogCore.build/empty-ZeroLogCore_ZeroLogCore.plist
+
+WriteAuxiliaryFile /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore_ZeroLogCore.build/ZeroLogCore_ZeroLogCore.DependencyStaticMetadataFileList (in target 'ZeroLogCore_ZeroLogCore' from project 'ZeroLogCore')
+    cd /Users/runner/work/zerolog/zerolog/app/Packages/ZeroLogCore
+    write-file /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore_ZeroLogCore.build/ZeroLogCore_ZeroLogCore.DependencyStaticMetadataFileList
 
 WriteAuxiliaryFile /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore_ZeroLogCore.build/ZeroLogCore_ZeroLogCore.DependencyMetadataFileList (in target 'ZeroLogCore_ZeroLogCore' from project 'ZeroLogCore')
     cd /Users/runner/work/zerolog/zerolog/app/Packages/ZeroLogCore
@@ -234,13 +234,13 @@ Ld /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/
     cd /Users/runner/work/zerolog/zerolog/app/Packages/ZeroLogCore
     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios17.0 -r -isysroot /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -Os -L/Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos -L/Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos -L/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib -F/Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/EagerLinkingTBDs/Release-iphoneos -F/Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos -iframework /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Frameworks -iframework /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/Developer/Library/Frameworks -filelist /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/Objects-normal/arm64/ZeroLogCore.LinkFileList -nostdlib -Xlinker -object_path_lto -Xlinker /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/Objects-normal/arm64/ZeroLogCore_lto.o -Xlinker -dependency_info -Xlinker /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/Objects-normal/arm64/ZeroLogCore_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/Objects-normal/arm64/ZeroLogCore.swiftmodule -o /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLogCore.o
 
-MkDir /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_output/thinned (in target 'ZeroLog' from project 'ZeroLog')
-    cd /Users/runner/work/zerolog/zerolog/app
-    /bin/mkdir -p /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_output/thinned
-
 MkDir /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_output/unthinned (in target 'ZeroLog' from project 'ZeroLog')
     cd /Users/runner/work/zerolog/zerolog/app
     /bin/mkdir -p /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_output/unthinned
+
+MkDir /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_output/thinned (in target 'ZeroLog' from project 'ZeroLog')
+    cd /Users/runner/work/zerolog/zerolog/app
+    /bin/mkdir -p /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_output/thinned
 
 GenerateAssetSymbols /Users/runner/work/zerolog/zerolog/app/ZeroLog/Assets.xcassets (in target 'ZeroLog' from project 'ZeroLog')
     cd /Users/runner/work/zerolog/zerolog/app
@@ -264,8 +264,8 @@ CompileAssetCatalogVariant thinned /Users/runner/work/zerolog/zerolog/app/build/
 ExtractAppIntentsMetadata (in target 'ZeroLogCore' from project 'ZeroLogCore')
     cd /Users/runner/work/zerolog/zerolog/app/Packages/ZeroLogCore
     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ZeroLogCore --sdk-root /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk --xcode-version 16F6 --platform-family iOS --deployment-target 17.0 --bundle-identifier zerologcore.ZeroLogCore --output /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLogCore.appintents --target-triple arm64-apple-ios17.0 --binary-file /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLogCore.o --dependency-file /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/Objects-normal/arm64/ZeroLogCore_dependency_info.dat --stringsdata-file /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/Objects-normal/arm64/ZeroLogCore.SwiftFileList --metadata-file-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/ZeroLogCore.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/ZeroLogCore.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLogCore.build/Release-iphoneos/ZeroLogCore.build/Objects-normal/arm64/ZeroLogCore.SwiftConstValuesFileList --force --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-11-10 00:04:35.952 appintentsmetadataprocessor[2036:9061] Starting appintentsmetadataprocessor export
-2026-11-10 00:04:36.012 appintentsmetadataprocessor[2036:9061] Extracted no relevant App Intents symbols, skipping writing output
+2026-11-10 13:31:59.612 appintentsmetadataprocessor[2168:9508] Starting appintentsmetadataprocessor export
+2026-11-10 13:31:59.709 appintentsmetadataprocessor[2168:9508] Extracted no relevant App Intents symbols, skipping writing output
 
 RegisterExecutionPolicyException /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLogCore.o (in target 'ZeroLogCore' from project 'ZeroLogCore')
     cd /Users/runner/work/zerolog/zerolog/app/Packages/ZeroLogCore
@@ -353,9 +353,9 @@ Ld /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/
 LinkAssetCatalog /Users/runner/work/zerolog/zerolog/app/ZeroLog/Assets.xcassets (in target 'ZeroLog' from project 'ZeroLog')
     cd /Users/runner/work/zerolog/zerolog/app
     builtin-linkAssetCatalog --thinned /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_output/thinned --thinned-dependencies /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_dependencies_thinned --thinned-info-plist-content /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_generated_info.plist_thinned --unthinned /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_output/unthinned --unthinned-dependencies /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_dependencies_unthinned --unthinned-info-plist-content /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_generated_info.plist_unthinned --output /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app --plist-output /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/assetcatalog_generated_info.plist
-note: Emplaced /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app/AppIcon76x76@2x~ipad.png (in target 'ZeroLog' from project 'ZeroLog')
 note: Emplaced /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app/AppIcon60x60@2x.png (in target 'ZeroLog' from project 'ZeroLog')
 note: Emplaced /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app/Assets.car (in target 'ZeroLog' from project 'ZeroLog')
+note: Emplaced /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app/AppIcon76x76@2x~ipad.png (in target 'ZeroLog' from project 'ZeroLog')
 
 ProcessInfoPlistFile /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app/Info.plist /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/empty-ZeroLog.plist (in target 'ZeroLog' from project 'ZeroLog')
     cd /Users/runner/work/zerolog/zerolog/app
@@ -364,8 +364,8 @@ ProcessInfoPlistFile /Users/runner/work/zerolog/zerolog/app/build/Build/Products
 ExtractAppIntentsMetadata (in target 'ZeroLog' from project 'ZeroLog')
     cd /Users/runner/work/zerolog/zerolog/app
     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --module-name ZeroLog --sdk-root /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk --xcode-version 16F6 --platform-family iOS --deployment-target 17.0 --bundle-identifier com.getzerolog.app --output /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app --target-triple arm64-apple-ios17.0 --binary-file /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app/ZeroLog --dependency-file /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/Objects-normal/arm64/ZeroLog_dependency_info.dat --stringsdata-file /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/Objects-normal/arm64/ZeroLog.SwiftFileList --metadata-file-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/ZeroLog.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/ZeroLog.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/Objects-normal/arm64/ZeroLog.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
-2026-11-10 00:05:20.202 appintentsmetadataprocessor[2761:11704] Starting appintentsmetadataprocessor export
-2026-11-10 00:05:20.206 appintentsmetadataprocessor[2761:11704] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+2026-11-10 13:32:36.772 appintentsmetadataprocessor[2819:11871] Starting appintentsmetadataprocessor export
+2026-11-10 13:32:36.776 appintentsmetadataprocessor[2819:11871] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
 
 CopySwiftLibs /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app (in target 'ZeroLog' from project 'ZeroLog')
     cd /Users/runner/work/zerolog/zerolog/app
@@ -379,8 +379,8 @@ GenerateDSYMFile /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Rel
 AppIntentsSSUTraining (in target 'ZeroLog' from project 'ZeroLog')
     cd /Users/runner/work/zerolog/zerolog/app
     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app/Info.plist --temp-dir-path /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/ssu --bundle-id com.getzerolog.app --product-path /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app --extracted-metadata-path /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app/Metadata.appintents --metadata-file-list /Users/runner/work/zerolog/zerolog/app/build/Build/Intermediates.noindex/ZeroLog.build/Release-iphoneos/ZeroLog.build/ZeroLog.DependencyMetadataFileList --archive-ssu-assets
-2026-11-10 00:05:20.255 appintentsnltrainingprocessor[2767:11748] Parsing options for appintentsnltrainingprocessor
-2026-11-10 00:05:20.256 appintentsnltrainingprocessor[2767:11748] No AppShortcuts found - Skipping.
+2026-11-10 13:32:36.849 appintentsnltrainingprocessor[2823:11891] Parsing options for appintentsnltrainingprocessor
+2026-11-10 13:32:36.852 appintentsnltrainingprocessor[2823:11891] No AppShortcuts found - Skipping.
 
 RegisterExecutionPolicyException /Users/runner/work/zerolog/zerolog/app/build/Build/Products/Release-iphoneos/ZeroLog.app (in target 'ZeroLog' from project 'ZeroLog')
     cd /Users/runner/work/zerolog/zerolog/app
