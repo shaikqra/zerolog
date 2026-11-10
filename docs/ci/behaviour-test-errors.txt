@@ -1,8 +1,0 @@
-Test Case '-[ZeroLogUITests.BehaviourTests testALoggedSetReachesHistoryWithTheNumbersItWasLoggedWith]' passed (51.429 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:279: error: -[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone] : XCTAssertTrue failed - Undo left the change in place
-Test Case '-[ZeroLogUITests.BehaviourTests testAWeightChangeExplainsItselfAndCanBeUndone]' failed (79.815 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testHistorySurvivesRelaunch]' passed (24.604 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testNoScreenShamesTheUser]' passed (26.364 seconds).
-/Users/runner/work/zerolog/zerolog/app/ZeroLogUITests/BehaviourTests.swift:90: error: -[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment] : XCTAssertFalse failed - the sweep could not untick every piece of equipment
-Test Case '-[ZeroLogUITests.BehaviourTests testSetupWillNotPlanAWorkoutWithNoEquipment]' failed (65.921 seconds).
-Test Case '-[ZeroLogUITests.BehaviourTests testTheThreeDBodyReportsItsMeshLoaded]' passed (12.202 seconds).
