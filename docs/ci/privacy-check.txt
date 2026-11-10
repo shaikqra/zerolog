@@ -9,20 +9,5 @@ build/Build/Products/Debug-iphonesimulator/ZeroLog.app/PrivacyInfo.xcprivacy: OK
   "NSPrivacyTrackingDomains" => [
   ]
 }
-build/Build/Products/Debug-watchsimulator/ZeroLogWatch.app/PrivacyInfo.xcprivacy: OK
---- build/Build/Products/Debug-watchsimulator/ZeroLogWatch.app/PrivacyInfo.xcprivacy ---
-{
-  "NSPrivacyAccessedAPITypes" => [
-    0 => {
-      "NSPrivacyAccessedAPIType" => "NSPrivacyAccessedAPICategorySystemBootTime"
-      "NSPrivacyAccessedAPITypeReasons" => [
-        0 => "35F9.1"
-      ]
-    }
-  ]
-  "NSPrivacyCollectedDataTypes" => [
-  ]
-  "NSPrivacyTracking" => 0
-  "NSPrivacyTrackingDomains" => [
-  ]
-}
+MISSING from bundle: build/Build/Products/Debug-watchsimulator/ZeroLogWatch.app/PrivacyInfo.xcprivacy
+watch manifest is missing the SystemBootTime declaration
