@@ -9,7 +9,6 @@ build/Build/Products/Debug-iphonesimulator/ZeroLog.app/PrivacyInfo.xcprivacy: OK
   "NSPrivacyTrackingDomains" => [
   ]
 }
-MISSING from bundle: build/Build/Products/Debug-iphonesimulator/ZeroLogUITests-Runner.app/PrivacyInfo.xcprivacy
 build/Build/Products/Debug-watchsimulator/ZeroLogWatch.app/PrivacyInfo.xcprivacy: OK
 --- build/Build/Products/Debug-watchsimulator/ZeroLogWatch.app/PrivacyInfo.xcprivacy ---
 {
