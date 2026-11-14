@@ -48,6 +48,21 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      # Stamp the commit into the app so Settings says which build is
+      # installed. Without it, "it looks the same" cannot be told apart from
+      # "the old app is still on the phone".
+      - name: Stamp the build
+        working-directory: app
+        run: |
+          BUILT=$(TZ=Europe/London date "+%-d %b %H:%M")
+          cat > ZeroLog/BuildStamp.swift <<EOF
+          enum BuildStamp {
+              static let commit = "${GITHUB_SHA::7}"
+              static let built = "$BUILT"
+          }
+          EOF
+          cat ZeroLog/BuildStamp.swift
+
       - name: Generate Xcode project
         working-directory: app
         run: xcodegen generate

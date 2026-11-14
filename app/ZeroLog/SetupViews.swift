@@ -122,6 +122,14 @@ struct SettingsView: View {
                         .foregroundStyle(Color.textTertiary)
                 } header: {
                     SectionTitle("Credits")
+                } footer: {
+                    // Which build is installed. Without this, "it looks the
+                    // same" could mean the change failed OR the old app is
+                    // still on the phone -- and neither of us could tell.
+                    Text("Build \(BuildStamp.commit)\(BuildStamp.built.isEmpty ? "" : " · \(BuildStamp.built)")")
+                        .font(.ui(13))
+                        .foregroundStyle(Color.textTertiary)
+                        .accessibilityIdentifier("BuildStamp")
                 }
                 .listRowBackground(Color.surface)
             }
