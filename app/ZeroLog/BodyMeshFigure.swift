@@ -80,7 +80,11 @@ private struct BodySceneView: UIViewRepresentable {
                 let spin = SCNAction.rotateBy(x: 0, y: CGFloat(2 * Float.pi) + CGFloat(resting),
                                               z: 0, duration: 2.6)
                 spin.timingMode = .easeInEaseOut
-                body.runAction(spin)
+                // Land EXACTLY on the resting angle: the founder's phone
+                // showed the figure parked side-on, and an accumulated
+                // rotateBy has no guarantee about where it stops.
+                let land = SCNAction.run { node in node.eulerAngles.y = resting }
+                body.runAction(.sequence([spin, land]), forKey: "spin")
             }
         }
 
@@ -164,6 +168,15 @@ private struct BodySceneView: UIViewRepresentable {
             g.setTranslation(.zero, in: view)
             body.removeAllActions()
             body.eulerAngles.y += dx * 0.012
+            // Let go and the figure eases back to face you: a home screen
+            // must not be left showing someone's last fidget side-on.
+            if g.state == .ended || g.state == .cancelled {
+                let home = SCNAction.rotateTo(x: 0,
+                                              y: CGFloat(BodyScene.restingAngle(for: sessionType)),
+                                              z: 0, duration: 0.7, usesShortestUnitArc: true)
+                home.timingMode = .easeInEaseOut
+                body.runAction(.sequence([.wait(duration: 1.5), home]), forKey: "home")
+            }
         }
 
         /// These live on the body's back, so the figure turns around before
@@ -253,10 +266,10 @@ private struct BodySceneView: UIViewRepresentable {
             // pause the breath, throb twice, breathe again.
             node.removeAction(forKey: "pulse")
             let up = SCNAction.customAction(duration: 0.45) { _, t in
-                material.emission.intensity = 0.1 + 1.1 * Double(t) / 0.45
+                material.emission.intensity = 0.45 * Double(t) / 0.45
             }
             let down = SCNAction.customAction(duration: 0.45) { _, t in
-                material.emission.intensity = 1.2 - 1.1 * Double(t) / 0.45
+                material.emission.intensity = 0.45 - 0.45 * Double(t) / 0.45
             }
             // Starts as the camera flight ends: arrive, THEN flex.
             node.runAction(.sequence([.wait(duration: 1.0), up, down, up, down])) {
@@ -412,10 +425,13 @@ enum BodyScene {
         // hotter than the simulator, and the founder's screenshot showed
         // blown-white legs on a chrome body. Matte materials + restrained
         // light let the muscle SHAPE carry the picture.
-        light(.omni, 300, SCNVector3(-2.2, 0.5, -0.4))
-        light(.omni, 300, SCNVector3(2.2, 0.5, -0.4))
-        light(.omni, 380, SCNVector3(0, 0.9, 4.5))
-        let ambient = SCNLight(); ambient.type = .ambient; ambient.intensity = 40
+        // Lambert units: 1000 = full light. Key from the front-top carves the
+        // muscle shapes; two rims from behind draw the silhouette edge;
+        // a little ambient keeps the dark side from vanishing.
+        light(.omni, 380, SCNVector3(-2.2, 0.5, -0.4))
+        light(.omni, 380, SCNVector3(2.2, 0.5, -0.4))
+        light(.omni, 700, SCNVector3(0.8, 1.4, 4.5))
+        let ambient = SCNLight(); ambient.type = .ambient; ambient.intensity = 150
         let ambientNode = SCNNode(); ambientNode.light = ambient
         scene.rootNode.addChildNode(ambientNode)
 
@@ -428,11 +444,15 @@ enum BodyScene {
     /// complete with anatomical eyes staring out of a shiny skull. Matte and
     /// dark, the body becomes the stage and the lit muscles the actors.
     private static var baseMaterial: SCNMaterial {
+        // LAMBERT, not physicallyBased: the PBR body rendered pale grey on
+        // the founder's phone while the simulator showed near-black -- PBR
+        // brightness depends on the device's renderer and could not be
+        // predicted from here. Lambert is plain arithmetic: diffuse x light
+        // sum. 0.07 x ~1.2 of total light stays near-black on any phone.
         let m = SCNMaterial()
-        m.lightingModel = .physicallyBased
-        m.diffuse.contents = UIColor(white: 0.045, alpha: 1)
-        m.metalness.contents = 0.15
-        m.roughness.contents = 0.8
+        m.lightingModel = .lambert
+        m.diffuse.contents = UIColor(white: 0.07, alpha: 1)
+        m.locksAmbientWithDiffuse = true
         return m
     }
 
@@ -442,10 +462,9 @@ enum BodyScene {
     /// Dark grey matte: clearly a head, never the star.
     private static var contextMaterial: SCNMaterial {
         let m = SCNMaterial()
-        m.lightingModel = .physicallyBased
-        m.diffuse.contents = UIColor(white: 0.18, alpha: 1)
-        m.metalness.contents = 0.0
-        m.roughness.contents = 0.85
+        m.lightingModel = .lambert
+        m.diffuse.contents = UIColor(white: 0.16, alpha: 1)
+        m.locksAmbientWithDiffuse = true
         return m
     }
 
@@ -456,13 +475,18 @@ enum BodyScene {
     /// than flashing. White, never red or green — those colours carry
     /// meanings this figure must not spend.
     private static var litMaterial: SCNMaterial {
+        // White that SHADES: lambert diffuse 0.9 under a key light, so faces
+        // toward the light read near-white and the creases between muscle
+        // bellies fall into grey. The first white pass stacked emission on
+        // top and clipped the legs to a flat paper silhouette on the phone.
+        // The breath now lives in a small emission range (0 -> 0.18) that
+        // brightens without erasing the shadows.
         let m = SCNMaterial()
-        m.lightingModel = .physicallyBased
-        m.diffuse.contents = UIColor(white: 0.95, alpha: 1)
-        m.metalness.contents = 0.0
-        m.roughness.contents = 0.6
+        m.lightingModel = .lambert
+        m.diffuse.contents = UIColor(white: 0.9, alpha: 1)
+        m.locksAmbientWithDiffuse = true
         m.emission.contents = UIColor(white: 1.0, alpha: 1)
-        m.emission.intensity = 0.1
+        m.emission.intensity = 0
         return m
     }
 
@@ -472,11 +496,11 @@ enum BodyScene {
         let half = 1.5
         let swell = SCNAction.customAction(duration: half) { _, t in
             let p = Double(t) / half
-            material.emission.intensity = 0.1 + 0.45 * (p * p * (3 - 2 * p))
+            material.emission.intensity = 0.18 * (p * p * (3 - 2 * p))
         }
         let settle = SCNAction.customAction(duration: half) { _, t in
             let p = Double(t) / half
-            material.emission.intensity = 0.55 - 0.45 * (p * p * (3 - 2 * p))
+            material.emission.intensity = 0.18 - 0.18 * (p * p * (3 - 2 * p))
         }
         return .repeatForever(.sequence([swell, settle]))
     }
